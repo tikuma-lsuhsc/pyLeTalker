@@ -1,0 +1,11 @@
+{
+    "svg.preview.background": "custom",
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "jupyter.widgetScriptSources": [
+        "jsdelivr.com",
+        "unpkg.com"
+    ],
+    "autoDocstring.docstringFormat": "sphinx-notypes",
+    "python.analysis.logLevel": "Trace"
+}

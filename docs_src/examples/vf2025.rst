@@ -1,0 +1,314 @@
+.. image:: ../images/VF2025_logo_light.svg
+   :class: only-light
+
+.. image:: ../images/VF2025_logo_dark.svg
+   :class: only-dark
+
+Generating dysphonic voice samples with kinematic VF model
+==========================================================
+
+Below are the videos and code snippets of the dysphonic voice syntheses 
+presented at 2025 Voice Foundation Symposium :footcite:p:`ikuma2025b`. (Some of 
+the presented videos were combined versions of those below.)
+
+Each code snippet illustrates how the syntheses were run to produce the signals
+which are depicted in the video. For brevity, the Python code to produce the 
+video is omitted. In every example, three signals are retrieved after running 
+the `lt.sim_kinematic` function:
+
+.. code-block:: python
+
+   # Running the kinematic VF model simulation
+   pout, res = lt.sim_kinematic(...)
+
+   # Gather signals within vocal fold model
+   res_vf = res["vocalfolds"]
+   ag = res_vf.glottal_area
+   ug = res_vf.ug
+
+Here we have:
+
+* `ag` - glottal area signal :math:`A_g`
+* `ug` - glottal flow signal :math:`U_g`
+* `pout` - acoustic signal :math:`P_{out}`
+
+The videos show the waveforms (left column) and spectra (right column) of these 
+signals over 100-ms window. The bottom left is a coarse spectrogram to act as an
+indicator of playback position. If an example has a time-varying control 
+parameter, it is shown beside the spectrogram at the bottom right.
+
+.. todo::
+
+   Video production example will be added in the future.
+
+.. footbibliography::
+
+1. Normal Voice (Baseline)
+--------------------------
+
+.. video:: ../videos/baseline.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   import letalker as lt
+
+   from letalker import fs # 44.1 kS/s
+    
+   T = 5  # sim duration
+
+   N = int(T * fs)  # number of samples
+    
+   # Simulate with symmetric kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, 100, "aa")
+
+
+2. Breathy/pressed voice
+------------------------
+
+.. video:: ../videos/breathy.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Gradually widen the posterior gap from 0 to 0.3 cm
+   xim = 0.12 # vibration amplitude in cm
+
+   # vary Qa, abduction quotient (Titze 1984)
+   Qa = lt.StepGenerator(
+      [     1, 2.5, 3.5],
+      [0.3, 0, 0.3, 0.2 / xim],
+      transition_type='linear',
+      transition_time_constant=0.2
+   )
+
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(
+      N,
+      100,
+      "aa",
+      Qa=Qa,
+      xim=xim
+      aspiration_noise=True # Turn on noise injector
+   )
+
+3. Voice Breaks
+---------------
+
+.. video:: ../videos/voice_break.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   fo = 100 # Hz
+   Tbreak = 0.02 # stoppage duration in seconds
+
+   # time-varying vocal fold vibration amplitude 
+   # - attenuated momentarily for voice break effect
+   A = lt.Constant(
+      0.12, # cm
+      transition_times=[
+         0.45, 0.45 + Tbreak,
+         1.98, 1.98 + Tbreak,
+         3.02, 3.02 + Tbreak,
+         4.5, 4.5 + Tbreak,
+      ],
+      transition_type="raised_cos",
+      transition_time_constant= Tbreak / 2,
+      transition_initial_on=True
+   )
+
+   # Simulate with symmetric kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, fo, "aa", xim=A)
+
+4. Frequency Jumps
+------------------
+
+.. video:: ../videos/fo_jump.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # fo suddenly steps up or down
+   fo = lt.StepGenerator(
+      [0, 1.3, 3.9, T],
+      [100, 134, 156, 121],
+      transition_type="raised_cos",
+      transition_time_constant=0.01,
+   )
+   
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(
+      N, lt.SineGenerator(fo), "aa")
+
+5. Flutter
+----------
+
+.. video:: ../videos/baseline+flutter.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Add ±1.5-Hz flutter to fo
+   fo_base = 100
+   FL = 25  # Klatt 1990 default
+   fo_max_dev = (FL / 50) * (fo_base / 100) * 3
+   fo = lt.FlutterGenerator(fo_max_dev, bias=fo_base)
+
+   # Reference VF motion signal
+   xi_ref = lt.SineGenerator(fo)
+
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, xi_ref, "aa")
+
+6. Vocal Tremor
+---------------
+
+.. video:: ../videos/modulation_tremor.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   fo = 100
+   # Tremor parameters from Ramig & Shipp 1982 
+   # ("incorrectly" applied to the VF motion)
+   mod_freq = 6.77 / fo  # 6.77 Hz
+   am_extent = 40.6 / 100 # 40.6%
+   fm_extent = 2 ** (1.42 / 12) - 1  # 1.42 STs
+
+   xi_ref = lt.ModulatedSineGenerator(
+      fo, mod_freq, am_extent, fm_extent)
+
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, xi_ref, "aa")
+
+7. Modulation (locked, subharmonics)
+------------------------------------
+
+.. video:: ../videos/modulation_locked.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Fixed parameters
+   fo = 100 # Hz
+   am_extent = 0.25
+   fm_extent = 0.1
+
+   # Step through 4 subharmonic periods: 1, 2, 3, 4
+   mod_freq = lt.StepGenerator(
+      levels = [0, 1/2, 1/3, 1/4],
+      transition_times = [1.25, 2.5, 3.75],
+      transition_type="raised_cos",
+      transition_time_constant=0.01,
+   )
+
+   # Define the modulated reference motion function
+   xi_ref = lt.ModulatedSineGenerator(
+      fo, mod_freq, am_extent, fm_extent)
+   
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, xi_ref, "aa")
+
+8. Modulation (unlocked)
+------------------------
+
+.. video:: ../videos/modulation_unlocked.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Fixed parameters (same as the subharmonic case)
+   fo = 100 # Hz
+   am_extent = 0.25
+   fm_extent = 0.1
+
+   # Pseudo-randomly vary between 0 and 0.5 at the rate
+   # no faster than 1 Hz, starting at 1 second mark
+   mod_freq = lt.FlutterGenerator(
+      fl=0.25, f=1.0, n=7, bias=0.25, 
+      transition_times=1)
+
+   # Define the modulated reference motion function
+   xi_ref = lt.ModulatedSineGenerator(
+      fo, mod_freq, am_extent, fm_extent)
+
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, xi_ref, "aa")
+
+9. Biphonation (locked, subharmonics)
+-------------------------------------
+
+.. video:: ../videos/biphonation_locked.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Keep one VF to vibrate at a fixed fo
+   fo0 = 100
+
+   # Define the progression of a pair of the fo’s
+   # locking the other VF’s fo at a rational ratio
+   fo = lt.StepGenerator(
+      [1.25, 2.5, 3.75],
+      [[fo0, fo0],     [fo0, fo0*3/2], 
+      [fo0, fo0*4/3], [fo0, fo0*5/4]],
+      transition_type="raised_cos",
+      transition_time_constant=0.01,
+   )
+
+   # Define the reference motion functions
+   xi_ref = lt.SineGenerator(fo)
+   
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, xi_ref, "aa")
+
+10. Biphonation (unlocked)
+--------------------------
+
+.. video:: ../videos/biphonation_unlocked.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Define two randomly wondering fo functions
+   # using the flutter mechanism (16 random sinusoids)
+   fo_mean = [100, 150]
+   fo_dev = [50, 100]
+   fo = lt.FlutterGenerator(
+      bias=fo_mean, fl=fo_dev, shape=2, f=0.2, n=16)
+
+   # Define the modulated reference motion function
+   xi_ref = lt.SineGenerator(fo)
+
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, xi_ref, "aa")
+
+11. Built-in vowels
+-------------------
+
+.. video:: ../videos/vowels.mp4
+   :width: 100%
+
+.. code-block:: python
+
+   # Built-in vocal tract cross-sectional areas
+   from letalker.constants import vocaltract_areas
+
+   # 2-letter vowel names as keys to retrieve the areas 
+   vowels = ["aa", "ii", "uu", "ae", "ih", 
+         "eh", "ah", "aw", "uh", "oo"]
+   nvowels = len(names)
+   Tvowel = T / nvowels
+   
+   # retrieve & stack areas of all vowels (10x44 array)
+   areas = np.stack(
+      [vocaltract_areas[vowel] for vowel in names], 0)
+
+   # Step through each vowel
+   transition_times = np.arange(1, nvowels) * Tvowel
+   vtarea_fun = lt.StepGenerator(transition_times, 
+                  areas, transition_time_constant=0.02)
+
+   # Simulate with kinematic vocal fold model
+   pout, res = lt.sim_kinematic(N, 100, vtarea_fun)

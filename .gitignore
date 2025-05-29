@@ -160,4 +160,8 @@ cython_debug/
 #.idea/
 
 KVFM_pkg/
-LeTalker1.22/
+docs_src/api/
+docs/
+!docs/.nojekyll
+
+octave_workspace

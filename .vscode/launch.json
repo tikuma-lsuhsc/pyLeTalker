@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "OctaveDebugger",
+            "request": "launch",
+            "name": "Execute selected m-file.",
+            "program": "${file}",
+            "octave": "octave-cli",
+            "sourceFolder": "${workspaceFolder}"
+        },
+        {
+            "name": "Python: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Sphinx Docs",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/.venv/Scripts/sphinx-build.exe",
+            "cwd": "${workspaceFolder}/docs_src",
+            "args": [
+                "-E",
+                "-b",
+                "html",
+                "-d",
+                "build/doctrees",
+                ".",
+                "build/html"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+    ]
+}

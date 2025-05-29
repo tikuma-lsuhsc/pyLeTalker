@@ -1,0 +1,7 @@
+dl.field-list dd li p {
+    display: inline;
+}
+
+dl.field-list dd p:empty {
+   display: none;
+}

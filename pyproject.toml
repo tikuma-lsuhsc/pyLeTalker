@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "pyLeTalker"
+description = "Wave-reflection voice synthesis framework"
+readme = "readme.md"
+license = { text = "GPL-2.0 License" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dynamic = ["version"]
+requires-python = ">=3.10"
+dependencies = [
+    "typing_extensions",
+    "numpy",
+    "scipy",
+    # "numba>0.52"
+]
+
+[project.urls]
+Repository = "https://github.com/tikuma-lsuhsc/pyLeTalker"
+Documentation = "https://tikuma-lsuhsc.github.io/pyLeTalker/"
+Discussions = "https://github.com/tikuma-lsuhsc/pyLeTalker/discussions"
+Issues = "https://github.com/tikuma-lsuhsc/pyLeTalker/issues"
+Pull_Requests = "https://github.com/tikuma-lsuhsc/pyLeTalker/pulls"
+
+[tool.setuptools.dynamic]
+version = { attr = "letalker.__version__" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# minversion = "6.0"
+# addopts = "-ra -q"

@@ -1,5 +1,3 @@
-numpy
-matplotlib
-PyQt5
-scipy
-ffmpegio
+-e .
+-r ./tests/requirements.txt
+-r ./docs_src/requirements.txt
