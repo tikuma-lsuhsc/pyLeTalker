@@ -149,6 +149,7 @@ def set_sampling_rate(fs: int | None):
 def ts(nb_samples: int, n0: int = 0):
     return TimeSampleHandler.ts(nb_samples, n0)
 
+ts.__doc__ = TimeSampleHandler.ts.__doc__
 
 ############################################################
 

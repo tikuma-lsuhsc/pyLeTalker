@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 ## [Unreleased]
 
+### Added
+
+- `ts()` (an alias of `core.ts()`) to the top-level module for convenience
+
 ## [0.1.0] - 2025-05-29
 
 ### Added

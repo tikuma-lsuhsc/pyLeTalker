@@ -1,4 +1,4 @@
-from .core import get_sampling_rate as _get_sampling_rate
+from .core import get_sampling_rate as _get_sampling_rate, ts
 
 from .sim import sim, sim_kinematic #, sim_dual, sim_dual_kinematic
 from .elements import *

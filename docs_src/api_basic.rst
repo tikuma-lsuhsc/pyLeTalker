@@ -9,6 +9,14 @@ features of pyLeTalker that are essential to run the voice synthesis while more
 advanced features remain only in their respective submodules. The following 
 lists summarize all the top-level functions and classes.
 
+* **Sampling rate and time vector**
+
+  .. autosummary::
+      :nosignatures:
+
+      fs
+      ts
+
 * **Simulation Functions**
   
   .. autosummary::
@@ -91,6 +99,15 @@ lists summarize all the top-level functions and classes.
 
         WhiteNoiseGenerator
         ColoredNoiseGenerator
+
+Sampling Rate and Time Vector
+-----------------------------
+
+.. py:attribute:: fs
+
+   System-wide sampling rate in samples per second. Default rate is 44100 S/s
+
+.. autofunction:: ts
 
 Simulation Functions
 --------------------
