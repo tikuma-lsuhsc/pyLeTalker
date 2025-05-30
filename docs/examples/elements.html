@@ -1,0 +1,1206 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Python classes to model various Elements of Voice Production Mechanism &#8212; pyLeTalker 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=0d290300" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=c89b5d42"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/elements';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="letalker.function_generators" href="functiongenerator_basics.html" />
+    <link rel="prev" title="Playing and saving synthesized acoustic signals" href="audio.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/wave-reflection-model-light.png" class="logo__image only-light" alt="pyLeTalker 0.1.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/wave-reflection-model-dark.png" class="logo__image only-dark" alt="pyLeTalker 0.1.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vf2025.html">Generating dysphonic voice samples with kinematic VF model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html">Plotting synthesized signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audio.html">Playing and saving synthesized acoustic signals</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Python classes to model various <code class="docutils literal notranslate"><span class="pre">Element</span></code>s of Voice Production Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="functiongenerator_basics.html"><code class="docutils literal notranslate"><span class="pre">letalker.function_generators</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functiongenerator_step_mixin.html"><code class="docutils literal notranslate"><span class="pre">TaperMixin</span></code> - Controlling onset and offset of functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="animate_kvf.html">Animating kinematic vocal folds</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../citations.html">Citation Guidelines</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_basic.html">Synthesis Basics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api_advanced.html">Submodules (advanced topics)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.typing.html">letalker.typing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.constants.html">letalker.constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.elements.html">letalker.elements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.function_generators.html">letalker.function_generators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.core.html">letalker.core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.utils.html">letalker.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker/blob/master/docs/examples/elements.ipynb?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/elements.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Python classes to model various Elements of Voice Production Mechanism</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.Lung-classes"><code class="docutils literal notranslate"><span class="pre">abc.Lung</span></code> classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.Lip-class:-LeTalkerLips"><code class="docutils literal notranslate"><span class="pre">abc.Lip</span></code> class: <code class="docutils literal notranslate"><span class="pre">LeTalkerLips</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.VocalTract"><code class="docutils literal notranslate"><span class="pre">abc.VocalTract</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.VocalFolds-classes"><code class="docutils literal notranslate"><span class="pre">abc.VocalFolds</span></code> classes</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#KinematicVocalFolds---Symmetric-and-Asymmetric-Kinematic-Vocal-Folds"><code class="docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code> - Symmetric and Asymmetric Kinematic Vocal Folds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#LeTalkerVocalFolds:-symmetric-(linearized)-3-mass-model-with-muscle-activation-controls"><code class="docutils literal notranslate"><span class="pre">LeTalkerVocalFolds</span></code>: symmetric (linearized) 3-mass model with muscle activation controls</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.AspirationNoise---Aspiration-noise-(turbulent-noise-injected-at-the-glottis-epiglottal-junction)"><code class="docutils literal notranslate"><span class="pre">abc.AspirationNoise</span></code> - Aspiration noise (turbulent noise injected at the glottis-epiglottal junction)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">welch</span>
+<span class="kn">from</span> <span class="nn">scipy.fft</span> <span class="kn">import</span> <span class="n">next_fast_len</span>
+
+<span class="kn">import</span> <span class="nn">letalker</span> <span class="k">as</span> <span class="nn">lt</span>
+</pre></div>
+</div>
+</div>
+<section id="Python-classes-to-model-various-Elements-of-Voice-Production-Mechanism">
+<h1>Python classes to model various <code class="docutils literal notranslate"><span class="pre">Element</span></code>s of Voice Production Mechanism<a class="headerlink" href="#Python-classes-to-model-various-Elements-of-Voice-Production-Mechanism" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">pyLeTalker</span></code> package divides the voice production model into 5 distinctive elements: lungs, trachea (subglottal vocal tract), vocal folds (larynx), (supraglottal) vocal tract, and lips. Each element is implement as a concrete subclass of the <code class="docutils literal notranslate"><span class="pre">abc.Element</span></code> abstract class. A same wave reflection model can be used for both the trachea and vocal tract, thus there are 4 types of elements, which are represented by abstract subclasses of <code class="docutils literal notranslate"><span class="pre">abc.Element</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">abc.Lungs</span></code></p></td>
+<td><p>Lungs / respiratory pressure generator, receiving incidental backward pressure, producing forward pressure</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">abc.VocalTract</span></code></p></td>
+<td><p>Tubes in which incidental pressure waves are propagating in both forward and backward directions</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">abc.VocalFolds</span></code></p></td>
+<td><p>Larynx, injecting the oscillatory behavior to the propagating incidental pressures</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">abc.Lips</span></code></p></td>
+<td><p>Lip, transforming the incidental pressures to radiated sound pressure output</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">abc.AspirationNoise</span></code></p></td>
+<td><p>Aspiration noise generator to be attached to <code class="docutils literal notranslate"><span class="pre">abc.VocalFolds</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The wave reflection model treats the voice production system as a chain of these elements, and at each connection the incidental pressure signals travels both forward and backward. The elements with full I/O (<code class="docutils literal notranslate"><span class="pre">abc.VocalTract</span></code> and <code class="docutils literal notranslate"><span class="pre">abc.VocalFolds</span></code>) have 4 ports while the terminating elements, both the source (<code class="docutils literal notranslate"><span class="pre">abc.Lungs</span></code>) and sink (<code class="docutils literal notranslate"><span class="pre">abc.Lips</span></code>), have 2 pressure ports exposed as illustrated below.</p>
+<p><img alt="Block Elements" src="../_images/element_blocks.svg" /></p>
+<p>Each <code class="docutils literal notranslate"><span class="pre">Element</span></code> class has its own <code class="docutils literal notranslate"><span class="pre">Runner</span></code> and <code class="docutils literal notranslate"><span class="pre">Result</span></code> classes within and instantiated by the <code class="docutils literal notranslate"><span class="pre">Element</span></code> class.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">Runner</span></code> class is instantiated by <code class="docutils literal notranslate"><span class="pre">Element.create_runner()</span></code> method, which if needed converts set of user-friendly model parameters to an optimized parameterization for simulation. At each time step <code class="docutils literal notranslate"><span class="pre">n</span></code>, <code class="docutils literal notranslate"><span class="pre">Runner.step()</span></code> method of every element is executed to updates element’s states given current input samples <span class="math notranslate nohighlight">\(F_{in,n}\)</span> and <span class="math notranslate nohighlight">\(B_{in,n}\)</span> and outputs <span class="math notranslate nohighlight">\(F_{out,n+1}\)</span> and <span class="math notranslate nohighlight">\(B_{out,n+1}\)</span>. <code class="docutils literal notranslate"><span class="pre">Runner</span></code> objects also saves selected internal signals for later analysis.</p>
+<p>Once the simulation completes (i.e., calling the <code class="docutils literal notranslate"><span class="pre">Element.step()</span></code> of every element in a loop for the prescribed number of steps), the configurations and results are gathered fro each element as an <code class="docutils literal notranslate"><span class="pre">Element.Result</span></code> object via the <code class="docutils literal notranslate"><span class="pre">Element.create_result()</span></code> method.</p>
+<section id="abc.Lung-classes">
+<h2><code class="docutils literal notranslate"><span class="pre">abc.Lung</span></code> classes<a class="headerlink" href="#abc.Lung-classes" title="Link to this heading">#</a></h2>
+<p>There are 3 builtin lung classes:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LeTalkerLungs</span></code></p></td>
+<td><p>Propagates 90% of the respiratory pressure <span class="math notranslate nohighlight">\(P_{L,n}\)</span> and reflects 80% of incidental backward wave <span class="math notranslate nohighlight">\(B_{in,n}\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">OpenLungs</span></code></p></td>
+<td><p>Outputs 100% of <span class="math notranslate nohighlight">\(P_{L,n}\)</span> and 0% of <span class="math notranslate nohighlight">\(B_{in,n}\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">NullLungs</span></code></p></td>
+<td><p>No respiratory pressure and only reflects the incidental backward wave <span class="math notranslate nohighlight">\(B_{in,n}\)</span> (80%)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create input signal generators</span>
+<span class="n">PL</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">transition_time</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span> <span class="c1"># constant level at 1.0, starting at t=0.01 s</span>
+<span class="n">Bin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">SineGenerator</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">transition_time</span><span class="o">=</span><span class="mf">0.015</span><span class="p">)</span> <span class="c1"># 100 Hz sine wave starting at t=0.015 s</span>
+<span class="c1"># create the base lung classes</span>
+<span class="n">lungs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;LeTalker&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerLungs</span><span class="p">(</span><span class="n">PL</span><span class="p">),</span>
+    <span class="s2">&quot;Open&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">OpenLungs</span><span class="p">(</span><span class="n">PL</span><span class="p">),</span>
+    <span class="s2">&quot;Null&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">NullLungs</span><span class="p">(),</span>
+<span class="p">}</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">fs</span><span class="o">*</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runners</span> <span class="o">=</span> <span class="p">[</span><span class="n">lung</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">lung</span> <span class="ow">in</span> <span class="n">lungs</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+<span class="n">Bin</span> <span class="o">=</span> <span class="n">Bin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># backward pressure input</span>
+<span class="n">Fout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">runners</span><span class="p">)))</span>  <span class="c1"># forward pressure output</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Bin</span><span class="p">):</span>
+    <span class="c1"># Compute the next states of fsg &amp; blung</span>
+    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">runner</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">runners</span><span class="p">):</span>
+        <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">Bin_generator</span><span class="o">.</span><span class="n">ts</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">PL</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$P_L$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Bin</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{in}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;time (s)&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fout</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">lungs</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;lower left&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;time (s)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_4_0.png" src="../_images/examples_elements_4_0.png" />
+</div>
+</div>
+</section>
+<section id="abc.Lip-class:-LeTalkerLips">
+<h2><code class="docutils literal notranslate"><span class="pre">abc.Lip</span></code> class: <code class="docutils literal notranslate"><span class="pre">LeTalkerLips</span></code><a class="headerlink" href="#abc.Lip-class:-LeTalkerLips" title="Link to this heading">#</a></h2>
+<p>There is one builtin class, <code class="docutils literal notranslate"><span class="pre">LeTalkerLips</span></code>, which is an implementation of Ishizaka-Flanagan model, a circular piston in an infinite baffle.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the lip class with time-varying lip crosssectional area</span>
+<span class="n">lips</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerLips</span><span class="p">(</span><span class="n">upstream</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># create input signal generators (white noise)</span>
+<span class="n">Fin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">WhiteNoiseGenerator</span><span class="p">()</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">lips</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">lips</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">Fin</span> <span class="o">=</span> <span class="n">Fin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># backward pressure output</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">Fin</span><span class="p">):</span>
+    <span class="c1"># Compute the next states of bout</span>
+    <span class="n">Bout</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">lips</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">ts</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">10</span>
+<span class="n">nfft</span> <span class="o">=</span> <span class="n">nfft</span> <span class="o">=</span> <span class="n">next_fast_len</span><span class="p">(</span><span class="n">lips</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="n">f</span><span class="p">,</span> <span class="n">H</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">lips</span><span class="o">.</span><span class="n">iter_freqz</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">forN</span><span class="o">=</span><span class="n">nfft</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">include_nyquist</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="n">Pp</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">pout</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># / (lips.fs / 2)</span>
+<span class="n">Pb</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span><span class="n">Bout</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># / (lips.fs / 2)</span>
+
+<span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+    <span class="n">HdB</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">H</span><span class="p">))</span>
+    <span class="n">PpdB</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pp</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">PbdB</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pb</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">PpdB</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;estimated psd&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">HdB</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;model response&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frequency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$P_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">PbdB</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;estimated psd&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">HdB</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;model response&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frequency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$B_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_6_0.png" src="../_images/examples_elements_6_0.png" />
+</div>
+</div>
+</section>
+<section id="abc.VocalTract">
+<h2><code class="docutils literal notranslate"><span class="pre">abc.VocalTract</span></code><a class="headerlink" href="#abc.VocalTract" title="Link to this heading">#</a></h2>
+<p>There are two builtin vocal tract models: <code class="docutils literal notranslate"><span class="pre">LeTalkerVocalTract</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">LossyCylinderVocalTract</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">pyLeTalker</span></code> uses the exact same vocal tract area data that were distributed in <code class="docutils literal notranslate"><span class="pre">LeTalker</span></code> Matlab program. They are 10 vowels (+1 modified version of <code class="docutils literal notranslate"><span class="pre">uu</span></code>) and another for a trachea, and they are found in the <code class="docutils literal notranslate"><span class="pre">lt.constants.vocaltract_areas</span></code> dict and its keys can also be found in:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vocaltract_names</span><span class="si">=}</span><span class="s1">&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+lt.constants.vocaltract_names=(&#39;aa&#39;, &#39;ii&#39;, &#39;uu&#39;, &#39;ae&#39;, &#39;ih&#39;, &#39;eh&#39;, &#39;ah&#39;, &#39;aw&#39;, &#39;uh&#39;, &#39;oo&#39;, &#39;uumod&#39;, &#39;trach&#39;)
+</pre></div></div>
+</div>
+<p>These keys for the vocal tract area can be specified as the <code class="docutils literal notranslate"><span class="pre">areas</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">LeTalkerVocalTract</span></code> constructor.</p>
+<p>The following code runs 4 different vocal tract models and plots the PSD estimates of the output pressure, driven by only one of the input pressure port. Note that these are open-loop behaviors and not the same as a simulation with lung and lip models attached to them (i.e., closed-loop simulation). Most notably, the <code class="docutils literal notranslate"><span class="pre">LossyCylinderVocalTract</span></code> model only attenuates and delays the signal. Only in a closed-loop configuration, this model will induce a resonance pattern.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create the lips class with time-varying lip crosssectional area</span>
+<span class="n">vt_models</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;aa&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalTract</span><span class="p">(</span><span class="s2">&quot;aa&quot;</span><span class="p">,</span> <span class="n">atten</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vt_atten</span><span class="p">),</span>
+    <span class="s2">&quot;ii&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalTract</span><span class="p">(</span><span class="s2">&quot;ii&quot;</span><span class="p">,</span> <span class="n">atten</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vt_atten</span><span class="p">),</span>
+    <span class="s2">&quot;uu&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalTract</span><span class="p">(</span><span class="s2">&quot;uu&quot;</span><span class="p">,</span> <span class="n">atten</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vt_atten</span><span class="p">),</span>
+    <span class="s2">&quot;cylinder&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">LossyCylinderVocalTract</span><span class="p">(</span>
+        <span class="mi">44</span> <span class="o">*</span> <span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vocaltract_resolution</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">atten</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vt_atten</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+<span class="c1"># - lt.constants.vt_atten = 0.002</span>
+<span class="n">n_models</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vt_models</span><span class="p">)</span>
+
+<span class="c1"># create input signal generators (white noise)</span>
+<span class="n">in_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">WhiteNoiseGenerator</span><span class="p">()</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">lips</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runners</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">model</span> <span class="ow">in</span> <span class="n">vt_models</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+
+<span class="c1"># generate input samples and preallocate output arrays</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">in_generator</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n_models</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>  <span class="c1"># pressure outputs</span>
+
+<span class="c1"># run the simulation</span>
+<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">runner</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">runners</span><span class="p">):</span>  <span class="c1"># for each model</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">inputs</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)]):</span>  <span class="c1"># for each input</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span class="p">)):</span>  <span class="c1"># for each time sample</span>
+            <span class="n">outputs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="n">fs</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">fs</span>
+<span class="n">N</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">20</span>
+<span class="n">nfft</span> <span class="o">=</span> <span class="n">nfft</span> <span class="o">=</span> <span class="n">next_fast_len</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+
+<span class="c1"># PSD estimation</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">Pyy</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">np</span><span class="o">.</span><span class="n">errstate</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">):</span>
+    <span class="n">PyydB</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pyy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># plot PSDs</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>  <span class="c1"># input</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>  <span class="c1"># output</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">PyydB</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Open-loop behaviors of vocal tract models&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Forward Output PSD&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Backward Output PSD&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Forward Input Only</span><span class="se">\n</span><span class="s2">(dB)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Backward Input Only</span><span class="se">\n</span><span class="s2">(dB)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frquency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frquency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">vt_models</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_10_0.png" src="../_images/examples_elements_10_0.png" />
+</div>
+</div>
+</section>
+<section id="abc.VocalFolds-classes">
+<h2><code class="docutils literal notranslate"><span class="pre">abc.VocalFolds</span></code> classes<a class="headerlink" href="#abc.VocalFolds-classes" title="Link to this heading">#</a></h2>
+<p>There are 4 builtin vocal fold models in <code class="docutils literal notranslate"><span class="pre">pyLeTalker</span></code>:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">VocalFoldsUg</span></code></p></td>
+<td><p>Known glottal flow (simulates no vocal fold motion)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">LeTalkerVocalFolds</span></code></p></td>
+<td><p>Symmetric 3-mass model</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code></p></td>
+<td><p>Symmetric kinematic model</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">AsymmetricKinematicVocalFolds</span></code></p></td>
+<td><p>Asymmetric kinematic model</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ug_gen</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">RosenbergGenerator</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">VocalFoldsUg</span><span class="p">(</span><span class="n">ug_gen</span><span class="p">,</span> <span class="n">upstream</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">downstream</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="c1"># set upstream and downstream tube cross-sectional areas</span>
+
+<span class="c1"># create input signal generators (white noise)</span>
+<span class="n">Fin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">WhiteNoiseGenerator</span><span class="p">()</span>
+<span class="n">Bin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">WhiteNoiseGenerator</span><span class="p">()</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">Fin</span> <span class="o">=</span> <span class="n">Fin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bin</span> <span class="o">=</span> <span class="n">Bin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># backward pressure output</span>
+<span class="n">Fout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">Bout</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">Fin</span><span class="p">,</span> <span class="n">Bin</span><span class="p">)):</span>
+    <span class="c1"># Compute the next states of bout</span>
+    <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Bout</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">ts</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$F_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&lt;matplotlib.legend.Legend at 0x7fcb187f79b0&gt;
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_12_1.png" src="../_images/examples_elements_12_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ag_gen</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">RosenbergGenerator</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">VocalFoldsAg</span><span class="p">(</span><span class="n">ag_gen</span><span class="p">,</span> <span class="n">upstream</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">downstream</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># create input signal generators (white noise)</span>
+<span class="n">Fin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">Bin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">Fin</span> <span class="o">=</span> <span class="n">Fin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force_time_axis</span><span class="o">=</span><span class="s1">&#39;tile_data&#39;</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bin</span> <span class="o">=</span> <span class="n">Bin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force_time_axis</span><span class="o">=</span><span class="s1">&#39;tile_data&#39;</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># backward pressure output</span>
+<span class="n">Fout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">Bout</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">Fin</span><span class="p">,</span> <span class="n">Bin</span><span class="p">)):</span>
+    <span class="c1"># Compute the next states of bout</span>
+    <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Bout</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">ts</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$F_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$A_</span><span class="si">{g}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ag_gen</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&lt;matplotlib.lines.Line2D at 0x7fcb181a2de0&gt;]
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_13_1.png" src="../_images/examples_elements_13_1.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">KinematicVocalFolds</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="o">**</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">male_vf_params</span><span class="p">,</span> <span class="n">upstream</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">downstream</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># create input signal generators (white noise)</span>
+<span class="n">Fin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">Bin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">Fin</span> <span class="o">=</span> <span class="n">Fin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force_time_axis</span><span class="o">=</span><span class="s1">&#39;tile_data&#39;</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bin</span> <span class="o">=</span> <span class="n">Bin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force_time_axis</span><span class="o">=</span><span class="s1">&#39;tile_data&#39;</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># backward pressure output</span>
+<span class="n">Fout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">Bout</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">Fin</span><span class="p">,</span> <span class="n">Bin</span><span class="p">)):</span>
+    <span class="c1"># Compute the next states of bout</span>
+    <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Bout</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">ts</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$F_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$U_</span><span class="si">{g}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">twinx</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">ug</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C2&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_14_0.png" src="../_images/examples_elements_14_0.png" />
+</div>
+</div>
+<section id="KinematicVocalFolds---Symmetric-and-Asymmetric-Kinematic-Vocal-Folds">
+<h3><code class="docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code> - Symmetric and Asymmetric Kinematic Vocal Folds<a class="headerlink" href="#KinematicVocalFolds---Symmetric-and-Asymmetric-Kinematic-Vocal-Folds" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code> is a subclass of <code class="docutils literal notranslate"><span class="pre">VocalFoldsAg</span></code> and generates the glottal area waveform from prescribed vocal fold geometry and motion equations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">KinematicVocalFolds</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># default (male) model with fo = 100 Hz</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">ts</span><span class="p">(</span><span class="n">n</span><span class="p">),</span><span class="n">vf</span><span class="o">.</span><span class="n">glottal_area</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;glottal area, $A_g$ (cm²)&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_16_0.png" src="../_images/examples_elements_16_0.png" />
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code> can also support left-right asymmetry of any of its parameters</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2:3 entrained biphonic phonation of the default (male) model with fo = 100 Hz and 150 Hz</span>
+<span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">KinematicVocalFolds</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">])</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">ts</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">vf</span><span class="o">.</span><span class="n">glottal_area</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;glottal area, $A_g$ (cm²)&quot;</span><span class="p">)</span>
+
+<span class="n">x_semi</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">xi</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># axes[1].plot(vf.ts(n), x_semi.T)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">ts</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">x_semi</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vf</span><span class="o">.</span><span class="n">ts</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="o">-</span><span class="n">x_semi</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;glottal semi-area (cm²)&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_18_0.png" src="../_images/examples_elements_18_0.png" />
+</div>
+</div>
+</section>
+<section id="LeTalkerVocalFolds:-symmetric-(linearized)-3-mass-model-with-muscle-activation-controls">
+<h3><code class="docutils literal notranslate"><span class="pre">LeTalkerVocalFolds</span></code>: symmetric (linearized) 3-mass model with muscle activation controls<a class="headerlink" href="#LeTalkerVocalFolds:-symmetric-(linearized)-3-mass-model-with-muscle-activation-controls" title="Link to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalFolds</span><span class="p">(</span>
+    <span class="n">upstream</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vocaltract_areas</span><span class="p">[</span><span class="s2">&quot;trach&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">downstream</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vocaltract_areas</span><span class="p">[</span><span class="s2">&quot;aa&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># create input signal generators (white noise)</span>
+<span class="n">Fin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">PL</span><span class="p">)</span>
+<span class="n">Bin_generator</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vf</span><span class="o">.</span><span class="n">fs</span> <span class="o">//</span> <span class="mi">10</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="n">Fin</span> <span class="o">=</span> <span class="n">Fin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force_time_axis</span><span class="o">=</span><span class="s1">&#39;tile_data&#39;</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bin</span> <span class="o">=</span> <span class="n">Bin_generator</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">force_time_axis</span><span class="o">=</span><span class="s1">&#39;tile_data&#39;</span><span class="p">)</span>  <span class="c1"># generate forward pressure input samples</span>
+<span class="n">Bout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>  <span class="c1"># backward pressure output</span>
+<span class="n">Fout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">Bout</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">Fin</span><span class="p">,</span> <span class="n">Bin</span><span class="p">)):</span>
+    <span class="c1"># Compute the next states of bout</span>
+    <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">Bout</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">vf</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">ts</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$F_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Bout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$B_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;output pressures&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">ag</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$A_g$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">ug</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$U_g$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">displacements</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Disp.&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (ms)&quot;</span><span class="p">)</span>
+
+<span class="c1"># fig.align_ylabels(axes)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 0, &#39;time (ms)&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_20_1.png" src="../_images/examples_elements_20_1.png" />
+</div>
+</div>
+<section id="abc.AspirationNoise---Aspiration-noise-(turbulent-noise-injected-at-the-glottis-epiglottal-junction)">
+<h4><code class="docutils literal notranslate"><span class="pre">abc.AspirationNoise</span></code> - Aspiration noise (turbulent noise injected at the glottis-epiglottal junction)<a class="headerlink" href="#abc.AspirationNoise---Aspiration-noise-(turbulent-noise-injected-at-the-glottis-epiglottal-junction)" title="Link to this heading">#</a></h4>
+<p>There are two builtin concrete classes:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>name</p></th>
+<th class="head"><p>description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">LeTalkerAspirationNoise</span></code></p></td>
+<td><p>Bandlimited noise injected only if Reynold number is above the thresold</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">KlattAspirationNoise</span></code></p></td>
+<td><p>Bandlimited noise injected at two levels depending on Reynold number</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Both of these models can be customized with different white noise generator (Gaussian, uniform, etc.) and spectral shaping filter.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># create aspiration noise sources</span>
+<span class="n">lt_noise</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerAspirationNoise</span><span class="p">()</span>
+<span class="n">kl_noise</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">KlattAspirationNoise</span><span class="p">()</span>
+
+<span class="c1"># create kinematic vocal fold models at fo=100Hz and assign the noise objects to them</span>
+<span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;upstream&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vocaltract_areas</span><span class="p">[</span><span class="s2">&quot;trach&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+    <span class="s2">&quot;downstream&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">vocaltract_areas</span><span class="p">[</span><span class="s2">&quot;aa&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+    <span class="s2">&quot;length&quot;</span><span class="p">:</span> <span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">male_vf_params</span><span class="p">[</span><span class="s2">&quot;L0&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+<span class="n">ug_gen</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">RosenbergGenerator</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+
+<span class="n">vf_lt</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">VocalFoldsUg</span><span class="p">(</span><span class="n">ug_gen</span><span class="p">,</span> <span class="n">aspiration_noise</span><span class="o">=</span><span class="n">lt_noise</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+<span class="n">vf_kl</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">VocalFoldsUg</span><span class="p">(</span><span class="n">ug_gen</span><span class="p">,</span> <span class="n">aspiration_noise</span><span class="o">=</span><span class="n">kl_noise</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c1"># create their simulation runner objects</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">vf_lt</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>  <span class="c1"># number of samples to simulate</span>
+<span class="n">lt_runner</span> <span class="o">=</span> <span class="n">vf_lt</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="n">kl_runner</span> <span class="o">=</span> <span class="n">vf_kl</span><span class="o">.</span><span class="n">create_runner</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># preallocate forward pressure output array (ignore backward outputs for now)</span>
+<span class="n">Fout</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># run simulation</span>
+<span class="n">b</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">lt_runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">Fout</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">kl_runner</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+<span class="c1"># gather the results</span>
+<span class="n">lt_res</span> <span class="o">=</span> <span class="n">vf_lt</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">lt_runner</span><span class="p">)</span>
+<span class="n">kl_res</span> <span class="o">=</span> <span class="n">vf_kl</span><span class="o">.</span><span class="n">create_result</span><span class="p">(</span><span class="n">kl_runner</span><span class="p">)</span>
+<span class="n">t</span> <span class="o">=</span> <span class="n">lt_res</span><span class="o">.</span><span class="n">ts</span>
+
+<span class="n">fs</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">constants</span><span class="o">.</span><span class="n">fs</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">lt_res</span><span class="o">.</span><span class="n">fs</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span>
+<span class="n">nfft</span> <span class="o">=</span> <span class="n">nfft</span> <span class="o">=</span> <span class="n">next_fast_len</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+
+<span class="c1"># PSD estimation</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">Pxx</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">lt_res</span><span class="o">.</span><span class="n">ug</span><span class="p">,</span> <span class="n">kl_res</span><span class="o">.</span><span class="n">ug</span><span class="p">],</span> <span class="n">nperseg</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">fs</span>
+<span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">Pyy</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span><span class="n">Fout</span><span class="p">,</span> <span class="n">nperseg</span><span class="o">=</span><span class="n">N</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fs</span><span class="o">=</span><span class="n">fs</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">Pzz</span> <span class="o">=</span> <span class="n">welch</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">lt_res</span><span class="o">.</span><span class="n">aspiration_noise</span><span class="o">.</span><span class="n">unoise</span><span class="p">,</span> <span class="n">kl_res</span><span class="o">.</span><span class="n">aspiration_noise</span><span class="o">.</span><span class="n">unoise</span><span class="p">],</span>
+    <span class="n">nperseg</span><span class="o">=</span><span class="n">N</span><span class="p">,</span>
+    <span class="n">noverlap</span><span class="o">=</span><span class="n">N</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">nfft</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span>
+    <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">fs</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">PyydB</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pyy</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># plot PSDs</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="s2">&quot;col&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">PyydB</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">80</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$F_</span><span class="si">{out}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;LeTalkerAspirationNoise&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">PyydB</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frequency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;KlattAspirationNoise&quot;</span><span class="p">)</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pxx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$U_g$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pzz</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$U_</span><span class="si">{noise}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">((</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$U_g$/$U_</span><span class="si">{noise}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pxx</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$U_g$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">Pzz</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$U_</span><span class="si">{noise}</span><span class="s2">$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frequency (Hz)&quot;</span><span class="p">)</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">lt_res</span><span class="o">.</span><span class="n">aspiration_noise</span><span class="o">.</span><span class="n">re2</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$R_e$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">lt_res</span><span class="o">.</span><span class="n">aspiration_noise</span><span class="o">.</span><span class="n">re2b</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$R_{e,c}$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;$R_e$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">kl_res</span><span class="o">.</span><span class="n">aspiration_noise</span><span class="o">.</span><span class="n">re2</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$R_e$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">kl_res</span><span class="o">.</span><span class="n">aspiration_noise</span><span class="o">.</span><span class="n">re2b</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;C1&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;$R_{e,c}$&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Text(0.5, 0, &#39;time (s)&#39;)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_elements_22_1.png" src="../_images/examples_elements_22_1.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="audio.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Playing and saving synthesized acoustic signals</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="functiongenerator_basics.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title"><code class="docutils literal notranslate"><span class="pre">letalker.function_generators</span></code></p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.Lung-classes"><code class="docutils literal notranslate"><span class="pre">abc.Lung</span></code> classes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.Lip-class:-LeTalkerLips"><code class="docutils literal notranslate"><span class="pre">abc.Lip</span></code> class: <code class="docutils literal notranslate"><span class="pre">LeTalkerLips</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.VocalTract"><code class="docutils literal notranslate"><span class="pre">abc.VocalTract</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.VocalFolds-classes"><code class="docutils literal notranslate"><span class="pre">abc.VocalFolds</span></code> classes</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#KinematicVocalFolds---Symmetric-and-Asymmetric-Kinematic-Vocal-Folds"><code class="docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code> - Symmetric and Asymmetric Kinematic Vocal Folds</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#LeTalkerVocalFolds:-symmetric-(linearized)-3-mass-model-with-muscle-activation-controls"><code class="docutils literal notranslate"><span class="pre">LeTalkerVocalFolds</span></code>: symmetric (linearized) 3-mass model with muscle activation controls</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abc.AspirationNoise---Aspiration-noise-(turbulent-noise-injected-at-the-glottis-epiglottal-junction)"><code class="docutils literal notranslate"><span class="pre">abc.AspirationNoise</span></code> - Aspiration noise (turbulent noise injected at the glottis-epiglottal junction)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Takeshi (Kesh) Ikuma
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Takeshi Ikuma, Louisiana State University Health Sciences Center.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>pyLeTalker – Python framework for wave-reflection voice synthesis &#8212; pyLeTalker 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=0d290300" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=c89b5d42"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/wave-reflection-model-light.png" class="logo__image only-light" alt="pyLeTalker 0.1.0 documentation - Home"/>
+    <script>document.write(`<img src="_static/wave-reflection-model-dark.png" class="logo__image only-dark" alt="pyLeTalker 0.1.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="examples.html">Examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/vf2025.html">Generating dysphonic voice samples with kinematic VF model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/plotting.html">Plotting synthesized signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/audio.html">Playing and saving synthesized acoustic signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/elements.html">Python classes to model various <code class="docutils literal notranslate"><span class="pre">Element</span></code>s of Voice Production Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functiongenerator_basics.html"><code class="docutils literal notranslate"><span class="pre">letalker.function_generators</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functiongenerator_step_mixin.html"><code class="docutils literal notranslate"><span class="pre">TaperMixin</span></code> - Controlling onset and offset of functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/animate_kvf.html">Animating kinematic vocal folds</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="citations.html">Citation Guidelines</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_basic.html">Synthesis Basics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="api_advanced.html">Submodules (advanced topics)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="letalker.typing.html">letalker.typing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="letalker.constants.html">letalker.constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="letalker.elements.html">letalker.elements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="letalker.function_generators.html">letalker.function_generators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="letalker.core.html">letalker.core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="letalker.utils.html">letalker.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker/blob/master/docs/index.rst?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/index.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>pyLeTalker – Python framework for wave-reflection voice synthesis</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">pyLeTalker – Python framework for wave-reflection voice synthesis</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-examples">Simple Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-and-contribution">Use and Contribution</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="pyletalker-python-framework-for-wave-reflection-voice-synthesis">
+<h1>pyLeTalker – Python framework for wave-reflection voice synthesis<a class="headerlink" href="#pyletalker-python-framework-for-wave-reflection-voice-synthesis" title="Link to this heading">#</a></h1>
+<p><img alt="PyPI" src="https://img.shields.io/pypi/v/pyLeTalker" /> <img alt="PyPI - Status" src="https://img.shields.io/pypi/status/pyLeTalker" /> <img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/pyLeTalker" /> <img alt="GitHub License" src="https://img.shields.io/github/license/tikuma-lsuhsc/pyLeTalker" /></p>
+<p><strong>pyLeTalker</strong> is a Python library to synthesize (or simulate) human voice production,
+intended for research use. It offers flexibility to test different numerical
+voice folds model and to synthesize various pathologial voice. It is currently
+not suitable to synthesize speech.</p>
+<p>This library started as a repackaged version of <a class="reference external" href="https://sites.arizona.edu/sapl/research/le-talker/">LeTalker, a Matlab GUI demo by
+Dr. Brad Story</a>, and it
+since has been evolved as a flexible general voice synthesis library built
+around the wave-reflection vocal tract model. The wave-reflection vocal tract
+model treats the vibrating air pressure as propagating waves through the vocal
+tract. Some portion of the incidental wave reflects when it encounters a change
+in the cross-sectional area of the vocal tract.</p>
+<img alt="_images/wave-reflection-model-light.png" class="only-light" src="_images/wave-reflection-model-light.png" />
+<img alt="_images/wave-reflection-model-dark.png" class="only-dark" src="_images/wave-reflection-model-dark.png" />
+<p>Please note that pyLeTalker will be perpetually in active development.
+As such, <em>feedback</em> and possibly <em>contributions</em> are highly appreciated.
+Please read the <a class="reference internal" href="#use-contribute"><span class="std std-ref">Use and Contribution</span></a> section below.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<p>Install the <code class="xref py py-mod docutils literal notranslate"><span class="pre">pyLeTalker</span></code> package via <code class="code docutils literal notranslate"><span class="pre">pip</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyLeTalker</span>
+</pre></div>
+</div>
+</section>
+<section id="simple-examples">
+<h2>Simple Examples<a class="headerlink" href="#simple-examples" title="Link to this heading">#</a></h2>
+<p>The following closely reproduces the <a class="reference external" href="https://sites.arizona.edu/sapl/research/le-talker/">LeTalker demo</a>’s
+default configuration:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">letalker</span> <span class="k">as</span> <span class="nn">lt</span>
+
+<span class="n">fs</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">fs</span> <span class="c1"># sampling rate (44.1 kHz)</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># simulation duration</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">T</span><span class="o">*</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span> <span class="c1"># number of samples to generate</span>
+
+<span class="c1"># define the simulation elements using the default parameter values</span>
+<span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalFolds</span><span class="p">()</span> <span class="c1"># 3-mass vocal fold model with muscle activation</span>
+<span class="n">vt</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalTract</span><span class="p">(</span><span class="s1">&#39;aa&#39;</span><span class="p">)</span> <span class="c1"># supraglottal vocal tract to produce /a/</span>
+<span class="n">tr</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalTract</span><span class="p">(</span><span class="s1">&#39;trach&#39;</span><span class="p">)</span> <span class="c1"># trachea / subglottal tract</span>
+<span class="n">lp</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerLips</span><span class="p">()</span> <span class="c1"># Ishizaka-Flanagan lip model</span>
+<span class="n">lg</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerLungs</span><span class="p">()</span> <span class="c1"># constant lung pressure</span>
+
+<span class="c1"># run the simulation</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">vf</span><span class="p">,</span> <span class="n">vt</span><span class="p">,</span> <span class="n">tr</span><span class="p">,</span> <span class="n">lg</span><span class="p">,</span> <span class="n">lp</span><span class="p">)</span>
+<span class="c1"># pout - radiated sound pressure signal (a 1D NumPy Array)</span>
+<span class="c1"># res - a dict of Results objects of all the simulation elements</span>
+</pre></div>
+</div>
+<p>The above script synthesizes an /a/ vowel sustained for 0.5 second of phonating /a/
+approximately at <span class="math notranslate nohighlight">\(f_o\approx\)</span> 100 Hz. <code class="xref py py-obj docutils literal notranslate"><span class="pre">lt.sim()</span></code> is the basic simulation function,
+and it is equipped with the default arguments so the above example can be shortened
+to</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># only need to define the vocal folds element</span>
+<span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">LeTalkerVocalFolds</span><span class="p">()</span> <span class="c1"># 3-mass vocal fold model with muscle activation</span>
+
+<span class="c1"># run the simulation with default subglottal tract, lips, and lungs elements as</span>
+<span class="c1"># well as the supraglottal tract with the specified vowel (/a/ in this case)</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">vf</span><span class="p">,</span> <span class="s1">&#39;aa&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The kinematic vocal fold model (<code class="xref py py-class docutils literal notranslate"><span class="pre">KinematicVocalFolds</span></code>) is a potent vocal fold
+model to provide more predictable outcomes, especially $f_o$, by trading off the
+interaction between the glottal flow and glottal area for programmable vocal fold
+geometry and motion.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fo</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># fundamental frequency in Hz</span>
+
+<span class="c1"># define the simulation elements</span>
+<span class="n">vf</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">KinematicVocalFolds</span><span class="p">(</span><span class="n">fo</span><span class="p">)</span> <span class="c1"># 3-mass vocal fold model with muscle activation</span>
+
+<span class="c1"># run the simulation</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">vf</span><span class="p">,</span> <span class="s1">&#39;aa&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The kinematic vocal folds get their own simulation function for convenience:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">fo</span><span class="p">,</span> <span class="s1">&#39;aa&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="use-and-contribution">
+<span id="use-contribute"></span><h2>Use and Contribution<a class="headerlink" href="#use-and-contribution" title="Link to this heading">#</a></h2>
+<p>The development and documentation of pyLeTalker is heavily biased towards the
+current research interests of the active developers. This project is offered as
+open-source to attract other voice researchers to get involved even just to use
+the library.</p>
+<p>If you are interested in using pyLeTalker but unsure of how to use
+it, please post your interest on [the Discussion board](<a class="github reference external" href="https://github.com/tikuma-lsuhsc/pyLeTalker/discussions">tikuma-lsuhsc/pyLeTalker#discussions</a>)
+or email me.
+I will help you setting up your script. This will help refining the available-but-
+not-yet-used features (both debugging and documentation) or adding new features
+that are not currently included.</p>
+<p>If you are a Python programmer/researcher and encountered a bug or needing a new
+feature, please post on [the Issues board](<a class="github reference external" href="https://github.com/tikuma-lsuhsc/pyLeTalker/issues">tikuma-lsuhsc/pyLeTalker#issues</a>),
+and I’ll be happy to discuss the prospect. I will accept [pull requests](<a class="github reference external" href="https://github.com/tikuma-lsuhsc/pyLeTalker/pulls">tikuma-lsuhsc/pyLeTalker</a>)
+but only after reviewing their values and qualities.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="examples/vf2025.html">Generating dysphonic voice samples with kinematic VF model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/plotting.html">Plotting synthesized signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/audio.html">Playing and saving synthesized acoustic signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/elements.html">Python classes to model various <code class="docutils literal notranslate"><span class="pre">Element</span></code>s of Voice Production Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functiongenerator_basics.html"><code class="docutils literal notranslate"><span class="pre">letalker.function_generators</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/functiongenerator_step_mixin.html"><code class="docutils literal notranslate"><span class="pre">TaperMixin</span></code> - Controlling onset and offset of functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples/animate_kvf.html">Animating kinematic vocal folds</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="citations.html">Citation Guidelines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="citations.html#citing-pyletalker">Citing <code class="docutils literal notranslate"><span class="pre">pyLeTalker</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="citations.html#citing-computational-models-used-in-pyletalker">Citing computational models used in <code class="docutils literal notranslate"><span class="pre">pyLeTalker</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_reference.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_basic.html">Synthesis Basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_advanced.html">Submodules (advanced topics)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading">#</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="examples.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">pyLeTalker – Python framework for wave-reflection voice synthesis</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-examples">Simple Examples</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-and-contribution">Use and Contribution</a></li>
+</ul>
+</li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Takeshi (Kesh) Ikuma
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Takeshi Ikuma, Louisiana State University Health Sciences Center.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

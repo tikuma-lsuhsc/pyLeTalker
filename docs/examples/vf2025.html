@@ -1,0 +1,787 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Generating dysphonic voice samples with kinematic VF model &#8212; pyLeTalker 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=0d290300" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=c89b5d42"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/vf2025';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Plotting synthesized signals" href="plotting.html" />
+    <link rel="prev" title="Examples" href="../examples.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/wave-reflection-model-light.png" class="logo__image only-light" alt="pyLeTalker 0.1.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/wave-reflection-model-dark.png" class="logo__image only-dark" alt="pyLeTalker 0.1.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Generating dysphonic voice samples with kinematic VF model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plotting.html">Plotting synthesized signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audio.html">Playing and saving synthesized acoustic signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">Python classes to model various <code class="docutils literal notranslate"><span class="pre">Element</span></code>s of Voice Production Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="functiongenerator_basics.html"><code class="docutils literal notranslate"><span class="pre">letalker.function_generators</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functiongenerator_step_mixin.html"><code class="docutils literal notranslate"><span class="pre">TaperMixin</span></code> - Controlling onset and offset of functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="animate_kvf.html">Animating kinematic vocal folds</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../citations.html">Citation Guidelines</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_basic.html">Synthesis Basics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api_advanced.html">Submodules (advanced topics)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.typing.html">letalker.typing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.constants.html">letalker.constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.elements.html">letalker.elements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.function_generators.html">letalker.function_generators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.core.html">letalker.core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.utils.html">letalker.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker/blob/master/docs/examples/vf2025.rst?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/vf2025.rst" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.rst</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Generating dysphonic voice samples with kinematic VF model</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normal-voice-baseline">1. Normal Voice (Baseline)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#breathy-pressed-voice">2. Breathy/pressed voice</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#voice-breaks">3. Voice Breaks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#frequency-jumps">4. Frequency Jumps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flutter">5. Flutter</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vocal-tremor">6. Vocal Tremor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modulation-locked-subharmonics">7. Modulation (locked, subharmonics)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modulation-unlocked">8. Modulation (unlocked)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#biphonation-locked-subharmonics">9. Biphonation (locked, subharmonics)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#biphonation-unlocked">10. Biphonation (unlocked)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#built-in-vowels">11. Built-in vowels</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <img alt="../_images/VF2025_logo_light.svg" class="only-light" src="../_images/VF2025_logo_light.svg" />
+<img alt="../_images/VF2025_logo_dark.svg" class="only-dark" src="../_images/VF2025_logo_dark.svg" />
+<section id="generating-dysphonic-voice-samples-with-kinematic-vf-model">
+<h1>Generating dysphonic voice samples with kinematic VF model<a class="headerlink" href="#generating-dysphonic-voice-samples-with-kinematic-vf-model" title="Link to this heading">#</a></h1>
+<p>Below are the videos and code snippets of the dysphonic voice syntheses
+presented at 2025 Voice Foundation Symposium <a class="footnote-reference brackets" href="#footcite-ikuma2025b" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. (Some of
+the presented videos were combined versions of those below.)</p>
+<p>Each code snippet illustrates how the syntheses were run to produce the signals
+which are depicted in the video. For brevity, the Python code to produce the
+video is omitted. In every example, three signals are retrieved after running
+the <code class="xref py py-obj docutils literal notranslate"><span class="pre">lt.sim_kinematic</span></code> function:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Running the kinematic VF model simulation</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="c1"># Gather signals within vocal fold model</span>
+<span class="n">res_vf</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s2">&quot;vocalfolds&quot;</span><span class="p">]</span>
+<span class="n">ag</span> <span class="o">=</span> <span class="n">res_vf</span><span class="o">.</span><span class="n">glottal_area</span>
+<span class="n">ug</span> <span class="o">=</span> <span class="n">res_vf</span><span class="o">.</span><span class="n">ug</span>
+</pre></div>
+</div>
+<p>Here we have:</p>
+<ul class="simple">
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ag</span></code> - glottal area signal <span class="math notranslate nohighlight">\(A_g\)</span></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">ug</span></code> - glottal flow signal <span class="math notranslate nohighlight">\(U_g\)</span></p></li>
+<li><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pout</span></code> - acoustic signal <span class="math notranslate nohighlight">\(P_{out}\)</span></p></li>
+</ul>
+<p>The videos show the waveforms (left column) and spectra (right column) of these
+signals over 100-ms window. The bottom left is a coarse spectrogram to act as an
+indicator of playback position. If an example has a time-varying control
+parameter, it is shown beside the spectrogram at the bottom right.</p>
+<div class="admonition-todo admonition" id="id2">
+<p class="admonition-title">Todo</p>
+<p>Video production example will be added in the future.</p>
+</div>
+<div class="docutils container" id="id3">
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="footcite-ikuma2025b" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>Takeshi Ikuma, Melda Kunduk, Andrew J. McWhorter, and Brad Story. `pyLeTalker`: A Python framework for wave reflection voice synthesis. In <em>The Voice Foundation’s 54nd Annual Symposium: Care of the Professional Voice</em>. Philadelphia, PA, May 2025.</p>
+</aside>
+</aside>
+</div>
+<section id="normal-voice-baseline">
+<h2>1. Normal Voice (Baseline)<a class="headerlink" href="#normal-voice-baseline" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/baseline.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">letalker</span> <span class="k">as</span> <span class="nn">lt</span>
+
+<span class="kn">from</span> <span class="nn">letalker</span> <span class="kn">import</span> <span class="n">fs</span> <span class="c1"># 44.1 kS/s</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># sim duration</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span> <span class="o">*</span> <span class="n">fs</span><span class="p">)</span>  <span class="c1"># number of samples</span>
+
+<span class="c1"># Simulate with symmetric kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="breathy-pressed-voice">
+<h2>2. Breathy/pressed voice<a class="headerlink" href="#breathy-pressed-voice" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/breathy.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gradually widen the posterior gap from 0 to 0.3 cm</span>
+<span class="n">xim</span> <span class="o">=</span> <span class="mf">0.12</span> <span class="c1"># vibration amplitude in cm</span>
+
+<span class="c1"># vary Qa, abduction quotient (Titze 1984)</span>
+<span class="n">Qa</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">StepGenerator</span><span class="p">(</span>
+   <span class="p">[</span>     <span class="mi">1</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">],</span>
+   <span class="p">[</span><span class="mf">0.3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span> <span class="o">/</span> <span class="n">xim</span><span class="p">],</span>
+   <span class="n">transition_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
+   <span class="n">transition_time_constant</span><span class="o">=</span><span class="mf">0.2</span>
+<span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span>
+   <span class="n">N</span><span class="p">,</span>
+   <span class="mi">100</span><span class="p">,</span>
+   <span class="s2">&quot;aa&quot;</span><span class="p">,</span>
+   <span class="n">Qa</span><span class="o">=</span><span class="n">Qa</span><span class="p">,</span>
+   <span class="n">xim</span><span class="o">=</span><span class="n">xim</span>
+   <span class="n">aspiration_noise</span><span class="o">=</span><span class="kc">True</span> <span class="c1"># Turn on noise injector</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="voice-breaks">
+<h2>3. Voice Breaks<a class="headerlink" href="#voice-breaks" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/voice_break.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fo</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># Hz</span>
+<span class="n">Tbreak</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># stoppage duration in seconds</span>
+
+<span class="c1"># time-varying vocal fold vibration amplitude</span>
+<span class="c1"># - attenuated momentarily for voice break effect</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span>
+   <span class="mf">0.12</span><span class="p">,</span> <span class="c1"># cm</span>
+   <span class="n">transition_times</span><span class="o">=</span><span class="p">[</span>
+      <span class="mf">0.45</span><span class="p">,</span> <span class="mf">0.45</span> <span class="o">+</span> <span class="n">Tbreak</span><span class="p">,</span>
+      <span class="mf">1.98</span><span class="p">,</span> <span class="mf">1.98</span> <span class="o">+</span> <span class="n">Tbreak</span><span class="p">,</span>
+      <span class="mf">3.02</span><span class="p">,</span> <span class="mf">3.02</span> <span class="o">+</span> <span class="n">Tbreak</span><span class="p">,</span>
+      <span class="mf">4.5</span><span class="p">,</span> <span class="mf">4.5</span> <span class="o">+</span> <span class="n">Tbreak</span><span class="p">,</span>
+   <span class="p">],</span>
+   <span class="n">transition_type</span><span class="o">=</span><span class="s2">&quot;raised_cos&quot;</span><span class="p">,</span>
+   <span class="n">transition_time_constant</span><span class="o">=</span> <span class="n">Tbreak</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+   <span class="n">transition_initial_on</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="c1"># Simulate with symmetric kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">fo</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">,</span> <span class="n">xim</span><span class="o">=</span><span class="n">A</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="frequency-jumps">
+<h2>4. Frequency Jumps<a class="headerlink" href="#frequency-jumps" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/fo_jump.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># fo suddenly steps up or down</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">StepGenerator</span><span class="p">(</span>
+   <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">,</span> <span class="mf">3.9</span><span class="p">,</span> <span class="n">T</span><span class="p">],</span>
+   <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">134</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">121</span><span class="p">],</span>
+   <span class="n">transition_type</span><span class="o">=</span><span class="s2">&quot;raised_cos&quot;</span><span class="p">,</span>
+   <span class="n">transition_time_constant</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span>
+   <span class="n">N</span><span class="p">,</span> <span class="n">lt</span><span class="o">.</span><span class="n">SineGenerator</span><span class="p">(</span><span class="n">fo</span><span class="p">),</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="flutter">
+<h2>5. Flutter<a class="headerlink" href="#flutter" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/baseline%2Bflutter.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Add ±1.5-Hz flutter to fo</span>
+<span class="n">fo_base</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">FL</span> <span class="o">=</span> <span class="mi">25</span>  <span class="c1"># Klatt 1990 default</span>
+<span class="n">fo_max_dev</span> <span class="o">=</span> <span class="p">(</span><span class="n">FL</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">fo_base</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">FlutterGenerator</span><span class="p">(</span><span class="n">fo_max_dev</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="n">fo_base</span><span class="p">)</span>
+
+<span class="c1"># Reference VF motion signal</span>
+<span class="n">xi_ref</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">SineGenerator</span><span class="p">(</span><span class="n">fo</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xi_ref</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="vocal-tremor">
+<h2>6. Vocal Tremor<a class="headerlink" href="#vocal-tremor" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/modulation_tremor.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">fo</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="c1"># Tremor parameters from Ramig &amp; Shipp 1982</span>
+<span class="c1"># (&quot;incorrectly&quot; applied to the VF motion)</span>
+<span class="n">mod_freq</span> <span class="o">=</span> <span class="mf">6.77</span> <span class="o">/</span> <span class="n">fo</span>  <span class="c1"># 6.77 Hz</span>
+<span class="n">am_extent</span> <span class="o">=</span> <span class="mf">40.6</span> <span class="o">/</span> <span class="mi">100</span> <span class="c1"># 40.6%</span>
+<span class="n">fm_extent</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="mf">1.42</span> <span class="o">/</span> <span class="mi">12</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># 1.42 STs</span>
+
+<span class="n">xi_ref</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">ModulatedSineGenerator</span><span class="p">(</span>
+   <span class="n">fo</span><span class="p">,</span> <span class="n">mod_freq</span><span class="p">,</span> <span class="n">am_extent</span><span class="p">,</span> <span class="n">fm_extent</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xi_ref</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="modulation-locked-subharmonics">
+<h2>7. Modulation (locked, subharmonics)<a class="headerlink" href="#modulation-locked-subharmonics" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/modulation_locked.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fixed parameters</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># Hz</span>
+<span class="n">am_extent</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">fm_extent</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># Step through 4 subharmonic periods: 1, 2, 3, 4</span>
+<span class="n">mod_freq</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">StepGenerator</span><span class="p">(</span>
+   <span class="n">levels</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">4</span><span class="p">],</span>
+   <span class="n">transition_times</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.75</span><span class="p">],</span>
+   <span class="n">transition_type</span><span class="o">=</span><span class="s2">&quot;raised_cos&quot;</span><span class="p">,</span>
+   <span class="n">transition_time_constant</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Define the modulated reference motion function</span>
+<span class="n">xi_ref</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">ModulatedSineGenerator</span><span class="p">(</span>
+   <span class="n">fo</span><span class="p">,</span> <span class="n">mod_freq</span><span class="p">,</span> <span class="n">am_extent</span><span class="p">,</span> <span class="n">fm_extent</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xi_ref</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="modulation-unlocked">
+<h2>8. Modulation (unlocked)<a class="headerlink" href="#modulation-unlocked" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/modulation_unlocked.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fixed parameters (same as the subharmonic case)</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># Hz</span>
+<span class="n">am_extent</span> <span class="o">=</span> <span class="mf">0.25</span>
+<span class="n">fm_extent</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<span class="c1"># Pseudo-randomly vary between 0 and 0.5 at the rate</span>
+<span class="c1"># no faster than 1 Hz, starting at 1 second mark</span>
+<span class="n">mod_freq</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">FlutterGenerator</span><span class="p">(</span>
+   <span class="n">fl</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+   <span class="n">transition_times</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Define the modulated reference motion function</span>
+<span class="n">xi_ref</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">ModulatedSineGenerator</span><span class="p">(</span>
+   <span class="n">fo</span><span class="p">,</span> <span class="n">mod_freq</span><span class="p">,</span> <span class="n">am_extent</span><span class="p">,</span> <span class="n">fm_extent</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xi_ref</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="biphonation-locked-subharmonics">
+<h2>9. Biphonation (locked, subharmonics)<a class="headerlink" href="#biphonation-locked-subharmonics" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/biphonation_locked.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Keep one VF to vibrate at a fixed fo</span>
+<span class="n">fo0</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># Define the progression of a pair of the fo’s</span>
+<span class="c1"># locking the other VF’s fo at a rational ratio</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">StepGenerator</span><span class="p">(</span>
+   <span class="p">[</span><span class="mf">1.25</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.75</span><span class="p">],</span>
+   <span class="p">[[</span><span class="n">fo0</span><span class="p">,</span> <span class="n">fo0</span><span class="p">],</span>     <span class="p">[</span><span class="n">fo0</span><span class="p">,</span> <span class="n">fo0</span><span class="o">*</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">],</span>
+   <span class="p">[</span><span class="n">fo0</span><span class="p">,</span> <span class="n">fo0</span><span class="o">*</span><span class="mi">4</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="n">fo0</span><span class="p">,</span> <span class="n">fo0</span><span class="o">*</span><span class="mi">5</span><span class="o">/</span><span class="mi">4</span><span class="p">]],</span>
+   <span class="n">transition_type</span><span class="o">=</span><span class="s2">&quot;raised_cos&quot;</span><span class="p">,</span>
+   <span class="n">transition_time_constant</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Define the reference motion functions</span>
+<span class="n">xi_ref</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">SineGenerator</span><span class="p">(</span><span class="n">fo</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xi_ref</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="biphonation-unlocked">
+<h2>10. Biphonation (unlocked)<a class="headerlink" href="#biphonation-unlocked" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/biphonation_unlocked.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define two randomly wondering fo functions</span>
+<span class="c1"># using the flutter mechanism (16 random sinusoids)</span>
+<span class="n">fo_mean</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">]</span>
+<span class="n">fo_dev</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">FlutterGenerator</span><span class="p">(</span>
+   <span class="n">bias</span><span class="o">=</span><span class="n">fo_mean</span><span class="p">,</span> <span class="n">fl</span><span class="o">=</span><span class="n">fo_dev</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+<span class="c1"># Define the modulated reference motion function</span>
+<span class="n">xi_ref</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">SineGenerator</span><span class="p">(</span><span class="n">fo</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">xi_ref</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="built-in-vowels">
+<h2>11. Built-in vowels<a class="headerlink" href="#built-in-vowels" title="Link to this heading">#</a></h2>
+<div  class="sphinx-contrib-video-container align-left"><video controls="True" preload="auto" width="100%"><source src="../_images/vowels.mp4" type="video/mp4"></video></div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Built-in vocal tract cross-sectional areas</span>
+<span class="kn">from</span> <span class="nn">letalker.constants</span> <span class="kn">import</span> <span class="n">vocaltract_areas</span>
+
+<span class="c1"># 2-letter vowel names as keys to retrieve the areas</span>
+<span class="n">vowels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;aa&quot;</span><span class="p">,</span> <span class="s2">&quot;ii&quot;</span><span class="p">,</span> <span class="s2">&quot;uu&quot;</span><span class="p">,</span> <span class="s2">&quot;ae&quot;</span><span class="p">,</span> <span class="s2">&quot;ih&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;eh&quot;</span><span class="p">,</span> <span class="s2">&quot;ah&quot;</span><span class="p">,</span> <span class="s2">&quot;aw&quot;</span><span class="p">,</span> <span class="s2">&quot;uh&quot;</span><span class="p">,</span> <span class="s2">&quot;oo&quot;</span><span class="p">]</span>
+<span class="n">nvowels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+<span class="n">Tvowel</span> <span class="o">=</span> <span class="n">T</span> <span class="o">/</span> <span class="n">nvowels</span>
+
+<span class="c1"># retrieve &amp; stack areas of all vowels (10x44 array)</span>
+<span class="n">areas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+   <span class="p">[</span><span class="n">vocaltract_areas</span><span class="p">[</span><span class="n">vowel</span><span class="p">]</span> <span class="k">for</span> <span class="n">vowel</span> <span class="ow">in</span> <span class="n">names</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Step through each vowel</span>
+<span class="n">transition_times</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nvowels</span><span class="p">)</span> <span class="o">*</span> <span class="n">Tvowel</span>
+<span class="n">vtarea_fun</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">StepGenerator</span><span class="p">(</span><span class="n">transition_times</span><span class="p">,</span>
+               <span class="n">areas</span><span class="p">,</span> <span class="n">transition_time_constant</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+
+<span class="c1"># Simulate with kinematic vocal fold model</span>
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">vtarea_fun</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../examples.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="plotting.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Plotting synthesized signals</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#normal-voice-baseline">1. Normal Voice (Baseline)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#breathy-pressed-voice">2. Breathy/pressed voice</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#voice-breaks">3. Voice Breaks</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#frequency-jumps">4. Frequency Jumps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#flutter">5. Flutter</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#vocal-tremor">6. Vocal Tremor</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modulation-locked-subharmonics">7. Modulation (locked, subharmonics)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modulation-unlocked">8. Modulation (unlocked)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#biphonation-locked-subharmonics">9. Biphonation (locked, subharmonics)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#biphonation-unlocked">10. Biphonation (unlocked)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#built-in-vowels">11. Built-in vowels</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Takeshi (Kesh) Ikuma
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Takeshi Ikuma, Louisiana State University Health Sciences Center.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

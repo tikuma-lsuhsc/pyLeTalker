@@ -1,0 +1,673 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Plotting synthesized signals &#8212; pyLeTalker 0.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=0d290300" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=a1637f0b"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=c89b5d42"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'examples/plotting';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Playing and saving synthesized acoustic signals" href="audio.html" />
+    <link rel="prev" title="Generating dysphonic voice samples with kinematic VF model" href="vf2025.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/wave-reflection-model-light.png" class="logo__image only-light" alt="pyLeTalker 0.1.0 documentation - Home"/>
+    <script>document.write(`<img src="../_static/wave-reflection-model-dark.png" class="logo__image only-dark" alt="pyLeTalker 0.1.0 documentation - Home"/>`);</script>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../examples.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="vf2025.html">Generating dysphonic voice samples with kinematic VF model</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Plotting synthesized signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="audio.html">Playing and saving synthesized acoustic signals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html">Python classes to model various <code class="docutils literal notranslate"><span class="pre">Element</span></code>s of Voice Production Mechanism</a></li>
+<li class="toctree-l2"><a class="reference internal" href="functiongenerator_basics.html"><code class="docutils literal notranslate"><span class="pre">letalker.function_generators</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functiongenerator_step_mixin.html"><code class="docutils literal notranslate"><span class="pre">TaperMixin</span></code> - Controlling onset and offset of functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="animate_kvf.html">Animating kinematic vocal folds</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../citations.html">Citation Guidelines</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api_reference.html">API Reference</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api_basic.html">Synthesis Basics</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../api_advanced.html">Submodules (advanced topics)</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.typing.html">letalker.typing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.constants.html">letalker.constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.elements.html">letalker.elements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.function_generators.html">letalker.function_generators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.core.html">letalker.core</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../letalker.utils.html">letalker.utils</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/tikuma-lsuhsc/pyLeTalker/blob/master/docs/examples/plotting.ipynb?plain=1" target="_blank"
+   class="btn btn-sm btn-source-file-button dropdown-item"
+   title="Show source"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-code"></i>
+  </span>
+<span class="btn__text-container">Show source</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/examples/plotting.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Plotting synthesized signals</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting-acoustic-waveform-and-its-spectrum">Plotting acoustic waveform and its spectrum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting-acoustic,-glottal-flow,-and-glottal-area">Plotting acoustic, glottal flow, and glottal area</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting-spectrogram">Plotting spectrogram</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Plotting-synthesized-signals">
+<h1>Plotting synthesized signals<a class="headerlink" href="#Plotting-synthesized-signals" title="Link to this heading">#</a></h1>
+<p>The scope of <code class="docutils literal notranslate"><span class="pre">pyLeTalker</span></code> is to generate a set of signals, most notably the radiated sound pressure signal or acoustic signal in short. Visualization of the synthesized signals must be done through third-party library.</p>
+<p>Both <a class="reference internal" href="../api_basic.html#letalker.sim"><span class="std std-ref">lt.sim()</span></a> and <a class="reference internal" href="../api_basic.html#letalker.sim_kinematic"><span class="std std-ref">lt.sim_kinematic()</span></a> functions return two objects: <code class="docutils literal notranslate"><span class="pre">pout</span></code> and <code class="docutils literal notranslate"><span class="pre">res</span></code>. The former is a length-<code class="docutils literal notranslate"><span class="pre">N</span></code> vector of the acoustic signal samples at the system sampling rate, which could be found as <code class="docutils literal notranslate"><span class="pre">lt.fs</span></code>. The <code class="docutils literal notranslate"><span class="pre">N</span></code> is the number of samples that you requested when calling <a class="reference internal" href="../api_basic.html#letalker.sim"><span class="std std-ref">lt.sim()</span></a> or <a class="reference internal" href="../api_basic.html#letalker.sim_kinematic"><span class="std std-ref">lt.sim_kinematic()</span></a> function. The
+second output <code class="docutils literal notranslate"><span class="pre">res</span></code> is a dict of simulation results generated by each of 5 elements of the model: <code class="docutils literal notranslate"><span class="pre">res['lungs']</span></code>, <code class="docutils literal notranslate"><span class="pre">res['trachea']</span></code>, <code class="docutils literal notranslate"><span class="pre">res['vocalfolds']</span></code>, <code class="docutils literal notranslate"><span class="pre">res['vocaltract']</span></code>, and <code class="docutils literal notranslate"><span class="pre">res['lips']</span></code>. These <code class="docutils literal notranslate"><span class="pre">Results</span></code> objects host both the element configurations as well as recorded samples of their internal signals.</p>
+<p>This example demonstrates how to plot the simulation outcomes using <a class="reference external" href="https://matplotlib.org/">Matplotlib</a>. If you are not familiar with Matplotlib, please follow <a class="reference external" href="https://matplotlib.org/stable/users/getting_started/">their Getting Started Guide</a> to install the library.</p>
+<p>We start out by importing <code class="docutils literal notranslate"><span class="pre">letalker</span></code> and <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code>. We use the shortened prefix (<code class="docutils literal notranslate"><span class="pre">lt.</span></code>) to access <code class="docutils literal notranslate"><span class="pre">letalker</span></code> library.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">letalker</span> <span class="k">as</span> <span class="nn">lt</span>
+</pre></div>
+</div>
+</div>
+<section id="Plotting-acoustic-waveform-and-its-spectrum">
+<h2>Plotting acoustic waveform and its spectrum<a class="headerlink" href="#Plotting-acoustic-waveform-and-its-spectrum" title="Link to this heading">#</a></h2>
+<p>For the sake of demonstration, let’s synthesize /a/ vowel for 100 milliseconds at <span class="math notranslate nohighlight">\(f_o =\)</span> 100 Hz (or simulating the first 10 vocal cycles).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1"># duration in seconds</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="o">*</span><span class="n">T</span><span class="p">)</span> <span class="c1"># =4410, number of samples to simulate</span>
+<span class="n">fo</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># fundamental frequency in Hz</span>
+
+<span class="n">pout</span><span class="p">,</span> <span class="n">res</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">fo</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>While we can plot the acoustic signal as a function of sample index, it’s more intuitive to have the <span class="math notranslate nohighlight">\(x\)</span>-axis in seconds. Every <code class="docutils literal notranslate"><span class="pre">Results</span></code> object in the <code class="docutils literal notranslate"><span class="pre">res</span></code> dict contains <code class="docutils literal notranslate"><span class="pre">ts</span></code> item which is the corresponding time vector.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;lips&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ts</span> <span class="c1"># grabbing the time vector from lips element</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="n">pout</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Radiated Sound Pressure&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_plotting_6_0.png" src="../_images/examples_plotting_6_0.png" />
+</div>
+</div>
+<p>To plot the spectrum of the acoustic signal, we use <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.magnitude_spectrum.html#matplotlib.pyplot.magnitude_spectrum">plt.magnitude_spectrum()</a> function. By default, it shows the frequency content up to the Nyquist frequency (i.e., the half of the sampling rate) which is typically too large to observe human voice behavior. So, we use <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.xlim">plt.xlim()</a> to only show the
+frequency content up to 4 kHz (or showing the first 40 harmonics).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">magnitude_spectrum</span><span class="p">(</span><span class="n">pout</span><span class="p">,</span>
+                       <span class="n">Fs</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span>     <span class="c1"># sampling rate</span>
+                       <span class="n">pad_to</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="c1"># set the resolution to be 1 Hz</span>
+                       <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;dB&quot;</span><span class="p">)</span>   <span class="c1"># alternately you can use &quot;linear&quot;</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4000</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_plotting_8_0.png" src="../_images/examples_plotting_8_0.png" />
+</div>
+</div>
+</section>
+<section id="Plotting-acoustic,-glottal-flow,-and-glottal-area">
+<h2>Plotting acoustic, glottal flow, and glottal area<a class="headerlink" href="#Plotting-acoustic,-glottal-flow,-and-glottal-area" title="Link to this heading">#</a></h2>
+<p>Now, let’s create a matrix of plots showing acoustic, glottal flow, and glottal area; both their waveforms and spectra.</p>
+<p>The glottal flow (<code class="docutils literal notranslate"><span class="pre">ug</span></code>) and glottal area (<code class="docutils literal notranslate"><span class="pre">glottal_area</span></code>) are given in the results of the vocal-folds element: <code class="docutils literal notranslate"><span class="pre">res['vocalfolds']</span></code>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ga</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;vocalfolds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">glottal_area</span>
+<span class="n">ug</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;vocalfolds&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">ug</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s layout the output to have 3 rows of signals and 2 columns (time and frequency domain) using <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.subplots.html#matplotlib.figure.Figure.subplots">plt.subplots()</a>. With increased number of plots, we use a larger figure size (14 inches by 8 inches or 1344 pixels by 768 pixels).</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="s2">&quot;col&quot;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">[</span><span class="mi">14</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+
+<span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">tax</span><span class="p">,</span> <span class="n">fax</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+    <span class="p">(</span><span class="s2">&quot;glottal area $A_g$&quot;</span><span class="p">,</span> <span class="s2">&quot;glottal flow $U_g$&quot;</span><span class="p">,</span> <span class="s2">&quot;radiated pressure $P_</span><span class="si">{Out}</span><span class="s2">$&quot;</span><span class="p">),</span>
+    <span class="p">(</span><span class="n">ga</span><span class="p">,</span> <span class="n">ug</span><span class="p">,</span> <span class="n">pout</span><span class="p">),</span>
+    <span class="n">axes</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">tax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">tax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+    <span class="n">fax</span><span class="o">.</span><span class="n">magnitude_spectrum</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">Fs</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">pad_to</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;dB&quot;</span><span class="p">)</span>
+    <span class="n">fax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="c1"># remove automatically inserted x-axis labels</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;time-domain&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;frequency-domain&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4000</span><span class="p">))</span>
+<span class="n">axes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;frequency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">align_ylabels</span><span class="p">(</span><span class="n">axes</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span> <span class="c1"># useful function to automatically adjust the axes margins</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_plotting_12_0.png" src="../_images/examples_plotting_12_0.png" />
+</div>
+</div>
+<p>Finally, you can use <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.savefig.html#matplotlib.pyplot.savefig">plt.savefig()</a> to save the last figure as an image or <code class="docutils literal notranslate"><span class="pre">fig.savefig()</span></code> to specify a specific figure object. To save the above figure as <code class="docutils literal notranslate"><span class="pre">my_pyLeTalker_plot.png</span></code>, you need to run the following code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;my_pyLeTalker_plot.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="Plotting-spectrogram">
+<h2>Plotting spectrogram<a class="headerlink" href="#Plotting-spectrogram" title="Link to this heading">#</a></h2>
+<p>Spectrogram is an important signal visualization to illustrate the spectro-temporal behavior. For this, we can use <a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.specgram.html">plt.specgram()</a>.</p>
+<p>To make the spectrogram a bit more interesting, let’s run another simulation with a 1-second duration and design an <span class="math notranslate nohighlight">\(f_o\)</span> contour with <a class="reference internal" href="../api_basic.html#letalker.Interpolator"><span class="std std-ref">lt.Interpolator</span></a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">T</span> <span class="o">*</span> <span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span>
+
+<span class="n">fo</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">Interpolator</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">85</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">120</span><span class="p">])</span>
+<span class="n">pout1</span><span class="p">,</span> <span class="n">res1</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">sim_kinematic</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">fo</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The default configuration (i.e., <code class="docutils literal notranslate"><span class="pre">plt.specgram(pout1,</span> <span class="pre">NFFT=nseg,</span> <span class="pre">Fs=lt.fs)</span></code>) is unfit to inspect the vocal behavior. For a better outcome, we need to set three additional critical arguments: <code class="docutils literal notranslate"><span class="pre">NFFT</span></code>, <code class="docutils literal notranslate"><span class="pre">noverlap</span></code>, and <code class="docutils literal notranslate"><span class="pre">pad_to</span></code>. Specifically, we aimed to evaluate spectrum with a 100-milliseond sliding window, which is captured every 10 millisecond. The spectrum is calculated with frequency sample resolution of 1 Hz.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nseg</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span> <span class="c1"># 100 ms in the number of samples</span>
+<span class="n">noverlap</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="mf">0.09</span> <span class="o">*</span> <span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">)</span> <span class="c1"># 10 ms offset to the number of samples overlapped</span>
+<span class="n">nfft</span> <span class="o">=</span> <span class="n">lt</span><span class="o">.</span><span class="n">fs</span> <span class="c1"># sampling rate =</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">specgram</span><span class="p">(</span><span class="n">pout1</span><span class="p">,</span> <span class="n">NFFT</span><span class="o">=</span><span class="n">nseg</span><span class="p">,</span> <span class="n">Fs</span><span class="o">=</span><span class="n">lt</span><span class="o">.</span><span class="n">fs</span><span class="p">,</span> <span class="n">pad_to</span><span class="o">=</span><span class="n">nfft</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">noverlap</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fo</span><span class="o">.</span><span class="n">ts</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="n">fo</span><span class="p">(</span><span class="n">N</span><span class="p">),</span> <span class="s2">&quot;r--&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;$f_o$ input&#39;</span><span class="p">)</span> <span class="c1"># superimpose fo</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;time (s)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;frequency (Hz)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/examples_plotting_17_0.png" src="../_images/examples_plotting_17_0.png" />
+</div>
+</div>
+<p>Note that the spectrogram is aligned to the center of the sliding window, thus it spans from <span class="math notranslate nohighlight">\(t=\)</span> 0.05 to 0.95 second. Meanwhile, the interpolated <span class="math notranslate nohighlight">\(f_o\)</span> input spans from 0 to 1 second.</p>
+</section>
+</section>
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="vf2025.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Generating dysphonic voice samples with kinematic VF model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="audio.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Playing and saving synthesized acoustic signals</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting-acoustic-waveform-and-its-spectrum">Plotting acoustic waveform and its spectrum</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting-acoustic,-glottal-flow,-and-glottal-area">Plotting acoustic, glottal flow, and glottal area</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Plotting-spectrogram">Plotting spectrogram</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Takeshi (Kesh) Ikuma
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2025, Takeshi Ikuma, Louisiana State University Health Sciences Center.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
