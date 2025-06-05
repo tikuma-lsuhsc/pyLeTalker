@@ -148,12 +148,11 @@ class LossyCylinderVocalTract(VocalTract):
         """
         area = self._area
 
-        if not self._area.is_fixed:
+        if not area.is_fixed:
             if n is None:
                 raise ValueError("Must specify n (and n0) for a dynamic lips")
-            area = area(n, n0)
-
-        return area
+        
+        return area(n, n0)
 
     @property
     def input_area_is_fixed(self) -> bool:
