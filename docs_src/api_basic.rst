@@ -24,6 +24,7 @@ lists summarize all the top-level functions and classes.
 
       sim
       sim_kinematic
+      sim_vf
 
 * **Synthesis Elements**
 
@@ -114,6 +115,7 @@ Simulation Functions
 
 .. autofunction:: sim
 .. autofunction:: sim_kinematic
+.. autofunction:: sim_vf
 
 Synthesis Elements
 ------------------

@@ -30,6 +30,7 @@ from .elements.abc import (
 from .function_generators.abc import FunctionGenerator, AnalyticFunctionGenerator
 
 from math import pi
+import numpy as np
 
 from .core import compile_njit_if_numba
 from .elements import (
@@ -39,11 +40,13 @@ from .elements import (
     KinematicVocalFolds,
     NullLungs,
 )
-from .function_generators import SineGenerator
+from .function_generators import SineGenerator, Constant, ClampedInterpolator
+from .constants import vocaltract_areas, PL
+
 
 class SimResultsDict(TypedDict):
-    """Dict of letalker simulation per-element outputs
-    """    
+    """Dict of letalker simulation per-element outputs"""
+
     lungs: Element.Results
     trachea: Element.Results
     vocalfolds: Element.Results
@@ -147,12 +150,12 @@ def sim(
         you may pass in a dict of key-value pairs. A custom `VocalTract` model object could also
         be passed.
     trachea, optional
-        Subglottal vocal tract model, by default None to use the `LeTalkerVocalTract` 
-        model with the default trachea cross-sectional areas (`'trach'`). If 1D 
-        or 2D array or a `FunctionGenerator` object is passed, it will be used 
+        Subglottal vocal tract model, by default None to use the `LeTalkerVocalTract`
+        model with the default trachea cross-sectional areas (`'trach'`). If 1D
+        or 2D array or a `FunctionGenerator` object is passed, it will be used
         as the cross-sectional areas (in cm²) of vocal tract sections (if 2D,
-        the first dimension is the time axes). To specify other parameters of 
-        the `LeTalkerVocalTract`, you may pass in a dict of key-value pairs. 
+        the first dimension is the time axes). To specify other parameters of
+        the `LeTalkerVocalTract`, you may pass in a dict of key-value pairs.
         A custom `VocalTract` model object could also be passed.
     lungs, optional
         Lungs model, by default None to use `LeTalkerLungs` model with the default 7840 dyn/cm² lung
@@ -180,7 +183,9 @@ def sim(
             The parameters and results of the simulation elements
     """
 
-    components = _sim_init(vocalfolds, vocaltract, trachea, lungs, lips, aspiration_noise)
+    components = _sim_init(
+        vocalfolds, vocaltract, trachea, lungs, lips, aspiration_noise
+    )
     # -> lungs, trachea, vocalfolds, vocaltract, lips
 
     runners = [c.create_runner(nb_samples, n0) for c in components]
@@ -242,12 +247,12 @@ def sim_kinematic(
         you may pass in a dict of key-value pairs. A custom `VocalTract` model object could also
         be passed.
     trachea, optional
-        Subglottal vocal tract model, by default None to use the `LeTalkerVocalTract` 
-        model with the default trachea cross-sectional areas (`'trach'`). If 1D 
-        or 2D array or a `FunctionGenerator` object is passed, it will be used 
+        Subglottal vocal tract model, by default None to use the `LeTalkerVocalTract`
+        model with the default trachea cross-sectional areas (`'trach'`). If 1D
+        or 2D array or a `FunctionGenerator` object is passed, it will be used
         as the cross-sectional areas (in cm²) of vocal tract sections (if 2D,
-        the first dimension is the time axes). To specify other parameters of 
-        the `LeTalkerVocalTract`, you may pass in a dict of key-value pairs. 
+        the first dimension is the time axes). To specify other parameters of
+        the `LeTalkerVocalTract`, you may pass in a dict of key-value pairs.
         A custom `VocalTract` model object could also be passed.
     lungs, optional
         Lungs model, by default None to use `LeTalkerLungs` model with the default 7840 dyn/cm² lung
@@ -292,6 +297,92 @@ def sim_kinematic(
         return_results=return_results,
         n0=n0,
     )
+
+
+def sim_vf(
+    nb_samples: int,
+    vocalfolds: VocalFolds,
+    *,
+    Asub: float | FunctionGenerator | Literal[False] | None = None,
+    Asup: float | FunctionGenerator | Literal[False] | None = None,
+    Fin: float | ArrayLike | FunctionGenerator | None = None,
+    Bin: float | ArrayLike | FunctionGenerator | None = None,
+    n0: int = 0,
+) -> Element.Results:
+    """Run simulation only with a vocal fold model
+
+    The given vocal fold model is simulated with the optional subglottal and
+    supraglottal conditions. Each condition is set by the interfacing cross-sectional
+    area (Asub/Asup) and the input pressure function (forward pressure Fin for 
+    subglottal input/backward pressure Bin for supraglottal input).
+
+    Parameters
+    ----------
+    nb_samples
+        Number of samples to generate
+    vocalfolds
+        Vocal fold model
+    Asub, optional
+        Subglottal area, by default None to use the default subglottal area 
+        (i.e., the last element of `constants.vocaltract_area['trach']`, 0.31 cm²)
+    Asup, optional
+        Epiglottal area, by default None to use the epiglottal area of default 
+        /a/ vocal tract (i.e., the first element of `constants.vocaltract_area['aa']`, 
+        0.56 cm²)
+    Fin, optional
+        Subglottal input pressure, by default None to use `constants.PL` (7840 dyn/cm²)
+    Bin, optional
+        Epiglottal input pressure, by default None to use 0
+    n0, optional
+        starting time sample offset, by default 0
+
+    Returns
+    -------
+        The result object of the specified `vocaltracts`.
+    """
+
+
+    if Asub is None and vocalfolds.upstream is None:
+        Asub = vocaltract_areas["trach"][-1]
+    if Asup is None and vocalfolds.downstream is None:
+        Asup = vocaltract_areas["aa"][0]
+
+    if Asub is not None or Asup is not None:
+        vocalfolds.link(Asub, Asup)
+
+    def set_pressure(P, P_default, name):
+        if P is None:
+            P = P_default
+
+        if isinstance(P, FunctionGenerator):
+            return P
+
+        try:
+            P = np.asarray(P, dtype=float)
+            assert P.ndim <= 1
+        except (ValueError, AssertionError) as e:
+            raise ValueError(f"{name} must be either float or a numerical 1D array.") from e
+
+        return (
+            Constant(P.reshape(()))
+            if P.size == 1
+            else ClampedInterpolator(vocalfolds.fs, P)
+        )
+
+    Fin = set_pressure(Fin, PL, "Fin")
+    Bin = set_pressure(Bin, 0.0, "Bin")
+
+    # create their simulation runner objects
+    runner = vocalfolds.create_runner(nb_samples, n0)
+
+    f_in = Fin(nb_samples, n0, force_time_axis="tile_data")
+    b_in = Bin(nb_samples, n0, force_time_axis="tile_data")
+
+    for i, (fi, bi) in enumerate(zip(f_in, b_in)):
+        # Compute the next states of bout
+        runner.step(i, fi, bi)
+
+    return vocalfolds.create_result(runner)
 
 
 ###################
@@ -420,7 +511,9 @@ def _sim_dual(
 
     lung_null = NullLungs()
 
-    components = _sim_init(vocalfolds, vocaltract, trachea, lungs, lips, aspiration_noise)
+    components = _sim_init(
+        vocalfolds, vocaltract, trachea, lungs, lips, aspiration_noise
+    )
     # -> lungs, trachea, vocalfolds, vocaltract, lips
 
     main_runners = [c.create_runner(nb_samples, n0) for c in components]
@@ -546,5 +639,12 @@ def _sim_dual_kinematic(
     vocalfolds = KinematicVocalFolds(xi_ref, **kvf_kws)
 
     return sim_dual(
-        nb_samples, vocalfolds, vocaltract, trachea, lungs, lips, aspiration_noise, n0=n0
+        nb_samples,
+        vocalfolds,
+        vocaltract,
+        trachea,
+        lungs,
+        lips,
+        aspiration_noise,
+        n0=n0,
     )
