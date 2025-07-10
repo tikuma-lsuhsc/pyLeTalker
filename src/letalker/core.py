@@ -96,7 +96,7 @@ class TimeSampleHandler:
                 raise ValueError("fs must be a positive integer.") from e
             TimeSampleHandler._fs = new_fs
 
-    @property
+    @classproperty
     def fs(self) -> int:
         """sampling rate in samples/second"""
         return TimeSampleHandler._fs
