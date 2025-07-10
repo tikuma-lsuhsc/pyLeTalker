@@ -24,3 +24,9 @@
       vt_atten
       vocaltract_resolution
    
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      smb_vt_area_data
+   

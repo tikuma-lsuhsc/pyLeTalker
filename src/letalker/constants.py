@@ -84,6 +84,69 @@ if TYPE_CHECKING:
 
 vocaltract_resolution = c / (2 * fs)  #: vocal tract tube segment length
 
+########################
+
+# The Six-Parameter Model data provided by Stone, Marxen, & Birkholz 2018
+
+# fmt: off
+SMB2018VocalTractSound = Literal['a:','e:','i:','o:','u:','E:','oe:','y:','a','E','I','O','U','oE','Y','@','f','l','s','S','C','x']
+#                        Literal['aː','eː','iː','oː','uː','ɛː','ø:', 'y:','a','ɛ','ɪ','ɔ','ʊ','œ', 'ʏ','ə','f','l','s','ʃ','ç','x']
+# fmt: on
+
+
+@lru_cache(4)
+def smb_vt_area_data(data_type: Literal["geom", "optim"], reduced: bool) -> NDArray:
+    """Stone-Marxen-Birkholz six-point vocal tract model preset parameters
+
+    Args:
+        data_type: "geom" for the geometrically fitted configurations or
+                   "optim" for the perceptually optimized configurations
+        reduced: True to return the reduced 11-parameter configurations or
+                 False to return the full 16-parameter configurations
+
+    Returns:
+        A numpy record array, containing 22 fields, one for each sound
+        specified in `SMB2018VocalTractSound`. Each field consists of either 11
+        or 16 parameters, depending on `reduced` argument:
+
+        | i | name |
+        |---|------|
+        | 0 | Ap   |
+        | 1 | npc  |
+        | 2 | xc   |
+        | 3 | Ac   |
+        | 4 | nca  |
+        | 5 | Aa   |
+        | 6 | nain |
+        | 7 | xin  |
+        | 8 | Ain  |
+        | 9 | xlip |
+        |10 | Alip |
+        |11 | xlar |
+        |12 | Alar |
+        |13 | nlarp|
+        |14 | xp   |
+        |15 | xa   |
+
+    """
+    from os import path
+    import numpy as np
+
+    csvfile = path.join(
+        path.split(__file__)[0],
+        "data",
+        f"smb2018_{data_type}_{'reduced' if reduced else 'full'}.csv",
+    )
+
+    data = np.rec.fromarrays(
+        np.loadtxt(csvfile, delimiter=","), names=get_args(SMB2018VocalTractSound)
+    )
+
+    if not reduced:
+        data = np.concatenate([data[4:9], data[10:], data[:4], data[[9]]], axis=0)
+
+    return data
+
 
 def __getattr__(name):
     if name == "vocaltract_areas":
