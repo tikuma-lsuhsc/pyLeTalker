@@ -15,7 +15,7 @@ from ..constants import (
     mu as mu_default,
 )
 
-from ..core import TimeSampleHandler, compile_jitclass_if_numba
+from ..core import TimeSampleHandler, compile_jitclass_if_numba, classproperty
 
 from ..function_generators import Constant
 
@@ -70,8 +70,8 @@ class Element(TimeSampleHandler, metaclass=abc.ABCMeta):
         if mu is not None:
             Element.mu = mu
 
-    @staticmethod
-    def nu() -> float:
+    @classproperty
+    def nu(cls) -> float:
         """kinematic viscosity in dyne·s·cm/g (= 10⁻³ mm²/s)"""
         return Element.mu / Element.rho
 

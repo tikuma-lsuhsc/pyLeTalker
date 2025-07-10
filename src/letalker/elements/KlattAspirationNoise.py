@@ -233,7 +233,7 @@ class KlattAspirationNoise(AspirationNoise):
     ) -> tuple[NDArray, ...]:
         """Generate element parameters (possibly time varying)"""
 
-        nuL_inv = 1 / (self.nu() * length)
+        nuL_inv = 1 / (self.nu * length)
         nf = self.generate_noise(n, n0)
         alpha = self.alpha
 

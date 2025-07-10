@@ -1542,7 +1542,7 @@ class KinematicVocalFolds(VocalFoldsAgBase):
 
         @cached_property
         def reynolds_number(self):
-            return self.ug / (self.element.nu() * self.length)
+            return self.ug / (self.element.nu * self.length)
 
         @overload
         def draw3d(
