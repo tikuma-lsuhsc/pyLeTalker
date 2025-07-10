@@ -90,7 +90,7 @@ def smb_vt_area_fun(
     b = np.diff(Acp) / 2
 
     xcp = np.array([xlar, xp, xc, xa, xin])
-    dxcp = np.diff(xcp) / 2
+    dxcp = np.diff(xcp)
 
     def func(x: NDArray) -> NDArray:
 
