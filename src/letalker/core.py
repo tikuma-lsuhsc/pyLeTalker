@@ -40,6 +40,11 @@ if has_numba:
     warnings.filterwarnings("ignore", category=NumbaExperimentalFeatureWarning)
 
 
+class classproperty(property):
+    def __get__(self, owner_self, owner_cls):
+        return self.fget(owner_cls)
+
+
 @lru_cache
 def _ts(
     fs: int,
