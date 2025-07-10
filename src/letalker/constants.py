@@ -28,8 +28,18 @@ mu: float = 0.000186  #: air viscosity in dyne-s/cm  (= Pa·s = kg/(m·s))
 nu: float = rho_air / mu  #: kinematic viscosity (m²/s)
 fs: int = 44100  #: sampling rate in S/s - must be fixed
 
-male_vf_params = {"L0": 1.42, "T0": 0.3, "fo2L": (4, 9.4), "xim": 0.12}  #: kinematic vocal fold model parameters of a male
-female_vf_params = {"L0": 0.86, "T0": 0.2, "fo2L": (5.5, 7.6), "xim": 0.1}  #: kinematic vocal fold model parameters of a female
+male_vf_params = {
+    "L0": 1.42,
+    "T0": 0.3,
+    "fo2L": (4, 9.4),
+    "xim": 0.12,
+}  #: kinematic vocal fold model parameters of a male
+female_vf_params = {
+    "L0": 0.86,
+    "T0": 0.2,
+    "fo2L": (5.5, 7.6),
+    "xim": 0.1,
+}  #: kinematic vocal fold model parameters of a female
 
 # fo2L: (A, B), A - kPa, B - unitless
 
@@ -77,7 +87,9 @@ def _load_vocaltract_data():
     }
 
 
-TwoLetterVowelLiteral = Literal[tuple(_load_vocaltract_data().keys())]  # Two-letter vowels
+TwoLetterVowelLiteral = Literal[
+    tuple(_load_vocaltract_data().keys())
+]  # Two-letter vowels
 
 if TYPE_CHECKING:
     vocaltract_areas: dict[TwoLetterVowelLiteral, NDArray]
@@ -91,6 +103,7 @@ vocaltract_resolution = c / (2 * fs)  #: vocal tract tube segment length
 # fmt: off
 SMB2018VocalTractSound = Literal['a:','e:','i:','o:','u:','E:','oe:','y:','a','E','I','O','U','oE','Y','@','f','l','s','S','C','x']
 #                        Literal['aː','eː','iː','oː','uː','ɛː','ø:', 'y:','a','ɛ','ɪ','ɔ','ʊ','œ', 'ʏ','ə','f','l','s','ʃ','ç','x']
+#                        Literal['AAː','EYː','IYː','OWː','UWː','EHː','ø:', 'y:','AA','EH','ɪ','ɔ','ʊ','œ', 'ʏ','AX','f','l','s','ʃ','ç','x']
 # fmt: on
 
 

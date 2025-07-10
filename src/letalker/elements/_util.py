@@ -1,7 +1,7 @@
 """internal utility functions"""
 
 from typing import Callable
-from numpy.typing import ArrayLike, NDArray
+from numpy.typing import NDArray
 
 import numpy as np
 
