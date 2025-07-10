@@ -9,6 +9,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 ### Added
 
 - `ts()` (an alias of `core.ts()`) to the top-level module for convenience
+- `sim_vf()` to run vocal-fold only simulation
+- `WaveReflectionVocalTract` refactored from `LetalkerVocalTract`
+- `SixPointVocalTract` to implement Stone-Merxen-Birkholz 2018 vocal tract model
+
+### Changed
+
+- `TimeSampleHandler.fs` and `Element.nu` changed to class properties
+
+### Fixed
+
+- `LossyCyclinderVocalTract.get_area()` to return NDArray all the time
 
 ## [0.1.0] - 2025-05-29
 
