@@ -35,6 +35,7 @@ from .VocalFoldsAg import VocalFoldsAg
 from .LeTalkerVocalFolds import LeTalkerVocalFolds
 from .WaveReflectionVocalTract import WaveReflectionVocalTract
 from .LeTalkerVocalTract import LeTalkerVocalTract
+from .SixPointVocalTract import SixPointVocalTract
 from .Lungs import LeTalkerLungs, OpenLungs, NullLungs
 from .LeTalkerLips import LeTalkerLips
 from .LeTalkerAspirationNoise import LeTalkerAspirationNoise, AspirationNoise
