@@ -33,6 +33,7 @@ from .KinematicVocalFolds import KinematicVocalFolds
 from .VocalFoldsUg import VocalFoldsUg
 from .VocalFoldsAg import VocalFoldsAg
 from .LeTalkerVocalFolds import LeTalkerVocalFolds
+from .WaveReflectionVocalTract import WaveReflectionVocalTract
 from .LeTalkerVocalTract import LeTalkerVocalTract
 from .Lungs import LeTalkerLungs, OpenLungs, NullLungs
 from .LeTalkerLips import LeTalkerLips
