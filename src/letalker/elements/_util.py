@@ -5,6 +5,15 @@ from numpy.typing import NDArray
 
 import numpy as np
 
+from ..constants import (
+    smb_xlar_default,
+    smb_Alar_default,
+    smb_nlarp_default,
+    smb_xp_default,
+    smb_xa_coefs,
+)
+
+
 pi = np.pi
 
 
@@ -66,22 +75,15 @@ def smb_vt_area_fun(
 
     # set defaults
     if xlar is None:
-        xlar = 2.0
+        xlar = smb_xlar_default
     if Alar is None:
-        Alar = 1.5125
+        Alar = smb_Alar_default
     if nlarp is None:
-        nlarp = 1.0
+        nlarp = smb_nlarp_default
     if xp is None:
-        xp = 3.0948
+        xp = smb_xp_default
     if xa is None:
-        xa = (
-            -2.347
-            - 0.061 * xc
-            - 2.052 * nca
-            - 0.159 * Aa
-            + 1.161 * xin
-            + 0.143 * xc * nca
-        )
+        xa = np.dot(smb_xa_coefs, (1.0, xc, nca, Aa, xin, xc * nca))
 
     n = [nlarp, npc, nca, nain]
 

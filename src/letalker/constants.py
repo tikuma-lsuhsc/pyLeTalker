@@ -18,6 +18,7 @@ from numpy.typing import NDArray
 
 from functools import lru_cache
 from math import pi
+import numpy as np
 
 _2pi = 2 * pi
 
@@ -73,7 +74,6 @@ vt_atten: float = 0.002  #: vocal tract attenuation factor
 def _load_vocaltract_data():
     from scipy.io.matlab import loadmat
     from os import path
-    import numpy as np
 
     datadir = path.join(path.split(__file__)[0], "data")
 
@@ -106,6 +106,11 @@ SMB2018VocalTractSound = Literal['a:','e:','i:','o:','u:','E:','oe:','y:','a','E
 #                        Literal['AAː','EYː','IYː','OWː','UWː','EHː','ø:', 'y:','AA','EH','ɪ','ɔ','ʊ','œ', 'ʏ','AX','f','l','s','ʃ','ç','x']
 # fmt: on
 
+smb_xlar_default = 2.0
+smb_Alar_default = 1.5125
+smb_nlarp_default = 1.0
+smb_xp_default = 3.0948
+smb_xa_coefs = np.array([-2.347, -0.061, -2.052, -0.159, 1.161, 0.143])
 
 @lru_cache(4)
 def smb_vt_area_data(data_type: Literal["geom", "optim"], reduced: bool) -> NDArray:
