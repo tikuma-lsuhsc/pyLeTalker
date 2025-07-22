@@ -10,8 +10,7 @@ from ..constants import smb_vt_area_data, SMB2018VocalTractSound
 
 
 class SixPointVocalTract(WaveReflectionVocalTract):
-    """Wave-reflection vocal tract model (Liljencrants, 1985; Story, 1995)"""
-
+    
     def __init__(
         self,
         Ap: float,
