@@ -1,3 +1,4 @@
+from typing import get_args
 import letalker as lt
 from letalker.elements import _util as util
 import numpy as np
@@ -21,11 +22,15 @@ def test_smb_vt_area_fun():
 def test_fant_horn_vt_area():
     from matplotlib import pyplot as plt
 
-    dx = lt.constants.c / lt.constants.fs
-    A = util.fant_horn_vt_area(dx, 0.85, 10.5)
-    x = np.arange(len(A)) * dx
-    plt.step(x,A)
+    # dx = lt.constants.c / lt.constants.fs
+    dx = 0.01
+    for model in get_args(util.TongueHornModel):
+        A = util.fant_horn_vt_area(dx, 0.85, 10.5, model=model)
+        x = np.arange(len(A)) * dx
+        plt.step(x, A, label=model)
+    plt.legend()
     plt.show()
 
-if __name__=='__main__':
+
+if __name__ == "__main__":
     test_fant_horn_vt_area()
