@@ -228,7 +228,7 @@ class LeTalkerLips(Lips):
             A[:-1, :] = a.T
             B[:-1, 0] = b
 
-            yield sps.ss2tf(A, B, C @ A, C @ B)
+            yield sps.ss2tf(A, B, c @ A, c @ B)
 
     def iter_freqz(
         self,

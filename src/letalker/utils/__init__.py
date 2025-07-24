@@ -1,4 +1,4 @@
-"""Utility Functions  
+"""Utility Functions
 
 The :py:mod:`letalker.utils` module defines utility functions to complement the
 synthesis functionality of pyLeTalker.
@@ -17,14 +17,15 @@ synthesis functionality of pyLeTalker.
 from __future__ import annotations
 
 from typing import Sequence
-from numpy.typing import NDArray
+from numpy.typing import NDArray, ArrayLike
 from fractions import Fraction
 import numpy as np
 
 from math import ceil
+from functools import reduce
 
 from ..function_generators.abc import FunctionGenerator
-from ..constants import fs as default_fs
+from ..constants import fs as default_fs, c, rho_air as rho
 from ..function_generators import Interpolator, Constant
 
 
@@ -36,7 +37,7 @@ def strobe_timing(
     fo: FunctionGenerator | Sequence[float] | float,
     duration: float | None = None,
     *,
-    fstrobe: int | Fraction = 1.2,
+    fstrobe: int | Fraction = Fraction(6, 5),
     n0: int = 0,
 ) -> NDArray:
     """compute non-uniform sampling indices for the strobe effect
@@ -146,3 +147,124 @@ def strobe_timing(
         nout[i + 1] = nsel
 
     return nout
+
+
+def vt_areas_to_tf(
+    f: ArrayLike,
+    areas: ArrayLike,
+    delta_l: float,
+    a: float | None = None,
+    b: float | None = None,
+    c1: float | None = None,
+    omega0_2: float | None = None,
+    c: float = c,
+    rho: float = rho,
+) -> NDArray:
+    """Compute the 2-in 2-out frequency response of vocal tract
+
+    Parameters
+    ----------
+    f
+        Length-N frequency vector in Hz
+    areas
+        vocal tract cross-sectional area vector in cm², ordered from glottis to lips
+    delta_l
+        length of each vocal tract tublet in cm
+    a, optional
+        ratio of wall resistance to mass in rad/s, by default None to use 130π
+    b, optional
+        squared angular freq. of mechan. resonance in (rad/s)², by default None
+        to use (30π)²
+    c1, optional
+        correction for thermal conductivity and viscosity in rad/s, by default
+        None to use 4
+    omega0_2, optional
+        lowest squ. ang. freq. of acoustic. resonance in (rad/s)², by default
+        None to use (406π)²
+    c, optional
+        speed of sound in cm/s, by default letalker.constants.c (35000)
+    rho, optional
+        air density in g/cm^3 (= kg/mm^3), by default letalker.constants.rho_air
+        (0.00114)
+
+    Returns
+    -------
+    K
+        The Nx2x2 NumPy array of complex values of the vocal tract's frequency
+        response estimated at each of the frequency values given in f:
+
+            [Pout(f);Uout(f)] = K(f) [Pin(f);Uin(f)]
+
+        Pin and Pout are the pressure at the input (glottis) and output (lips),
+        respectively; and Uin and Uout are the flows at the respective ends of
+        the vocal folds
+
+    References
+    ----------
+    [1] M. Sondhi and J. Schroeter, “A hybrid time-frequency domain articulatory
+        speech synthesizer,” IEEE Trans. Acoust., Speech, Signal Process.,
+        vol. 35, no. 7, pp. 955–967, July 1987, doi: 10.1109/TASSP.1987.1165240.
+    [2] B. H. Story, A.-M. Laukkanen, and I. R. Titze, “Acoustic impedance of an
+        artificially lengthened and constricted vocal tract,” Journal of Voice,
+        vol. 14, no. 4, pp. 455–469, Dec. 2000, doi: 10.1016/S0892-1997(00)80003-X.
+
+    """
+
+    if c1 is None:
+        c1 = 4
+    if a is None:
+        a = 130 * np.pi
+    if b is None:
+        b = (30 * np.pi) ** 2
+    if omega0_2 is None:
+        omega0_2 = (406 * np.pi) ** 2
+
+    jomega = 2j * np.pi * np.asarray(f)
+    alpha = np.sqrt(jomega * c1)
+    beta = jomega * omega0_2 / ((jomega + a) * jomega + b) + alpha
+    gamma = np.sqrt((a + jomega) / (beta + jomega))
+    sigma = gamma * (beta + jomega)
+    sigdl_c = sigma * delta_l / c
+
+    areas = np.asarray(areas).reshape(-1, 1)
+
+    ABCD = np.empty((areas.size, jomega.size, 2, 2), dtype=complex)
+    ABCD[:, :, 0, 0] = ABCD[:, :, 1, 1] = np.cosh(sigdl_c)
+    BC1 = -rho * c / areas * gamma
+    BC2 = np.sinh(sigdl_c)
+    ABCD[:, :, 0, 1] = BC1 * BC2
+    ABCD[:, :, 1, 0] = BC2 / BC1
+
+    return reduce(np.matmul, ABCD)
+
+
+def lips_z_load(f: ArrayLike, a: float, c: float = c)->NDArray:
+    """_summary_
+
+    Parameters
+    ----------
+    f
+        _description_
+    a
+        _description_
+    c, optional
+        _description_, by default c
+
+    Returns
+    -------
+        _description_
+    """    
+    jomega = 2j * np.pi * f
+    bm = np.sqrt(a / np.pi)
+    Zm = rho * c / a
+    R = 128 * Zm / (9 * np.pi**2)
+    L = 8 * bm * Zm / (3 * np.pi * c)
+    return jomega * R * L / (R + jomega * L)
+
+
+def vt_lips_z_in(
+    f, areas, delta_l, a=None, b=None, c1=None, omega0_2=None, c=c, rho=rho
+):
+    K = vt_areas_to_tf(f, areas, delta_l, a, b, c1, omega0_2, c, rho)
+    ZL = lips_z_load(f, areas[-1], c)
+    return (K[..., 1, 1] * ZL - K[..., 0, 1]) / (K[..., 0, 0] - K[..., 1, 0] * ZL)
