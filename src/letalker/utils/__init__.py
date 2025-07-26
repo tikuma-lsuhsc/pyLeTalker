@@ -28,6 +28,9 @@ from ..function_generators.abc import FunctionGenerator
 from ..constants import fs as default_fs, c, rho_air as rho
 from ..function_generators import Interpolator, Constant
 
+_pi = np.pi
+_2pi = 2 * _pi
+_j2pi = 2j * _pi
 
 __all__ = ["strobe_timing"]
 
@@ -154,9 +157,9 @@ def vt_areas_to_tf(
     areas: ArrayLike,
     delta_l: float,
     a: float | None = None,
-    b: float | None = None,
+    Fw: float | None = None,
     c1: float | None = None,
-    omega0_2: float | None = None,
+    FT: float | None = None,
     c: float = c,
     rho: float = rho,
 ) -> NDArray:
@@ -172,15 +175,15 @@ def vt_areas_to_tf(
         length of each vocal tract tublet in cm
     a, optional
         ratio of wall resistance to mass in rad/s, by default None to use 130π
-    b, optional
-        squared angular freq. of mechan. resonance in (rad/s)², by default None
-        to use (30π)²
+    Fw, optional
+        frequency of mechanical resonance in Hz, by default None
+        to use 15 Hz
     c1, optional
         correction for thermal conductivity and viscosity in rad/s, by default
         None to use 4
-    omega0_2, optional
-        lowest squ. ang. freq. of acoustic. resonance in (rad/s)², by default
-        None to use (406π)²
+    FT, optional
+        lowest resonant frequency of closed tract in Hz, by default
+        None to use 203 Hz
     c, optional
         speed of sound in cm/s, by default letalker.constants.c (35000)
     rho, optional
@@ -213,15 +216,17 @@ def vt_areas_to_tf(
     if c1 is None:
         c1 = 4
     if a is None:
-        a = 130 * np.pi
-    if b is None:
-        b = (30 * np.pi) ** 2
-    if omega0_2 is None:
-        omega0_2 = (406 * np.pi) ** 2
+        a = 130 * _pi
+    if Fw is None:
+        Fw = 15
+    if FT is None:
+        FT = 203
 
-    jomega = 2j * np.pi * np.asarray(f)
+    jomega = _j2pi * np.asarray(f)
+    omega0 = _2pi * FT
+    b = Fw * _2pi
     alpha = np.sqrt(jomega * c1)
-    beta = jomega * omega0_2 / ((jomega + a) * jomega + b) + alpha
+    beta = jomega * omega0**2 / ((jomega + a) * jomega + b**2) + alpha
     gamma = np.sqrt((a + jomega) / (beta + jomega))
     sigma = gamma * (beta + jomega)
     sigdl_c = sigma * delta_l / c
@@ -238,33 +243,96 @@ def vt_areas_to_tf(
     return reduce(np.matmul, ABCD)
 
 
-def lips_z_load(f: ArrayLike, a: float, c: float = c)->NDArray:
-    """_summary_
+def lips_z_load(f: ArrayLike, a: float, c: float = c) -> NDArray:
+    """calculate radiation impedance
 
     Parameters
     ----------
     f
-        _description_
+        Length-N frequency vector in Hz
     a
-        _description_
+        cross-sectional area between lips
     c, optional
-        _description_, by default c
+        speed of sound, by default letalker.constants.c (35000)
 
     Returns
     -------
-        _description_
-    """    
-    jomega = 2j * np.pi * f
-    bm = np.sqrt(a / np.pi)
+        Length-N radiation impedance
+
+    References
+    ----------
+    [1] B. H. Story, A.-M. Laukkanen, and I. R. Titze, “Acoustic impedance of an
+        artificially lengthened and constricted vocal tract,” Journal of Voice,
+        vol. 14, no. 4, pp. 455–469, Dec. 2000, doi: 10.1016/S0892-1997(00)80003-X.
+    """
+
+    jomega = _j2pi * np.asarray(f)
+    bm = np.sqrt(a / _pi)
     Zm = rho * c / a
-    R = 128 * Zm / (9 * np.pi**2)
-    L = 8 * bm * Zm / (3 * np.pi * c)
+    R = 128 * Zm / (9 * _pi**2)
+    L = 8 * bm * Zm / (3 * _pi * c)
     return jomega * R * L / (R + jomega * L)
 
 
 def vt_lips_z_in(
-    f, areas, delta_l, a=None, b=None, c1=None, omega0_2=None, c=c, rho=rho
-):
+    f: ArrayLike,
+    areas: ArrayLike,
+    delta_l: float,
+    a: float | None = None,
+    b: float | None = None,
+    c1: float | None = None,
+    omega0_2: float | None = None,
+    c: float = c,
+    rho: float = rho,
+) -> NDArray:
+    """Compute input impedance of vocal tract with lip radiation
+
+    Parameters
+    ----------
+    f
+        Length-N frequency vector in Hz
+    areas
+        vocal tract cross-sectional area vector in cm², ordered from glottis to lips
+    delta_l
+        length of each vocal tract tublet in cm
+    a, optional
+        ratio of wall resistance to mass in rad/s, by default None to use 130π
+    Fw, optional
+        frequency of mechanical resonance in Hz, by default None
+        to use 15 Hz
+    c1, optional
+        correction for thermal conductivity and viscosity in rad/s, by default
+        None to use 4
+    FT, optional
+        lowest resonant frequency of closed tract in Hz, by default
+        None to use 203 Hz
+    c, optional
+        speed of sound in cm/s, by default letalker.constants.c (35000)
+    rho, optional
+        air density in g/cm^3 (= kg/mm^3), by default letalker.constants.rho_air
+        (0.00114)
+
+    Returns
+    -------
+    K
+        The Nx2x2 NumPy array of complex values of the vocal tract's frequency
+        response estimated at each of the frequency values given in f:
+
+            [Pout(f);Uout(f)] = K(f) [Pin(f);Uin(f)]
+
+        Pin and Pout are the pressure at the input (glottis) and output (lips),
+        respectively; and Uin and Uout are the flows at the respective ends of
+        the vocal folds
+
+    References
+    ----------
+    [1] M. Sondhi and J. Schroeter, “A hybrid time-frequency domain articulatory
+        speech synthesizer,” IEEE Trans. Acoust., Speech, Signal Process.,
+        vol. 35, no. 7, pp. 955–967, July 1987, doi: 10.1109/TASSP.1987.1165240.
+    [2] B. H. Story, A.-M. Laukkanen, and I. R. Titze, “Acoustic impedance of an
+        artificially lengthened and constricted vocal tract,” Journal of Voice,
+        vol. 14, no. 4, pp. 455–469, Dec. 2000, doi: 10.1016/S0892-1997(00)80003-X.
+    """
     K = vt_areas_to_tf(f, areas, delta_l, a, b, c1, omega0_2, c, rho)
     ZL = lips_z_load(f, areas[-1], c)
     return (K[..., 1, 1] * ZL - K[..., 0, 1]) / (K[..., 0, 0] - K[..., 1, 0] * ZL)
