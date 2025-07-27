@@ -240,7 +240,7 @@ def vt_areas_to_tf(
     ABCD[:, :, 0, 1] = BC1 * BC2
     ABCD[:, :, 1, 0] = BC2 / BC1
 
-    return reduce(np.matmul, ABCD)
+    return reduce(np.matmul, ABCD[1:], ABCD[0])
 
 
 def lips_z_load(f: ArrayLike, a: float, c: float = c) -> NDArray:
