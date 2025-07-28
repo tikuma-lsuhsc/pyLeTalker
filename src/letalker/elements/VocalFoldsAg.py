@@ -93,7 +93,7 @@ class VocalFoldsAgBase(VocalFoldsBase, metaclass=abc.ABCMeta):
 
             self.ug[i] = ug
 
-            # compute the forward pressure in epilarnx
+            # compute the forward pressure in epilarynx
             feplx = beplx + ug * rhoca_eplx
 
             # compute the backward pressure in subglottis
