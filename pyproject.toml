@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools >= 61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["scikit-build-core", "nanobind"]
+build-backend = "scikit_build_core.build"
 
 
 [project]
@@ -22,7 +22,6 @@ dependencies = [
     "typing_extensions",
     "numpy",
     "scipy",
-    # "numba>0.52"
 ]
 
 [project.urls]
@@ -39,3 +38,6 @@ version = { attr = "letalker.__version__" }
 testpaths = ["tests"]
 # minversion = "6.0"
 # addopts = "-ra -q"
+
+[tool.scikit-build]
+wheel.packages = ["src/letalker","src/pyLetalker"]

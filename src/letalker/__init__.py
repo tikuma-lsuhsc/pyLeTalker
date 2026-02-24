@@ -1,14 +1,12 @@
-from .core import get_sampling_rate as _get_sampling_rate, ts
-
-from .sim import sim, sim_kinematic, sim_vf  # , sim_dual, sim_dual_kinematic
-from .elements import *
-from .function_generators import *
-from . import constants
-from .errors import LeTalkerError
-from . import utils
-
-
 import logging
+
+from . import _backend, constants, utils
+from .core import get_sampling_rate as _get_sampling_rate
+from .core import ts
+from .elements import *
+from .errors import LeTalkerError
+from .function_generators import *
+from .sim import sim, sim_kinematic, sim_vf  # , sim_dual, sim_dual_kinematic
 
 logger = logging.getLogger("letalker")
 logger.addHandler(logging.NullHandler())
