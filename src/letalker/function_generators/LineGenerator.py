@@ -20,7 +20,6 @@ if TYPE_CHECKING:
 
 
 class BasePolyGenerator(FunctionGenerator):
-
     @overload
     def __init__(
         self,

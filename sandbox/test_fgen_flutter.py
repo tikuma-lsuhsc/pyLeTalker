@@ -6,9 +6,9 @@ from letalker.constants import fs
 n = fs  # 1 second demo
 t = np.arange(n) / fs
 
-fo_mean = [100,124]
+fo_mean = [100, 124]
 fo_div = 20
-fo = FlutterGenerator(fo_div,0.1,16,bias=fo_mean,shape=2)
+fo = FlutterGenerator(fo_div, 0.1, 16, bias=fo_mean, shape=2)
 xi_ref = SineGenerator(fo)
 print(xi_ref(n).shape)
 exit()

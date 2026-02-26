@@ -1,3 +1,4 @@
 -e .
 -r ./tests/requirements.txt
 -r ./docs_src/requirements.txt
+ruff

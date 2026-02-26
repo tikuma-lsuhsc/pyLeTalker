@@ -125,7 +125,7 @@ class ColoredNoiseGenerator(WhiteNoiseGenerator):
 
     @cached_property
     def z0(self) -> NDArray:
-        """initial condition of the cascaded second-order sections of the noise coloring filter"""        
+        """initial condition of the cascaded second-order sections of the noise coloring filter"""
         return np.zeros((self.sos.shape[0], 2))  # sosfilt_zi(self.sos)
 
     def generate(self, n: int, z0: ArrayLike | None = None) -> tuple[NDArray, NDArray]:

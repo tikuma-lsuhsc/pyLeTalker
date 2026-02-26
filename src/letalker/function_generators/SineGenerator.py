@@ -20,7 +20,6 @@ _2pi = 2 * np.pi
 
 
 class BaseSineGenerator(AnalyticFunctionGenerator):
-    
     phi0: FunctionGenerator
 
     def __init__(
@@ -199,7 +198,7 @@ class BaseSineGenerator(AnalyticFunctionGenerator):
 
 class SineGenerator(TaperMixin, BiasMixin, ScaleMixin, BaseSineGenerator):
     """Sine wave generator (analytic)"""
-    
+
     @overload
     def __init__(
         self,

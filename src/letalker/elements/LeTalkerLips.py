@@ -50,7 +50,8 @@ def ishizaka_flanagan_lip_model(
 
 
 class LeTalkerLips(Lips):
-    """Ishizaka-Flanagan """
+    """Ishizaka-Flanagan"""
+
     @dataclass
     class Results(Element.Results):
         final_states: NDArray

@@ -121,7 +121,7 @@ def _validate_param(name: str, x: NDArray, ndim: int) -> NDArray:
         if x.ndim != ndim or x.shape[-1] != 2:
             raise LeTalkerError(
                 f"Incompatible {name}. {name} must be or produce {ndim}D array for symmetric vocal fold model or "
-                f"{ndim+1}D array for left-right asymmetric vocal fold model with the last dimension being 2."
+                f"{ndim + 1}D array for left-right asymmetric vocal fold model with the last dimension being 2."
             )
         x = np.moveaxis(x, -1, 0).reshape(2, *shape)
     else:
@@ -270,7 +270,6 @@ class Xi0ZFunBase(Xi0Z_Callable, metaclass=abc.ABCMeta):
 
 
 class Xi0ZFunPolyBase(Xi0ZFunBase):
-
     Qb: SampleGenerator | None  # bulging quotient
 
     def __init__(self, Qb: float | ArrayLike | SampleGenerator | None = None):
@@ -632,7 +631,6 @@ Xi1Z_Callable = Callable[[NDArray, int, int], NDArray]
 
 
 class LeTalkerXi1ZFun(Xi1Z_Callable):
-
     Qnp: SampleGenerator = Constant(kinematic_params_default["Qnp"])
     Qp: SampleGenerator = Constant(kinematic_params_default["Qp"])
 

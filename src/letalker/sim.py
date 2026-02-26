@@ -108,7 +108,6 @@ def _sim_loop(
     flung = blung = fsg = bsg = feplx = beplx = flip = blip = 0.0
 
     for i in range(nb_steps):
-
         # Compute current pressure outputs from VOCAL FOLD
         feplx, bsg = vf.step(i, fsg, beplx)
 
@@ -313,7 +312,7 @@ def sim_vf(
 
     The given vocal fold model is simulated with the optional subglottal and
     supraglottal conditions. Each condition is set by the interfacing cross-sectional
-    area (Asub/Asup) and the input pressure function (forward pressure Fin for 
+    area (Asub/Asup) and the input pressure function (forward pressure Fin for
     subglottal input/backward pressure Bin for supraglottal input).
 
     Parameters
@@ -323,11 +322,11 @@ def sim_vf(
     vocalfolds
         Vocal fold model
     Asub, optional
-        Subglottal area, by default None to use the default subglottal area 
+        Subglottal area, by default None to use the default subglottal area
         (i.e., the last element of `constants.vocaltract_area['trach']`, 0.31 cm²)
     Asup, optional
-        Epiglottal area, by default None to use the epiglottal area of default 
-        /a/ vocal tract (i.e., the first element of `constants.vocaltract_area['aa']`, 
+        Epiglottal area, by default None to use the epiglottal area of default
+        /a/ vocal tract (i.e., the first element of `constants.vocaltract_area['aa']`,
         0.56 cm²)
     Fin, optional
         Subglottal input pressure, by default None to use `constants.PL` (7840 dyn/cm²)
@@ -340,7 +339,6 @@ def sim_vf(
     -------
         The result object of the specified `vocaltracts`.
     """
-
 
     if Asub is None and vocalfolds.upstream is None:
         Asub = vocaltract_areas["trach"][-1]
@@ -361,7 +359,9 @@ def sim_vf(
             P = np.asarray(P, dtype=float)
             assert P.ndim <= 1
         except (ValueError, AssertionError) as e:
-            raise ValueError(f"{name} must be either float or a numerical 1D array.") from e
+            raise ValueError(
+                f"{name} must be either float or a numerical 1D array."
+            ) from e
 
         return (
             Constant(P.reshape(()))
@@ -405,7 +405,6 @@ def _sim_sep_loop(
     hblung = hfsg = hbeplx = hblip = 0.0  # harmonic component
     nblung = nfsg = nbeplx = nblip = 0.0  # nonharmonic component
     for i in range(nb_steps):
-
         # Compute harmonics+noise vf
         feplx, bsg = m_vf.step(i, hfsg + nfsg, hbeplx + nbeplx)
 

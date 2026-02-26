@@ -17,7 +17,6 @@ _2pi = 2 * np.pi
 
 
 class BaseFlutterGenerator(FunctionGenerator):
-
     _sine_gen: BaseSineGenerator
     _ampl: FunctionGenerator
 
@@ -65,7 +64,7 @@ class BaseFlutterGenerator(FunctionGenerator):
 
         super().__init__(**kwargs)
 
-        if isinstance(shape,int):
+        if isinstance(shape, int):
             shape = (shape,)
 
         freqs = np.asarray(f)

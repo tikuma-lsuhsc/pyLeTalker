@@ -3,4 +3,4 @@
 import sys, letalker
 from letalker import *
 
-sys.modules['pyLeTalker'] = letalker
+sys.modules["pyLeTalker"] = letalker

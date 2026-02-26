@@ -59,7 +59,7 @@ analytic = False
 
 # test higher order derivatives & anti-derivatives
 # gen0 = SineGenerator(fo=[10, 14], A=[1.2, 1.4], phi0=np.pi / 2)
-gen0 = SineGenerator(fo=[10, 14], A=[1.2, 1.4], phi0='random')
+gen0 = SineGenerator(fo=[10, 14], A=[1.2, 1.4], phi0="random")
 
 nu_max = 5
 fig, axes = plt.subplots(2, nu_max, sharex=True)

@@ -290,7 +290,6 @@ class ScaleMixin:
 
 
 class TaperMixin:
-
     _taper_BaseClass: FunctionGenerator | None
 
     def __init__(

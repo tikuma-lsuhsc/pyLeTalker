@@ -1,4 +1,4 @@
-"""Utility Functions  
+"""Utility Functions
 
 The :py:mod:`letalker.utils` module defines utility functions to complement the
 synthesis functionality of pyLeTalker.
@@ -115,7 +115,6 @@ def strobe_timing(
     nout[0] = 0  # first frame is always at 0
 
     for i, (phi_i, ni0, ni1) in enumerate(zip(phi_n[1:], nedges[:-1], nedges[1:])):
-
         # find the rising edges during the frame duration
         tf = phi_wrapped[ni0:ni1] > phi_i
         j = np.where(~tf[:-1] & tf[1:])[0]

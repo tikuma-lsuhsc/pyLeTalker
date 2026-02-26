@@ -29,7 +29,7 @@ x = nfsrc.generate_noise(11000)
 
 f, Pxx = welch(x[1000:], fs, nperseg=1000, noverlap=750, nfft=1024 * 8)
 # f, Pxx = periodogram(x[1000:], fs)
-plt.plot(f, 10*np.log10(Pxx*1000))
+plt.plot(f, 10 * np.log10(Pxx * 1000))
 plt.show()
 exit()
 

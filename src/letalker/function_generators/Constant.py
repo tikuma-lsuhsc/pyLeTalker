@@ -11,7 +11,6 @@ from . import _functions as _f
 
 
 class BaseConstant(FunctionGenerator):
-
     def __init__(self, level: float | NDArray, **kwargs):
         super().__init__(**kwargs)
         self._c = np.asarray([level])

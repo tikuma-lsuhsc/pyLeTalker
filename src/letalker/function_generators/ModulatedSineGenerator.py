@@ -17,6 +17,7 @@ _2pi = 2 * pi
 
 class ModulatedSineGenerator(SineGenerator):
     """Modulated sine wave generator (analytic)"""
+
     _fm: bool = False  # true if FM enabled
     _am: bool = False  # true if AM enabled
 

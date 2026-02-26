@@ -18,10 +18,12 @@ from letalker.elements import SixPointVocalTract
 
 
 for v in get_args(SixPointVocalTract.VocalTractSound)[14:15]:
-    for data_type in ('geom','optim'):
-        for reduced in (False,True):
-            vocaltract = SixPointVocalTract.from_preset(v,data_type, reduced)
-            plt.step(vocaltract.z, vocaltract.areas()[0],label=f'{v}:{data_type}:{reduced}')
+    for data_type in ("geom", "optim"):
+        for reduced in (False, True):
+            vocaltract = SixPointVocalTract.from_preset(v, data_type, reduced)
+            plt.step(
+                vocaltract.z, vocaltract.areas()[0], label=f"{v}:{data_type}:{reduced}"
+            )
 
 plt.legend()
 plt.show()

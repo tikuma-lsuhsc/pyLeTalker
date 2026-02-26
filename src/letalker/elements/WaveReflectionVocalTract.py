@@ -20,6 +20,7 @@ from ..core import has_numba, classproperty
 if has_numba:
     import numba as nb
 
+
 class WaveReflectionVocalTract(VocalTract):
     """Wave-reflection vocal tract model (Liljencrants, 1985; Story, 1995)"""
 

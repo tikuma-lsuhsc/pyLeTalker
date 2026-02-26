@@ -112,6 +112,7 @@ smb_nlarp_default = 1.0
 smb_xp_default = 3.0948
 smb_xa_coefs = np.array([-2.347, -0.061, -2.052, -0.159, 1.161, 0.143])
 
+
 @lru_cache(4)
 def smb_vt_area_data(data_type: Literal["geom", "optim"], reduced: bool) -> NDArray:
     """Stone-Marxen-Birkholz six-point vocal tract model preset parameters

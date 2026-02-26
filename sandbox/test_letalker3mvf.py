@@ -17,7 +17,7 @@ w = runner.w[0]
 f = np.zeros((N, 3))
 # f[:, :2] = np.random.rand(N, 2)*0.1
 f[:] = 0
-y0 = np.random.rand(6)*0.05
+y0 = np.random.rand(6) * 0.05
 y0[-1] += max(y0[:2])
 
 y = np.empty((N + 1, 6))

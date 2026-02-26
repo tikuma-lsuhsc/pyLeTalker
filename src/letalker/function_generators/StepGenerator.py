@@ -26,6 +26,7 @@ StepTypeLiteral = Literal[
 
 class StepGenerator(FunctionGenerator):
     "Step function generator"
+
     _step_level0: float  # initial value
     _step_args: list[tuple]  # tuples of step function name and arguments
 
@@ -155,7 +156,6 @@ class StepGenerator(FunctionGenerator):
         t = self.ts(*ts_args)
 
         if len(self._step_args):
-
             # composite stepping multiplier
             x = sum(
                 [
@@ -307,9 +307,10 @@ class StepGenerator(FunctionGenerator):
 
         omega, ta, tb = StepGenerator._raised_cos_args(t0, tcos)
         g = x1 / 2
-        fcn1 = lambda t: _f.poly_antiderivative(
-            [g], (t.ravel() - ta), nu
-        ) + g * _f.sine_antiderivative(omega, 0.0, (t - t0), False, nu)
+        fcn1 = lambda t: (
+            _f.poly_antiderivative([g], (t.ravel() - ta), nu)
+            + g * _f.sine_antiderivative(omega, 0.0, (t - t0), False, nu)
+        )
 
         xb = fcn1(tb)
 
@@ -355,9 +356,12 @@ class StepGenerator(FunctionGenerator):
         tau, t0 = StepGenerator._exp_decay_args(t0, tau)
         a = -tau
         b = -1 / tau
-        fcn0 = lambda t: x1 * (
-            _f.poly_antiderivative([np.ones_like(x1)], (t.ravel() - t0), nu)
-            - a**nu * np.exp(b * (t - t0))
+        fcn0 = lambda t: (
+            x1
+            * (
+                _f.poly_antiderivative([np.ones_like(x1)], (t.ravel() - t0), nu)
+                - a**nu * np.exp(b * (t - t0))
+            )
         )
 
         xb = fcn0(t0)
@@ -410,7 +414,7 @@ class StepGenerator(FunctionGenerator):
     def _step_logistic(t0: float, x1: NDArray, a: float, t: NDArray):
         a /= 4
         nu = (t - t0) / a
-        return x1 * expit(nu) # 1/(1+exp(-nu))
+        return x1 * expit(nu)  # 1/(1+exp(-nu))
 
     @staticmethod
     def _dstep_logistic(t0: float, x1: NDArray, a: float, t: NDArray, nu: int):
@@ -421,8 +425,8 @@ class StepGenerator(FunctionGenerator):
         t = t - t0
         a /= 4
         # e = np.exp(-t / a)
-        nu = t/a
-        return x1/a * expit(nu)*expit(-nu)
+        nu = t / a
+        return x1 / a * expit(nu) * expit(-nu)
         # return x1 * e / (a * (1 + e) ** 2)
         # x1 / a * (1 / (e**(-1) + 1)) * 1 / (1 + e)
 
@@ -434,10 +438,10 @@ class StepGenerator(FunctionGenerator):
             )
         t = t - t0
         a /= 4
-        nu = t/a
-        
+        nu = t / a
+
         # x = x1 * (a * np.log(1 + np.exp(-nu)) + t)
-        return x1 * (t-a * log_expit(nu)).reshape(-1,*np.ones(x1.ndim,int))
+        return x1 * (t - a * log_expit(nu)).reshape(-1, *np.ones(x1.ndim, int))
 
     # ATAN TRANSITION
 

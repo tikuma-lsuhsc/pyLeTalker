@@ -26,7 +26,6 @@ RosenbergPulseType = Literal[
 
 
 class BaseRosenbergGenerator(AnalyticFunctionGenerator):
-
     pulse_type: RosenbergPulseType = "polynomial"
     oq: float | FunctionGenerator = 0.5
     sq: float | FunctionGenerator = 2.0

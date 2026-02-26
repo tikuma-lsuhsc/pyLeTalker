@@ -99,7 +99,8 @@ def format_parameter(
             raise ValueError(f"Invalid parameter dimension/shape.")
 
         parameter = ClampedInterpolator(
-            get_sampling_rate(), [parameter] if force_time_axis and not ndim else parameter
+            get_sampling_rate(),
+            [parameter] if force_time_axis and not ndim else parameter,
         )
 
     return parameter

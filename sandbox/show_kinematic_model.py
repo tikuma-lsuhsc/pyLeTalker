@@ -27,7 +27,9 @@ Ae = vocaltract_areas["aa"][0]
 As = vocaltract_areas["trach"][-1]
 
 vf = KinematicVocalFolds(
-    xiref, As=As, Ae=Ae  # , **male_vf_params, Qa=0.3, Qs=3, Qb=1, Qp=0.2
+    xiref,
+    As=As,
+    Ae=Ae,  # , **male_vf_params, Qa=0.3, Qs=3, Qb=1, Qp=0.2
 )
 
 fig = plt.figure()

@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 
 class BaseLogGenerator(FunctionGenerator):
-
     def __init__(
         self, antilog: FunctionGenerator, *, base: float | None = None, **kwargs
     ):

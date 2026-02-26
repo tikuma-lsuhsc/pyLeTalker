@@ -114,8 +114,22 @@ class SixPointVocalTract(WaveReflectionVocalTract):
 
         areas = smb_vt_area_fun(
             # fmt:off
-            Ap, npc, xc, Ac, nca, Aa, nain, xin, Ain, xlip, Alip, xlar, Alar, 
-            nlarp, xp, xa
+            Ap,
+            npc,
+            xc,
+            Ac,
+            nca,
+            Aa,
+            nain,
+            xin,
+            Ain,
+            xlip,
+            Alip,
+            xlar,
+            Alar,
+            nlarp,
+            xp,
+            xa,
             # fmt:on
         )(x)
 

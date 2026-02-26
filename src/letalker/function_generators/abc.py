@@ -9,15 +9,19 @@ import numpy as np
 
 from ..core import TimeSampleHandler
 
-__all__ = ['SampleGenerator','FunctionGenerator','AnalyticFunctionGenerator','NoiseGenerator']
+__all__ = [
+    "SampleGenerator",
+    "FunctionGenerator",
+    "AnalyticFunctionGenerator",
+    "NoiseGenerator",
+]
+
 
 class SampleGenerator(TimeSampleHandler, Callable, metaclass=abc.ABCMeta):
-    """Abstract baseclass of classes to generate 
+    """Abstract baseclass of classes to generate"""
 
-    """
-    
     # auto_repeat: bool = True
-    
+
     def __init__(self, **kwargs):
         if len(kwargs):
             raise TypeError(f"Unresolved keyword arguments remain: {kwargs=}")
@@ -45,7 +49,7 @@ class SampleGenerator(TimeSampleHandler, Callable, metaclass=abc.ABCMeta):
         Returns
         -------
             nb_samples-element NumPy array containing the time sequence in second
-        """    
+        """
 
         t = TimeSampleHandler.ts(nb_samples, n0, sample_edges, upsample_factor)
         if self.ndim:
@@ -171,10 +175,7 @@ class FunctionGenerator(SampleGenerator, metaclass=abc.ABCMeta):
 
 
 class AnalyticFunctionGenerator(FunctionGenerator, metaclass=abc.ABCMeta):
-    """Abstract base class of function generators, which can possibly generate analytic signal version of the function.
-
-    """
-
+    """Abstract base class of function generators, which can possibly generate analytic signal version of the function."""
 
     _fo: FunctionGenerator  # fundamental frequency
 
@@ -243,6 +244,7 @@ class NoiseGenerator(SampleGenerator, metaclass=abc.ABCMeta):
     metaclass, optional
         _description_, by default abc.ABCMeta
     """
+
     def __init__(self, **kwargs):
 
         super().__init__(**kwargs)

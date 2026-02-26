@@ -15,20 +15,20 @@ The :py:mod:`~typing` module defines the custom type hints.
 
       'aa', 'ii', 'uu', 'ae', 'ih', 'eh', 'ah', 'aw', 'uh', 'oo', 'trach'
 
-   These codes specify vocal tract areas. These can be used for the :code:`areas` 
-   argument of the :py:class:`letalker.LeTalkerVocalTract` constructor. Also, 
-   they are the keys of the :py:attr:`letalker.constants.vocaltract_areas` 
+   These codes specify vocal tract areas. These can be used for the :code:`areas`
+   argument of the :py:class:`letalker.LeTalkerVocalTract` constructor. Also,
+   they are the keys of the :py:attr:`letalker.constants.vocaltract_areas`
    dict.
-   
-   The two-letter vowel codes specify the built-in (supraglottal) vocal tract 
-   configurations to produce the specified vowel (44-segment models) while the 
-   last option, :code:`"trach"`, is a 32-segment trachea (subglottal) vocal 
+
+   The two-letter vowel codes specify the built-in (supraglottal) vocal tract
+   configurations to produce the specified vowel (44-segment models) while the
+   last option, :code:`"trach"`, is a 32-segment trachea (subglottal) vocal
    tract model.
 
 .. py:attribute:: StepTypeLiteral
 
-   This literal specifies the transition types supported by 
-   :py:class:`letalker.StepGenerator` and other function generators with 
+   This literal specifies the transition types supported by
+   :py:class:`letalker.StepGenerator` and other function generators with
    :code:`transition_type` argument. There are 9 options:
 
    =================  =========================
@@ -58,7 +58,7 @@ The :py:mod:`~typing` module defines the custom type hints.
    `"two_point"`      Symmetrical two-point distribution
    `"uniform"`        Symmetrical uniform distribution
    =================  ==================================
-   
+
 """
 
 from .sim import SimResultsDict
@@ -68,7 +68,7 @@ from .function_generators.WhiteNoiseGenerator import WhiteNoiseDistributionLiter
 
 from typing import Literal
 
-TestLiteral = Literal['test','test1'] 
+TestLiteral = Literal["test", "test1"]
 
 
 __all__ = [

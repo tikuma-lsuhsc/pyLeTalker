@@ -18,12 +18,12 @@ def test_colored_noise():
 
     ngen = ColoredNoiseGenerator(*noise_bpass)
     x, zo = ngen.generate(100)
-    ngen.generate(100,zo)
+    ngen.generate(100, zo)
     assert x.shape == (100,)
     x = ngen(100)
     assert x.shape == (100,)
-    assert np.array_equal(x,ngen(100))
+    assert np.array_equal(x, ngen(100))
 
     x = ngen(100, 120)
     y = ngen(220)
-    assert np.array_equal(x,y[120:])
+    assert np.array_equal(x, y[120:])

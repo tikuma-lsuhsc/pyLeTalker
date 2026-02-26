@@ -34,8 +34,10 @@ S = win.sum()  # rectangular window
 # x = np.random.randn(N)*fs**0.5
 x = x.reshape((N // nwin, nwin))
 
-nfft = 1024*8
-X = np.mean(np.abs(rfft(x.reshape(N // nwin, nwin) * win, nfft, axis=-1)) ** 2, 0) / S  # / fs
+nfft = 1024 * 8
+X = (
+    np.mean(np.abs(rfft(x.reshape(N // nwin, nwin) * win, nfft, axis=-1)) ** 2, 0) / S
+)  # / fs
 f = np.arange(nfft // 2 + 1) * fs / nfft
 
 print(x.var() / fs)
@@ -54,7 +56,7 @@ f, H = welch(
     scaling="density",
     detrend=False,
 )
-plt.plot(f, H*fs/2)
+plt.plot(f, H * fs / 2)
 
 plt.subplot(3, 1, 3)
 b, a = sos2tf(generator.sos)

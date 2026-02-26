@@ -36,7 +36,6 @@ class BlockRunner(Protocol):
 
 
 class Element(TimeSampleHandler, metaclass=abc.ABCMeta):
-
     c: float = c_default  #: speed of sound in cm/s
     rho: float = rho_default  #: air density in g/cm³ (= kg/mm³)
     mu: float = mu_default  #: air viscosity in dyne-s/cm²  (= Pa·s = kg/(m·s))

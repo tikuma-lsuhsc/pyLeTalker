@@ -13,7 +13,7 @@ with open(f"{letalker.__path__[0]}/../../sandbox/ltvf_disps.pkl", "rb") as f:
 fig = plt.figure()
 axes = fig.add_subplot(projection="3d")
 
-axes.view_init(22.5, -70) # good perspective view
+axes.view_init(22.5, -70)  # good perspective view
 # axes.view_init(90, -90)  # top view
 # axes.view_init(0, -90)  # top view
 

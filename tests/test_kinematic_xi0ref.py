@@ -104,7 +104,7 @@ def test_Xi0ZFunPoly(xi0, Qb):
     out_shape = (n if is_dynamic else 1, nz)
     if is_lateral:
         out_shape = (2, *out_shape)
-    elif not is_dynamic:    
+    elif not is_dynamic:
         out_shape = out_shape[1:]
 
     xi0z = Xi0ZFunPoly(xi0, Qb)

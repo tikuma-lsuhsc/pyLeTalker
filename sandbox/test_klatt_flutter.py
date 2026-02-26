@@ -4,7 +4,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
 n = 100000
 fo = 100
 fs = 44100
@@ -12,7 +11,7 @@ fs = 44100
 t = np.arange(n) / fs
 phi = 2 * np.pi * fo * t
 
-flutter = FlutteredPitch(phi0='random')
+flutter = FlutteredPitch(phi0="random")
 
 fo_flutter = flutter.modify_pitch(t, fo)
 

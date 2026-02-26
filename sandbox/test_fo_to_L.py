@@ -28,8 +28,8 @@ plt.plot(eps * 100, eps_to_mu_riede(eps, A, B), "--", c="C0", label="Male (Titze
 plt.plot(eps * 100, eps_to_mu_chan(eps, Af, Bf), c="C1", label="Chan 2007")
 plt.plot(eps * 100, eps_to_mu_riede(eps, Af, Bf), "--", c="C1", label="Titze 2016")
 plt.legend()
-plt.xlabel('strain $\epsilon$ (%)')
-plt.ylabel('stress (kPa)')
+plt.xlabel("strain $\epsilon$ (%)")
+plt.ylabel("stress (kPa)")
 plt.show()
 
 print(A, B)

@@ -112,6 +112,7 @@ class LeTalkerLungs(LungsBase):
 
 class OpenLungs(LungsBase):
     """Constant-pressure lung model with zero-reflection"""
+
     class Runner:
         n: int
         plung: np.ndarray

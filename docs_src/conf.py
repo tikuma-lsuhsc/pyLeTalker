@@ -94,7 +94,7 @@ autodoc_member_order = "groupwise"
 autodoc_type_aliases = {
     "ArrayLike": "~numpy.typing.ArrayLike",
     "NDArray": "~numpy.typing.NDArray",
-    "lt": "letalker"
+    "lt": "letalker",
 }
 autodoc_mock_imports = ["builtins"]
 autodoc_typehints_format = "short"
@@ -102,7 +102,7 @@ autodoc_typehints_format = "short"
 autodoc_default_options = {"exclude-members": "__new__", "class-doc-from": "init"}
 autodoc_typehints = "description"
 
-overloads_location = 'signature'
+overloads_location = "signature"
 
 
 # Intersphinx configuration
@@ -124,7 +124,7 @@ nitpick_ignore = [
     ("py:class", "numpy.complex128"),
     ("py:class", "numpy.typing.ArrayLike"),
     ("py:obj", "List"),
-    ("Lungs.LungsBase.Results",None),
+    ("Lungs.LungsBase.Results", None),
 ]
 
 
@@ -139,9 +139,7 @@ linkcheck_ignore = []
 rst_epilog = """
 .. |binder_badge_examples| image:: https://mybinder.org/badge_logo.svg
     :target: https://mybinder.org/v2/gh/tikuma-lsuhsc/pyLeTalker/{binder_ref}?urlpath=lab/tree/docs/examples
-""".format(
-    binder_ref=branch_or_commit
-)
+""".format(binder_ref=branch_or_commit)
 
 # nbsphinx_prolog = f"""
 # {{% set docname = 'docs_src/' + env.doc2path(env.docname, base=False) %}}

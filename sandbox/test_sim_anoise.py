@@ -54,7 +54,7 @@ t = t[1000:]
 po_harmonics = lips.pout[1000:]
 po_noise = lip_nout[1000:, 0]
 
-nfft = 1024*8
+nfft = 1024 * 8
 
 plt.subplots(1, 2)
 plt.subplot(1, 2, 1)
@@ -64,7 +64,7 @@ plt.grid()
 plt.legend()
 plt.subplot(1, 2, 2)
 plt.magnitude_spectrum(po_harmonics, fs, pad_to=nfft, scale="dB")
-plt.magnitude_spectrum(po_noise, fs,pad_to=nfft, scale="dB")
+plt.magnitude_spectrum(po_noise, fs, pad_to=nfft, scale="dB")
 plt.grid()
 plt.legend()
 

@@ -1,6 +1,6 @@
 from .core import get_sampling_rate as _get_sampling_rate, ts
 
-from .sim import sim, sim_kinematic, sim_vf #, sim_dual, sim_dual_kinematic
+from .sim import sim, sim_kinematic, sim_vf  # , sim_dual, sim_dual_kinematic
 from .elements import *
 from .function_generators import *
 from . import constants
@@ -15,6 +15,7 @@ logger.addHandler(logging.NullHandler())
 
 
 __version__ = "0.1.0"
+
 
 def __getattr__(name):
     if name == "fs":

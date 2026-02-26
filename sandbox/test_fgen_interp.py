@@ -22,21 +22,21 @@ for nu in range(1, 4):
     axes[1, nu].plot(t, ix)
 
     axes[0, nu - 1].plot(t, x0 + np.cumsum(dx, 0) / fs)
-    axes[1, nu - 1].plot(t[:-1], np.diff(ix, axis=0) *fs)
+    axes[1, nu - 1].plot(t[:-1], np.diff(ix, axis=0) * fs)
 
     x0 = dx[0]
 
 from scipy.interpolate import make_interp_spline
 
-x = np.linspace(0, 2*np.pi, 10)
+x = np.linspace(0, 2 * np.pi, 10)
 y = np.array([np.sin(x), np.cos(x)])
 
 plt.figure()
-ax = plt.axes(projection='3d')
-xx = np.linspace(0, 20*np.pi, 1000)
-bspl = make_interp_spline(x, y, k=5, bc_type='periodic', axis=1)
+ax = plt.axes(projection="3d")
+xx = np.linspace(0, 20 * np.pi, 1000)
+bspl = make_interp_spline(x, y, k=5, bc_type="periodic", axis=1)
 ax.plot3D(xx, *bspl(xx))
-ax.scatter3D(x, *y, color='red')
+ax.scatter3D(x, *y, color="red")
 
 
 plt.show()

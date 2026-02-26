@@ -1,9 +1,9 @@
 """
 
-Creating Custom Voice Production Element Classes  
+Creating Custom Voice Production Element Classes
 ================================================
 
-You can create your own Python classes for both the voice production elements 
+You can create your own Python classes for both the voice production elements
 and function generators to custom models or parameter behaviors.
 
 The main module :py:mod:`~letalker` provides all the functions and classes that
@@ -12,7 +12,7 @@ are essential to run the voice synthesis.
 
 API Reference
 -------------
-     
+
 .. autosummary::
 
     abc.Element

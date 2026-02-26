@@ -6,7 +6,11 @@ from scipy.signal import get_window
 # from oct2py import octave
 # from os import path, getcwd
 
-from letalker import AsymmetricKinematicVocalFolds, SineGenerator, ModulatedSineGenerator
+from letalker import (
+    AsymmetricKinematicVocalFolds,
+    SineGenerator,
+    ModulatedSineGenerator,
+)
 from letalker.constants import fs, male_vf_params, rho_air, c, vocaltract_areas, PL
 
 N = 4000
@@ -40,8 +44,8 @@ plt.subplots(2, 1, sharex=False)
 plt.subplot(2, 1, 1)
 plt.plot(vf.glottal_area(N), label="glottal area")
 plt.subplot(2, 1, 2)
-plt.magnitude_spectrum(vf.glottal_area(N),fs,scale='dB',pad_to=44100)
-plt.xlim(0,1000)
+plt.magnitude_spectrum(vf.glottal_area(N), fs, scale="dB", pad_to=44100)
+plt.xlim(0, 1000)
 # plt.plot(vf.contact_area(N), label="contact area")
 plt.show()
 exit()

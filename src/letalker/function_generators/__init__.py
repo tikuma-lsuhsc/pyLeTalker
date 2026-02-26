@@ -1,8 +1,8 @@
 """
-Creating Custom Function Generator Classes  
+Creating Custom Function Generator Classes
 ================================================
 
-You can create your own Python classes for both the voice production elements 
+You can create your own Python classes for both the voice production elements
 and function generators to custom models or parameter behaviors.
 
 The main module :py:mod:`~letalker` provides all the functions and classes that

@@ -2,16 +2,16 @@
 
 Klatt & Klatt describes their aspiration noise as [1, p.838]:
 
-"The aspiration noise has a spectrum that falls off at about 6 dB/oct of frequency 
-increase, but when the radiation characteristic is folded into the source models, 
+"The aspiration noise has a spectrum that falls off at about 6 dB/oct of frequency
+increase, but when the radiation characteristic is folded into the source models,
 the result is a relatively flat spectrum. Thus, as noise is added to the voicing
-source, it is most noticeable at high frequencies where the harmonic spectrum of 
-voicing is weaker. If the glottis is partially spread, as in a breathy vowel, TL 
-and AH will be increased, and higher harmonics of the source spectrum will be 
+source, it is most noticeable at high frequencies where the harmonic spectrum of
+voicing is weaker. If the glottis is partially spread, as in a breathy vowel, TL
+and AH will be increased, and higher harmonics of the source spectrum will be
 replaced by aspiration noise."
 
-According to `klatt.c` of the eSpeak synthesizer [2], the 3-dB cut-off frequency 
-of the lowpass process is around 4000 Hz (a discrete-time AR(1) process with pole 
+According to `klatt.c` of the eSpeak synthesizer [2], the 3-dB cut-off frequency
+of the lowpass process is around 4000 Hz (a discrete-time AR(1) process with pole
 at 0.75, sampled at 88.2 kS/s).
 
 Also in [2], the noise power is modulated during phonation: the amplitude is halved
@@ -19,7 +19,7 @@ for the half (closing phase) of the source vibration period.
 
 Changes in KlattAspirationNoise:
 
-1. The default lowpass filter is changed to a bilinear transformed first-order 
+1. The default lowpass filter is changed to a bilinear transformed first-order
 Butterworth lowpass filter with the 4 kHz cutoff.
 
 2. The modulation is imposed by Reynolds number, a la `KlattAspirationNoise`.
@@ -78,12 +78,12 @@ from ..function_generators.abc import NoiseGenerator
 from .abc import AspirationNoise, Element
 
 from ..core import has_numba
+
 if has_numba:
     import numba as nb
 
 
 class KlattAspirationNoise(AspirationNoise):
-
     alpha: float = 0.5
     """sub-critical noise level"""
     REc: float = 1200.0
@@ -107,15 +107,19 @@ class KlattAspirationNoise(AspirationNoise):
     # override result class
     _ResultsClass = Results
 
-    RunnerSpec = [
-        ("n", nb.int64),
-        ("nuL_inv", nb.float64[:]),
-        ("nf", nb.float64[:]),
-        ("alpha", nb.float64),
-        ("re2b", nb.float64[:]),
-        ("re2", nb.float64[:]),
-        ("ug_noise", nb.float64[:]),
-    ] if has_numba else []
+    RunnerSpec = (
+        [
+            ("n", nb.int64),
+            ("nuL_inv", nb.float64[:]),
+            ("nf", nb.float64[:]),
+            ("alpha", nb.float64),
+            ("re2b", nb.float64[:]),
+            ("re2", nb.float64[:]),
+            ("ug_noise", nb.float64[:]),
+        ]
+        if has_numba
+        else []
+    )
 
     class Runner:
         n: int

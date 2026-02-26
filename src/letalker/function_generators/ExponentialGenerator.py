@@ -19,7 +19,6 @@ if TYPE_CHECKING:
 
 
 class BaseExponentialGenerator(FunctionGenerator):
-
     def __init__(
         self, exponent: FunctionGenerator, *, base: float | None = None, **kwargs
     ):

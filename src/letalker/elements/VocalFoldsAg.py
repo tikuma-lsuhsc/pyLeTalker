@@ -23,7 +23,6 @@ if has_numba:
 
 
 class VocalFoldsAgBase(VocalFoldsBase, metaclass=abc.ABCMeta):
-
     RunnerSpec = (
         [
             ("n", nb.int64),

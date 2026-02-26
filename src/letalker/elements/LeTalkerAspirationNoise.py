@@ -19,7 +19,6 @@ if has_numba:
 
 
 class LeTalkerAspirationNoise(AspirationNoise):
-
     REc: float = noise_REc
 
     _default_noise_source_args = noise_bpass
@@ -148,7 +147,7 @@ class LeTalkerAspirationNoise(AspirationNoise):
         Returns
         -------
             array of nb_sample-element noise sample array
-        """        
+        """
         return self.noise_source(nb_samples, n0)
 
     @property
