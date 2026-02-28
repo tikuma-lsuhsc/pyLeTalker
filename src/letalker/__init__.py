@@ -1,3 +1,4 @@
+import importlib.metadata
 import logging
 
 from . import _backend, constants, utils
@@ -11,8 +12,10 @@ from .sim import sim, sim_kinematic, sim_vf  # , sim_dual, sim_dual_kinematic
 logger = logging.getLogger("letalker")
 logger.addHandler(logging.NullHandler())
 
-
-__version__ = "0.1.0"
+try:
+    __version__ = importlib.metadata.version("pyLeTalker")
+except importlib.metadata.PackageNotFoundError:
+    print("Package is not installed in the current environment or metadata is missing.")
 
 
 def __getattr__(name):

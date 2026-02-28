@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-dynamic = ["version"]
+version = '0.1.0'
 requires-python = ">=3.10"
 dependencies = [
     "typing_extensions",
@@ -31,13 +31,10 @@ Discussions = "https://github.com/tikuma-lsuhsc/pyLeTalker/discussions"
 Issues = "https://github.com/tikuma-lsuhsc/pyLeTalker/issues"
 Pull_Requests = "https://github.com/tikuma-lsuhsc/pyLeTalker/pulls"
 
-[tool.setuptools.dynamic]
-version = { attr = "letalker.__version__" }
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # minversion = "6.0"
 # addopts = "-ra -q"
 
 [tool.scikit-build]
-wheel.packages = ["src/letalker","src/pyLetalker"]
+wheel.packages = ["src/letalker", "src/pyLeTalker"]
