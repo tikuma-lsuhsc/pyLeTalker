@@ -1,4 +1,7 @@
--e .
 -r ./tests/requirements.txt
 -r ./docs_src/requirements.txt
 ruff
+nanobind 
+scikit-build-core
+scikit-build-core[pyproject]
+# call pip with --no-build-isolation and -ve.
