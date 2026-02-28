@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15...3.26)
 
-project(nanobind_example LANGUAGES CXX)
+project(letalker_backend LANGUAGES CXX)
 
 if (NOT SKBUILD)
   message(WARNING "\
