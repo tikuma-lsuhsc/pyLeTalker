@@ -1,23 +1,18 @@
-import warnings
-
 # from numba.core.errors import NumbaExperimentalFeatureWarning
 
 # warnings.filterwarnings("ignore", category=NumbaExperimentalFeatureWarning)
 
+from letalker.constants import male_vf_params
 from letalker.elements import (
     KinematicVocalFolds,
-    LeTalkerVocalTract,
     LeTalkerLips,
     LeTalkerLungs,
+    LeTalkerVocalTract,
 )
-from letalker.constants import male_vf_params
 from letalker.sim import sim, sim_kinematic
-
-# from letalker.core import use_numba
 
 
 def test_sim():
-    # use_numba(False)
 
     N = 100  # fs  # 10000  # fs
     fo = 101

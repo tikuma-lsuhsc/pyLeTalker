@@ -1,23 +1,17 @@
 from __future__ import annotations
 
-from typing import Any
-from numpy.typing import ArrayLike, NDArray
-from collections.abc import Sequence
-from typing import Protocol
-
 import abc
+from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any, Protocol
+
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
-from ..constants import (
-    c as c_default,
-    rho_air as rho_default,
-    mu as mu_default,
-)
-
+from ..constants import c as c_default
+from ..constants import mu as mu_default
+from ..constants import rho_air as rho_default
 from ..core import TimeSampleHandler, compile_jitclass_if_numba, classproperty
-
-from ..function_generators import Constant
 
 __all__ = ["Element", "Lungs", "Lips", "VocalFolds", "VocalTract", "AspirationNoise"]
 

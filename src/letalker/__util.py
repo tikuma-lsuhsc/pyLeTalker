@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from typing import Any
-from numpy.typing import ArrayLike, NDArray
 
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
-from .core import has_numba, get_sampling_rate
-from .function_generators.abc import SampleGenerator
+from .core import get_sampling_rate
 from .function_generators import ClampedInterpolator, Constant
+from .function_generators.abc import SampleGenerator
 
 
 def parameter_is_dynamic(parameter: Any) -> bool:
@@ -72,14 +72,14 @@ def format_parameter(
     if isinstance(parameter, SampleGenerator):
         is_fixed = parameter.is_fixed
         if is_static and not is_fixed:
-            raise ValueError(f"Parameter cannot be a dynamic SampleGenerator.")
+            raise ValueError("Parameter cannot be a dynamic SampleGenerator.")
         if (
             ndim
             and parameter.ndim != ndim
             or shape
             and (not any(validate_shape(parameter.shape, s) for s in shape))
         ):
-            raise ValueError(f"Invalid parameter dimension/shape.")
+            raise ValueError("Invalid parameter dimension/shape.")
     else:
         parameter = np.asarray(parameter)
         # assume stationary first
@@ -88,7 +88,7 @@ def format_parameter(
         if ndim == pndim or (shape and any(validate_shape(pshape, s) for s in shape)):
             return Constant([parameter] if force_time_axis and not ndim else parameter)
         if is_static:
-            raise ValueError(f"Invalid parameter dimension/shape.")
+            raise ValueError("Invalid parameter dimension/shape.")
 
         # check dynamic array
         pndim -= 1
@@ -96,7 +96,7 @@ def format_parameter(
         if (ndim and ndim == pndim) or (
             shape and any(validate_shape(pshape, s) for s in shape)
         ):
-            raise ValueError(f"Invalid parameter dimension/shape.")
+            raise ValueError("Invalid parameter dimension/shape.")
 
         parameter = ClampedInterpolator(
             get_sampling_rate(),

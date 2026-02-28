@@ -8,22 +8,22 @@ from numba.core.errors import NumbaExperimentalFeatureWarning
 
 warnings.filterwarnings("ignore", category=NumbaExperimentalFeatureWarning)
 
+from letalker.constants import PL, fs, male_vf_params, vocaltract_areas
+
 # from math import ceil, log2
 # from scipy.signal import get_window
-
 from letalker.elements import (
     KinematicVocalFolds,
-    LeTalkerVocalTract,
+    LeTalkerAspirationNoise,
     LeTalkerLips,
     LeTalkerLungs,
-    LeTalkerAspirationNoise,
+    LeTalkerVocalTract,
 )
 from letalker.function_generators import (
-    SineGenerator,
     ModulatedSineGenerator,
+    SineGenerator,
     StepGenerator,
 )
-from letalker.constants import fs, male_vf_params, vocaltract_areas, PL
 from letalker.sim import sim, sim_kinematic
 
 

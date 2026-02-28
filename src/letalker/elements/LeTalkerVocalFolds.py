@@ -1,20 +1,21 @@
 from __future__ import annotations
-from numpy.typing import NDArray, ArrayLike
-from typing import cast, Literal
 
 from dataclasses import dataclass
 from functools import cached_property
 from math import pi
+from typing import Literal, cast
 
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
-from ..function_generators.abc import SampleGenerator
 from ..__util import format_parameter
-from .abc import Element, AspirationNoise, BlockRunner, VocalTract
+from ..function_generators import Constant
+from ..function_generators.abc import SampleGenerator
+from .abc import AspirationNoise, BlockRunner, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
 
+
 from ..core import has_numba
-from ..function_generators import Constant
 
 if has_numba:
     import numba as nb

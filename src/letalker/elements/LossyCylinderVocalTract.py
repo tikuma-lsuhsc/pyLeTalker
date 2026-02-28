@@ -1,13 +1,14 @@
 from __future__ import annotations
-from numpy.typing import ArrayLike, NDArray
 
 from dataclasses import dataclass
-import numpy as np
 
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
+
+from ..__util import format_parameter
 from ..constants import vt_atten as atten_default
 from ..function_generators.abc import SampleGenerator
-from .abc import Element, VocalTract, BlockRunner
-from ..__util import format_parameter
+from .abc import BlockRunner, Element, VocalTract
 from ..core import has_numba
 
 if has_numba:
