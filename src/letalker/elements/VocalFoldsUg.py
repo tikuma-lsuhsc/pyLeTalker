@@ -7,30 +7,13 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
-from ..core import has_numba
 from ..function_generators.abc import SampleGenerator
 from .abc import AspirationNoise, BlockRunner, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
 
-if has_numba:
-    import numba as nb
-
 
 class VocalFoldsUg(VocalFoldsBase):
     """Vocal source model with known glottal flow function"""
-
-    RunnerSpec = (
-        [
-            ("n", nb.int64),
-            ("ug", nb.float64[:]),
-            ("rhoca_sg", nb.float64[:]),
-            ("rhoca_eplx", nb.float64[:]),
-            ("psg", nb.float64[:]),
-            ("peplx", nb.float64[:]),
-        ]
-        if has_numba
-        else []
-    )
 
     class Runner:
         n: int
@@ -103,11 +86,6 @@ class VocalFoldsUg(VocalFoldsBase):
     def _nb_states(self) -> int:
         """number of states, excluding aspiration model"""
         return 0
-
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-
-        return VocalFoldsUg.Runner, VocalFoldsUg.RunnerSpec
 
     def generate_sim_params(self, n: int, n0: int = 0) -> tuple[NDArray, ...]:
         """Generate parameter arrays"""

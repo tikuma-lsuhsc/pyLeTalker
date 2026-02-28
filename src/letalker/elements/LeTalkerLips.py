@@ -13,13 +13,6 @@ from ..function_generators import Constant
 from ..function_generators.abc import SampleGenerator
 from .abc import Element, Lips, VocalTract
 
-from ..core import has_numba
-
-
-if has_numba:
-    from numba.types import intc, float64, CPointer
-    import numba as nb
-
 
 def ishizaka_flanagan_lip_model(
     area: float | NDArray, c: float = c_default
@@ -61,20 +54,6 @@ class LeTalkerLips(Lips):
 
     # override result class
     _ResultsClass = Results
-
-    RunnerSpec = (
-        [
-            ("n", nb.int64),
-            ("A", nb.float64[:, ::1, ::1]),
-            ("b", nb.float64[:, :]),
-            ("c", nb.float64[:]),
-            ("s", nb.float64[::1]),
-            ("pout", nb.float64[:]),
-            ("uout", nb.float64[:]),
-        ]
-        if has_numba
-        else []
-    )
 
     class Runner:
         n: int
@@ -122,10 +101,6 @@ class LeTalkerLips(Lips):
     def pout_index(self) -> int:
         """column index of the resultant NDArray with radiated pressure output"""
         return 0
-
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        return LeTalkerLips.Runner, LeTalkerLips.RunnerSpec
 
     @property
     def _runner_fields_to_results(self) -> list[str]:

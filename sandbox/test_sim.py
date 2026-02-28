@@ -1,12 +1,5 @@
-from matplotlib import pyplot as plt
-
 import numpy as np
-import numba as nb
-
-import warnings
-from numba.core.errors import NumbaExperimentalFeatureWarning
-
-warnings.filterwarnings("ignore", category=NumbaExperimentalFeatureWarning)
+from matplotlib import pyplot as plt
 
 from letalker.constants import PL, fs, male_vf_params, vocaltract_areas
 

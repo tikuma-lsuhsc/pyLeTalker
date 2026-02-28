@@ -75,11 +75,6 @@ from ..function_generators import ColoredNoiseGenerator
 from ..function_generators.abc import NoiseGenerator
 from .abc import AspirationNoise, Element
 
-from ..core import has_numba
-
-if has_numba:
-    import numba as nb
-
 
 class KlattAspirationNoise(AspirationNoise):
     alpha: float = 0.5
@@ -104,20 +99,6 @@ class KlattAspirationNoise(AspirationNoise):
 
     # override result class
     _ResultsClass = Results
-
-    RunnerSpec = (
-        [
-            ("n", nb.int64),
-            ("nuL_inv", nb.float64[:]),
-            ("nf", nb.float64[:]),
-            ("alpha", nb.float64),
-            ("re2b", nb.float64[:]),
-            ("re2", nb.float64[:]),
-            ("ug_noise", nb.float64[:]),
-        ]
-        if has_numba
-        else []
-    )
 
     class Runner:
         n: int
@@ -220,10 +201,6 @@ class KlattAspirationNoise(AspirationNoise):
 
     def generate_noise(self, nb_samples: int, n0: int = 0) -> NDArray:
         return self.noise_source(nb_samples, n0)
-
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        return KlattAspirationNoise.Runner, KlattAspirationNoise.RunnerSpec
 
     @property
     def _runner_fields_to_results(self) -> list[str]:

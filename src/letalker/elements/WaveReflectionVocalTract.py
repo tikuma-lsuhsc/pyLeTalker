@@ -10,12 +10,9 @@ from ..__util import format_parameter
 from ..constants import (
     vt_atten as atten_default,
 )
-from ..core import has_numba, classproperty
+from ..core import classproperty
 from ..function_generators.abc import SampleGenerator
 from .abc import Element, VocalTract
-
-if has_numba:
-    import numba as nb
 
 
 class WaveReflectionVocalTract(VocalTract):
@@ -26,21 +23,7 @@ class WaveReflectionVocalTract(VocalTract):
     log_sections: bool = False
     _nb_states: int
 
-    RunnerSpec = (
-        [
-            ("n", nb.int64),
-            ("alph_odd", nb.float64[:, :]),
-            ("alph_even", nb.float64[:, :]),
-            ("r_odd", nb.float64[:, :]),
-            ("r_even", nb.float64[:, :]),
-            ("s", nb.float64[:]),
-            ("p_sections", nb.float64[:, :, :]),
-        ]
-        if has_numba
-        else []
-    )
-
-    class Runner:
+    class FastRunner:
         n: int
         alph_odd: NDArray  # odd-section propagation gains
         alph_even: NDArray  # even-section propagation gains
@@ -212,6 +195,10 @@ class WaveReflectionVocalTract(VocalTract):
 
             return f_odd[-1], b_even[0]
 
+    @property
+    def Runner(self):
+        return self.LoggedRunner if self.log_sections else self.FastRunner
+
     def __init__(
         self,
         areas: ArrayLike | SampleGenerator,
@@ -281,15 +268,6 @@ class WaveReflectionVocalTract(VocalTract):
     def total_length(self) -> float:
         """total length of vocal tract"""
         return self.nb_sections * self.dz
-
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        Spec = WaveReflectionVocalTract.RunnerSpec
-        return (
-            WaveReflectionVocalTract.LoggedRunner
-            if self.log_sections
-            else WaveReflectionVocalTract.Runner
-        ), (Spec if self.log_sections else Spec[:-1])
 
     @property
     def _runner_fields_to_results(self) -> list[str]:

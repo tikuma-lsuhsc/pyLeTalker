@@ -3,16 +3,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from numbers import Number
 
+import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..constants import PL as default_lung_pressure
 from ..function_generators import ClampedInterpolator, Constant
 from ..function_generators.abc import FunctionGenerator
 from .abc import Element, Lungs
-from ..core import has_numba
-
-if has_numba:
-    import numba as nb
 
 
 class LungsBase(Lungs):
@@ -27,8 +24,6 @@ class LungsBase(Lungs):
         plung: NDArray
 
     _ResultsClass = Results  # override result class
-
-    RunnerSpec = [("n", nb.int64), ("plung", nb.float64[:])] if has_numba else []
 
     @property
     def _runner_fields_to_results(self) -> list[str]:
@@ -99,9 +94,8 @@ class LeTalkerLungs(LungsBase):
             lung_pressure = self.plung[i if i < self.plung.shape[0] else -1]
             return 0.9 * lung_pressure - 0.8 * blung
 
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        return LeTalkerLungs.Runner, LungsBase.RunnerSpec
+
+    
 
 
 #################################################################
@@ -122,9 +116,7 @@ class OpenLungs(LungsBase):
             """perform one time-step update"""
             return self.plung[i if i < self.plung.shape[0] else -1]
 
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        return OpenLungs.Runner, LungsBase.RunnerSpec
+    
 
 
 #################################################################
@@ -132,8 +124,6 @@ class OpenLungs(LungsBase):
 
 class NullLungs(Lungs):
     """Zero-pressure lung model, only reflecting 80% of the backward pressure"""
-
-    RunnerSpec = [("n", nb.int64)] if has_numba else []
 
     class Runner:
         n: int
@@ -145,9 +135,6 @@ class NullLungs(Lungs):
             """perform one time-step update"""
             return -0.8 * blung
 
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        return NullLungs.Runner, LungsBase.RunnerSpec
 
     @property
     def _runner_fields_to_results(self) -> list[str]:
