@@ -12,7 +12,6 @@ from letalker import (
     OpenLungs,
 )
 from letalker.constants import male_vf_params
-from letalker.core import use_numba, using_numba
 
 
 # @nb.njit
@@ -55,14 +54,14 @@ def test_runner(CLS, args, kwargs):
     N = 10
     runner = element.create_runner(N)
 
-    n_ports = (not element.is_sink) + (not element.is_source)
+    # n_ports = (not element.is_sink) + (not element.is_source)
 
-    x = np.random.randn(N, n_ports)
+    x = np.random.randn(N, 2)
 
-    if n_ports == 1:
-        run_edge(runner, x)
-    else:
-        run(runner, x)
+    # if n_ports == 1:
+    #     run_edge(runner, x)
+    # else:
+    run(runner, x)
 
     results = element.create_result(runner)
     assert isinstance(results, CLS.Results)

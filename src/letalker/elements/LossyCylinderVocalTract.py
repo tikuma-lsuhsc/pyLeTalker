@@ -9,10 +9,6 @@ from ..__util import format_parameter
 from ..constants import vt_atten as atten_default
 from ..function_generators.abc import SampleGenerator
 from .abc import BlockRunner, Element, VocalTract
-from ..core import has_numba
-
-if has_numba:
-    import numba as nb
 
 
 class LossyCylinderVocalTract(VocalTract):
@@ -21,17 +17,6 @@ class LossyCylinderVocalTract(VocalTract):
     _atten: float = atten_default  #: flow attenuation factor/half unit section
     _area: SampleGenerator  #:cross-sectional area of the tube
     _nb_sections: int  #: number of tubelets
-
-    RunnerSpec = (
-        [
-            ("n", nb.int64),
-            ("m", nb.int64),
-            ("gain", nb.float64[:]),
-            ("s", nb.float64[:, ::1]),
-        ]
-        if has_numba
-        else []
-    )
 
     class Runner(BlockRunner):
         n: int  # number of samles
@@ -113,10 +98,6 @@ class LossyCylinderVocalTract(VocalTract):
     def total_length(self) -> float:
         """total length of vocal tract"""
         return self.nb_sections * self.dz
-
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-        return LossyCylinderVocalTract.Runner, LossyCylinderVocalTract.RunnerSpec
 
     def generate_sim_params(self, n: int, n0: int = 0, **_) -> tuple[NDArray, ...]:
 

@@ -22,7 +22,6 @@ from ..constants import (
 from ..constants import (
     rho_tis as default_rho_tis,
 )
-from ..core import has_numba
 from ..errors import LeTalkerError
 from ..function_generators import Constant, PeriodicInterpolator, SineGenerator
 from ..function_generators.abc import (
@@ -32,9 +31,6 @@ from ..function_generators.abc import (
 )
 from .abc import AspirationNoise, Element, VocalTract
 from .VocalFoldsAg import VocalFoldsAgBase
-
-if has_numba:
-    import numba as nb
 
 Fo2L_Callable = Callable[[float, float], float]
 """convert fundamental frequency to glottal length
@@ -1164,11 +1160,6 @@ class KinematicVocalFolds(VocalFoldsAgBase):
         area = np.sum(g, axis=1) * (L / g.shape[1] / 2)  #
 
         return area
-
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-
-        return KinematicVocalFolds.Runner, VocalFoldsAgBase.RunnerSpec
 
     def y(self, nb_samples: int | None = None, n0: int = 0) -> NDArray:
         length = self.length(nb_samples, n0)

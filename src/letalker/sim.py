@@ -22,7 +22,6 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from .constants import PL, vocaltract_areas
-from .core import compile_njit_if_numba
 from .elements import (
     KinematicVocalFolds,
     LeTalkerLips,
@@ -188,7 +187,7 @@ def sim(
 
     runners = [c.create_runner(nb_samples, n0) for c in components]
 
-    compile_njit_if_numba(_sim_loop, fastmath=True)(nb_samples, *runners)
+    _sim_loop(nb_samples, *runners)
 
     # extract the acoustic output
     lips = components[-1]
@@ -528,9 +527,7 @@ def _sim_dual(
         ),
     ]
 
-    compile_njit_if_numba(_sim_sep_loop, fastmath=True)(
-        nb_samples, *main_runners, *aux_runners
-    )
+    _sim_sep_loop(nb_samples, *main_runners, *aux_runners)
 
     # extract the acoustic output
     main_res = (components[i].create_result(main_runners[i], n0=n0) for i in (4, 2))

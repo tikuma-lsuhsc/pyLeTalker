@@ -7,7 +7,6 @@ from numpy.typing import ArrayLike, NDArray
 
 from .abc import AspirationNoise, BlockRunner, Element, VocalFolds, VocalTract
 from .LeTalkerAspirationNoise import LeTalkerAspirationNoise
-from ..core import using_numba, compile_jitclass_if_numba
 
 
 class NoAspirationNoiseRunner:
@@ -270,19 +269,12 @@ class VocalFoldsBase(VocalFolds):
         ns = self._nb_states
 
         an_runner = (
-            compile_jitclass_if_numba(NoAspirationNoiseRunner)()
+            NoAspirationNoiseRunner()
             if noise_free
             else self.create_noise_runner(n, n0, s_in[ns:])
         )
 
-        CLS, Spec = self.runner_info
-
-        if using_numba():
-            Spec = [*Spec, ("_anoise", type(an_runner)._numba_type_)]
-
-        CLS = compile_jitclass_if_numba(CLS, Spec)
-
-        return CLS(n, s_in[:ns], an_runner, *params)
+        return self.Runner(n, s_in[:ns], an_runner, *params)
 
     def create_noise_runner(
         self,
@@ -295,7 +287,7 @@ class VocalFoldsBase(VocalFolds):
         noise_model = self.noise_model
 
         if not noise_model:
-            return compile_jitclass_if_numba(NoAspirationNoiseRunner)()
+            return NoAspirationNoiseRunner()
 
         if not self.known_length and noise_model.need_length:
             raise TypeError(

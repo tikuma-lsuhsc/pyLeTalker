@@ -17,27 +17,14 @@ basic flow of the voice synthesis.
 """
 
 from __future__ import annotations
-from numpy.typing import NDArray
-from collections.abc import Callable
 
 from functools import lru_cache
+
 import numpy as np
+from numpy.typing import NDArray
 
-try:
-    import numba as nb
-
-    has_numba = True
-except:
-    has_numba = False
-
+from . import _backend
 from .constants import fs as fs_default
-
-import warnings
-
-if has_numba:
-    from numba.core.errors import NumbaExperimentalFeatureWarning
-
-    warnings.filterwarnings("ignore", category=NumbaExperimentalFeatureWarning)
 
 
 class classproperty(property):
@@ -159,41 +146,6 @@ ts.__doc__ = TimeSampleHandler.ts.__doc__
 
 ############################################################
 
-_use_njit: bool = has_numba  # True to use Numba (default)
-
-
-def use_numba(mode: bool):
-    """Enable/disable Numba"""
-    global _use_njit
-
-    if mode and not has_numba:
-        raise RuntimeError(
-            "numba package is not available in the current Python environment."
-        )
-
-    _use_njit = bool(mode)
-
-
-def using_numba() -> bool:
-    """Returns True if Numba is enabled"""
-    return _use_njit
-
-
-def compile_njit_if_numba(func: Callable, **kwargs) -> Callable:
-    return (nb.njit(**kwargs))(func) if _use_njit else func
-
-
-def compile_jitclass_if_numba(
-    CLS: type, spec: list[tuple[str, type]] = None, **kwargs
-) -> type:
-    return nb.experimental.jitclass(CLS, spec) if _use_njit else CLS
-
-
-def compile_cfunc(func: Callable, c_sig: str, **kwargs) -> Callable:
-    if _use_njit and "nopython" not in kwargs:
-        kwargs["nopython"] = True
-    return (nb.cfunc(c_sig, **kwargs))(func) if _use_njit else func
-
 
 def _get_param(x: NDArray, i: int) -> float | NDArray:
     """return the i-th element or the last element of x"""
@@ -210,6 +162,6 @@ if TYPE_CHECKING:
 
 def __getattr__(name):
     if name == "get_param":
-        return nb.njit()(_get_param) if _use_njit else _get_param
+        return _get_param
 
     raise AttributeError()

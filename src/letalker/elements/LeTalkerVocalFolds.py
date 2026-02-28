@@ -15,12 +15,6 @@ from .abc import AspirationNoise, BlockRunner, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
 
 
-from ..core import has_numba
-
-if has_numba:
-    import numba as nb
-
-
 def calc_stress(eps: float) -> tuple[float, float, float]:
     """Stress calculations for the three-mass model based on Titze and Story
 
@@ -215,14 +209,6 @@ class LeTalkerVocalFolds(VocalFoldsBase):
         self._Dc = None
         self._eps = None
 
-    @property
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
-
-        return (
-            LeTalkerVocalFolds.Runner,
-            LeTalkerVocalFolds.RunnerSpec,
-        )
-
     def generate_sim_params(self, n: int, n0: int = 0) -> tuple[NDArray, ...]:
         """Generate parameter arrays"""
 
@@ -395,31 +381,6 @@ class LeTalkerVocalFolds(VocalFoldsBase):
         bmat = 2 * self.zeta * (mmat * kmat) ** 0.5
 
         return L, T, zn, mmat, kmat, kc, bmat
-
-    RunnerSpec = (
-        [
-            ("n", nb.int64),
-            {"K": nb.float64[:]},
-            {"B": nb.float64[:]},  # damping matrix
-            {"w": nb.float64[:]},  # reciprocal of masses [m1,m2,mbase]
-            {"L", nb.float64[:]},
-            {"T", nb.float64[:]},
-            {"x0", nb.float64[:]},
-            {"Ae", nb.float64[:]},
-            ("As", nb.float64[:]),
-            {"zn", nb.float64[:]},
-            ("ug", nb.float64[:]),
-            ("psg", nb.float64[:]),
-            ("peplx", nb.float64[:]),
-            {"delta", nb.float64},
-            {"rhoc", nb.float64},
-            {"rhoc2", nb.float64},
-            {"c", nb.float64},
-            {"dt", nb.float64},
-        ]
-        if has_numba
-        else []
-    )
 
     class Runner:
         n: int

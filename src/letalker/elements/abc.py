@@ -11,7 +11,7 @@ from numpy.typing import ArrayLike, NDArray
 from ..constants import c as c_default
 from ..constants import mu as mu_default
 from ..constants import rho_air as rho_default
-from ..core import TimeSampleHandler, compile_jitclass_if_numba, classproperty
+from ..core import TimeSampleHandler, classproperty
 
 __all__ = ["Element", "Lungs", "Lips", "VocalFolds", "VocalTract", "AspirationNoise"]
 
@@ -128,12 +128,11 @@ class Element(TimeSampleHandler, metaclass=abc.ABCMeta):
         elif isinstance(s_in, np.ndarray) and s_in.shape != (self.nb_states,):
             raise TypeError(f"s_in must be a 1D numpy array of size {self.nb_states}")
         params = self.generate_sim_params(n, n0, **kwargs)
-        CLS = compile_jitclass_if_numba(*self.runner_info)
-        return CLS(n, s_in, *params)
+        return self.Runner(n, s_in, *params)
 
     @property
     @abc.abstractmethod
-    def runner_info(self) -> tuple[type, list[tuple[str, type]]]:
+    def Runner(self) -> BlockRunner:
         """element's runner class and its numba jitclass spec"""
 
     @abc.abstractmethod
