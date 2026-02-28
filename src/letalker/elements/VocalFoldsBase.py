@@ -1,18 +1,13 @@
 from __future__ import annotations
 
-from numpy.typing import NDArray, ArrayLike
-
-from .abc import Element, BlockRunner, VocalFolds, AspirationNoise, VocalTract
-
 import abc
-import numpy as np
 
-from ..core import using_numba, compile_jitclass_if_numba
-from ..function_generators.abc import SampleGenerator
-from ..__util import format_parameter
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
+
+from .abc import AspirationNoise, BlockRunner, Element, VocalFolds, VocalTract
 from .LeTalkerAspirationNoise import LeTalkerAspirationNoise
-from ..function_generators import Constant
-from .abc import VocalTract
+from ..core import using_numba, compile_jitclass_if_numba
 
 
 class NoAspirationNoiseRunner:

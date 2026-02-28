@@ -2,8 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from letalker import sim, use_numba
-from letalker.elements import *
 from letalker.constants import fs
+from letalker.elements import *
 
 use_numba(False)
 N = round(0.1 * fs)

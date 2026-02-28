@@ -1,37 +1,37 @@
 from __future__ import annotations
-from numpy.typing import NDArray, ArrayLike
-from typing import cast, Literal
-from typing_extensions import overload
-from collections.abc import Callable
-from numbers import Number
 
 import abc
+from collections.abc import Callable
 from dataclasses import dataclass
-from functools import partial, cached_property
+from functools import cached_property, partial
 from math import pi
+from typing import Literal, cast
+
 import numpy as np
+from numpy.typing import ArrayLike, NDArray
 from scipy.special import lambertw
+from typing_extensions import overload
 
 _2pi = 2 * pi
 
+from .. import constants
+from ..__util import format_parameter
 from ..constants import (
-    rho_tis as default_rho_tis,
     kinematic_params as kinematic_params_default,
 )
+from ..constants import (
+    rho_tis as default_rho_tis,
+)
+from ..core import has_numba
+from ..errors import LeTalkerError
+from ..function_generators import Constant, PeriodicInterpolator, SineGenerator
 from ..function_generators.abc import (
-    SampleGenerator,
     AnalyticFunctionGenerator,
     FunctionGenerator,
+    SampleGenerator,
 )
-from ..function_generators import PeriodicInterpolator, SineGenerator, Constant
-
-from ..__util import format_parameter
-from .abc import Element, AspirationNoise, VocalTract
+from .abc import AspirationNoise, Element, VocalTract
 from .VocalFoldsAg import VocalFoldsAgBase
-
-from ..core import has_numba
-from .. import constants
-from ..errors import LeTalkerError
 
 if has_numba:
     import numba as nb

@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from letalker import LeTalkerVocalTract, LeTalkerLungs
+from letalker import LeTalkerLungs, LeTalkerVocalTract
 from letalker.core import use_numba
 
 use_numba(True)

@@ -66,15 +66,13 @@ with the reduction factor `alpha`.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
+import numpy as np
 from numpy.typing import NDArray
 
-from dataclasses import dataclass
-import numpy as np
-
-from ..__util import format_parameter
 from ..function_generators import ColoredNoiseGenerator
 from ..function_generators.abc import NoiseGenerator
-
 from .abc import AspirationNoise, Element
 
 from ..core import has_numba

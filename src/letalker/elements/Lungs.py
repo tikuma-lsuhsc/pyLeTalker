@@ -1,17 +1,14 @@
 from __future__ import annotations
 
-from numpy.typing import NDArray, ArrayLike
+from dataclasses import dataclass
 from numbers import Number
 
-from .abc import Lungs, Element
-
-from dataclasses import dataclass
-import numpy as np
+from numpy.typing import ArrayLike, NDArray
 
 from ..constants import PL as default_lung_pressure
-from ..function_generators import Constant, ClampedInterpolator
+from ..function_generators import ClampedInterpolator, Constant
 from ..function_generators.abc import FunctionGenerator
-
+from .abc import Element, Lungs
 from ..core import has_numba
 
 if has_numba:

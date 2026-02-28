@@ -1,19 +1,20 @@
 from __future__ import annotations
-from typing import Iterator
-from numpy.typing import NDArray, ArrayLike
 
 from dataclasses import dataclass
 from math import pi
+from typing import Iterator
+
 import numpy as np
 import scipy.signal as sps
+from numpy.typing import ArrayLike, NDArray
 
 from ..constants import c as c_default
-from ..__util import format_parameter
+from ..function_generators import Constant
 from ..function_generators.abc import SampleGenerator
 from .abc import Element, Lips, VocalTract
 
 from ..core import has_numba
-from ..function_generators import Constant
+
 
 if has_numba:
     from numba.types import intc, float64, CPointer

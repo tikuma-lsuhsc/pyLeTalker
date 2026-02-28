@@ -1,21 +1,18 @@
 from __future__ import annotations
-from typing import cast
-from numpy.typing import ArrayLike, NDArray
 
 from dataclasses import dataclass
-import numpy as np
+from typing import cast
 
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
+
+from ..__util import format_parameter
 from ..constants import (
     vt_atten as atten_default,
-    vocaltract_areas,
-    fs as default_fs,
-    TwoLetterVowelLiteral,
 )
-from .abc import Element, VocalTract
-from ..function_generators.abc import SampleGenerator
-from ..__util import format_parameter
-
 from ..core import has_numba, classproperty
+from ..function_generators.abc import SampleGenerator
+from .abc import Element, VocalTract
 
 if has_numba:
     import numba as nb

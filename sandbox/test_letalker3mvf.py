@@ -1,5 +1,6 @@
-from matplotlib import pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
+
 from letalker import LeTalkerVocalFolds, use_numba
 from letalker.elements.LeTalkerVocalFolds import calc_stress
 

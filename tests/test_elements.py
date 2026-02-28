@@ -1,20 +1,18 @@
-import pytest
 import numpy as np
+import pytest
 
 # import numba as nb
-
 from letalker import (
-    LeTalkerLungs,
-    OpenLungs,
-    LeTalkerVocalTract,
-    LossyCylinderVocalTract,
-    LeTalkerLips,
     KinematicVocalFolds,
     KlattAspirationNoise,
+    LeTalkerLips,
+    LeTalkerLungs,
+    LeTalkerVocalTract,
+    LossyCylinderVocalTract,
+    OpenLungs,
 )
-from letalker.core import use_numba, using_numba
-
 from letalker.constants import male_vf_params
+from letalker.core import use_numba, using_numba
 
 
 # @nb.njit

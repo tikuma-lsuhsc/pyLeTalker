@@ -1,11 +1,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from letalker.elements import LeTalkerLips
 from letalker.constants import fs, vocaltract_areas
-from letalker import use_numba
-
-# use_numba(False)
+from letalker.elements import LeTalkerLips
 
 areas = vocaltract_areas["aa"]
 
@@ -39,7 +36,8 @@ plt.plot(y)
 plt.show()
 
 if False:
-    from os import path, getcwd
+    from os import getcwd, path
+
     from oct2py import octave
 
     letalker_dir = path.join(

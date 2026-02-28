@@ -13,35 +13,34 @@ References:
 
 from __future__ import annotations
 
-from typing import Literal, TypedDict
 from collections.abc import Callable
-from numpy.typing import ArrayLike, NDArray
-from numbers import Number
-
-from .elements.abc import (
-    VocalFolds,
-    VocalTract,
-    Lips,
-    Lungs,
-    AspirationNoise,
-    Element,
-    BlockRunner,
-)
-from .function_generators.abc import FunctionGenerator, AnalyticFunctionGenerator
-
 from math import pi
-import numpy as np
+from numbers import Number
+from typing import Literal, TypedDict
 
+import numpy as np
+from numpy.typing import ArrayLike, NDArray
+
+from .constants import PL, vocaltract_areas
 from .core import compile_njit_if_numba
 from .elements import (
-    LeTalkerVocalTract,
+    KinematicVocalFolds,
     LeTalkerLips,
     LeTalkerLungs,
-    KinematicVocalFolds,
+    LeTalkerVocalTract,
     NullLungs,
 )
-from .function_generators import SineGenerator, Constant, ClampedInterpolator
-from .constants import vocaltract_areas, PL
+from .elements.abc import (
+    AspirationNoise,
+    BlockRunner,
+    Element,
+    Lips,
+    Lungs,
+    VocalFolds,
+    VocalTract,
+)
+from .function_generators import ClampedInterpolator, Constant, SineGenerator
+from .function_generators.abc import AnalyticFunctionGenerator, FunctionGenerator
 
 
 class SimResultsDict(TypedDict):
