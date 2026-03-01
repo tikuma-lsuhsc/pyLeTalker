@@ -61,7 +61,7 @@ nanobind_add_module(
   NB_STATIC
 
   # Source code goes here
-  src/_backend_cpp/_backend.cpp
+  src/_backend_cpp/bindings.cpp
 )
 target_link_libraries (_backend PRIVATE Eigen3::Eigen)
 
