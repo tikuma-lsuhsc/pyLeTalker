@@ -39,6 +39,9 @@ find_package(Python 3.9
 # Import nanobind through CMake's find_package mechanism
 find_package(nanobind CONFIG REQUIRED)
 
+# import eigen
+add_subdirectory(ext/eigen)
+
 # We are now ready to compile the actual extension module
 nanobind_add_module(
   # Name of the extension
@@ -60,6 +63,7 @@ nanobind_add_module(
   # Source code goes here
   src/_backend_cpp/_backend.cpp
 )
+target_link_libraries (_backend PRIVATE Eigen3::Eigen)
 
 # Ensure correct output directory inside the package
 # set_target_properties(core PROPERTIES
