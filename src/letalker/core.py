@@ -23,7 +23,6 @@ from functools import lru_cache
 import numpy as np
 from numpy.typing import NDArray
 
-from . import _backend
 from .constants import fs as fs_default
 
 

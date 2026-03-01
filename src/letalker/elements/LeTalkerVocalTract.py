@@ -1,13 +1,11 @@
 from __future__ import annotations
+
 from numpy.typing import ArrayLike
 
-from ..constants import (
-    vocaltract_areas,
-    fs as default_fs,
-    TwoLetterVowelLiteral,
-)
-from .WaveReflectionVocalTract import WaveReflectionVocalTract
+from ..constants import TwoLetterVowelLiteral, vocaltract_areas
+from ..constants import fs as default_fs
 from ..function_generators.abc import SampleGenerator
+from .WaveReflectionVocalTract import WaveReflectionVocalTract
 
 
 class LeTalkerVocalTract(WaveReflectionVocalTract):
