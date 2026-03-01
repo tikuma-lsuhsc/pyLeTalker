@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.15...3.26)
 
+# Detect the installed nanobind package and import it into CMake
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+
+
 project(letalker_backend LANGUAGES CXX)
 
 if (NOT SKBUILD)
