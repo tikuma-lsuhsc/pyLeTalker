@@ -7,6 +7,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
+from .._backend import PyRunnerBase
 from ..constants import (
     vt_atten as atten_default,
 )
@@ -23,7 +24,7 @@ class WaveReflectionVocalTract(VocalTract):
     log_sections: bool = False
     _nb_states: int
 
-    class FastRunner:
+    class FastRunner(PyRunnerBase):
         n: int
         alph_odd: NDArray  # odd-section propagation gains
         alph_even: NDArray  # even-section propagation gains
@@ -40,6 +41,8 @@ class WaveReflectionVocalTract(VocalTract):
             r_odd: NDArray,
             r_even: NDArray,
         ):
+            super().__init__()
+
             self.n = nb_steps
             self.alph_odd = alph_odd
             self.alph_even = alph_even
@@ -103,7 +106,7 @@ class WaveReflectionVocalTract(VocalTract):
 
             return f_odd[-1], b_even[0]
 
-    class LoggedRunner:
+    class LoggedRunner(PyRunnerBase):
         n: int
         alph_odd: NDArray  # odd-section propagation gains
         alph_even: NDArray  # even-section propagation gains
@@ -121,6 +124,8 @@ class WaveReflectionVocalTract(VocalTract):
             r_odd: NDArray,
             r_even: NDArray,
         ):
+            super().__init__()
+
             self.n = nb_steps
             self.alph_odd = alph_odd
             self.alph_even = alph_even

@@ -21,6 +21,8 @@ from typing import Literal, TypedDict
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from ._backend import RunnerBase
+from ._backend import sim_loop as _sim_loop
 from .constants import PL, vocaltract_areas
 from .elements import (
     KinematicVocalFolds,
@@ -31,7 +33,6 @@ from .elements import (
 )
 from .elements.abc import (
     AspirationNoise,
-    BlockRunner,
     Element,
     Lips,
     Lungs,
@@ -92,30 +93,6 @@ def _sim_init(
     lungs.link(trachea)
 
     return lungs, trachea, vocalfolds, vocaltract, lips
-
-
-def _sim_loop(
-    nb_steps: int,
-    lungs: BlockRunner,
-    trachea: BlockRunner,
-    vf: BlockRunner,
-    vt: BlockRunner,
-    lips: BlockRunner,
-):
-
-    flung = blung = fsg = bsg = feplx = beplx = flip = blip = 0.0
-
-    for i in range(nb_steps):
-        # Compute current pressure outputs from VOCAL FOLD
-        feplx, bsg = vf.step(i, fsg, beplx)
-
-        # Compute the next states of flip & beplx
-        flip, beplx = vt.step(i, feplx, blip)
-        blip = lips.step(i, flip)
-
-        # Compute the next states of fsg & blung
-        flung = lungs.step(i, blung)
-        fsg, blung = trachea.step(i, flung, bsg)
 
 
 def sim(
@@ -388,16 +365,16 @@ def sim_vf(
 
 def _sim_sep_loop(
     nb_steps: int,
-    h_lung: BlockRunner,
-    h_trachea: BlockRunner,
-    m_vf: BlockRunner,
-    h_vt: BlockRunner,
-    h_lip: BlockRunner,
-    n_lung: BlockRunner,
-    n_trachea: BlockRunner,
-    a_vf: BlockRunner,
-    n_vt: BlockRunner,
-    n_lip: BlockRunner,
+    h_lung: RunnerBase,
+    h_trachea: RunnerBase,
+    m_vf: RunnerBase,
+    h_vt: RunnerBase,
+    h_lip: RunnerBase,
+    n_lung: RunnerBase,
+    n_trachea: RunnerBase,
+    a_vf: RunnerBase,
+    n_vt: RunnerBase,
+    n_lip: RunnerBase,
 ):
 
     hblung = hfsg = hbeplx = hblip = 0.0  # harmonic component

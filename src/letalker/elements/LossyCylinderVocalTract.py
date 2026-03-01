@@ -6,9 +6,10 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
+from .._backend import PyRunnerBase
 from ..constants import vt_atten as atten_default
 from ..function_generators.abc import SampleGenerator
-from .abc import BlockRunner, Element, VocalTract
+from .abc import Element, VocalTract
 
 
 class LossyCylinderVocalTract(VocalTract):
@@ -18,7 +19,7 @@ class LossyCylinderVocalTract(VocalTract):
     _area: SampleGenerator  #:cross-sectional area of the tube
     _nb_sections: int  #: number of tubelets
 
-    class Runner(BlockRunner):
+    class Runner(PyRunnerBase):
         n: int  # number of samles
         m: int  # number of sections
         gain: NDArray  # total propagation gain
@@ -27,6 +28,8 @@ class LossyCylinderVocalTract(VocalTract):
         def __init__(
             self, nb_steps: int, states0: NDArray, nb_sections: int, gain: NDArray
         ):
+            super().__init__()
+
             self.n = nb_steps
             self.m = nb_sections
             self.gain = gain

@@ -5,7 +5,8 @@ import abc
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .abc import AspirationNoise, BlockRunner, Element, VocalFolds, VocalTract
+from .._backend import RunnerBase
+from .abc import AspirationNoise, Element, VocalFolds, VocalTract
 from .LeTalkerAspirationNoise import LeTalkerAspirationNoise
 
 
@@ -55,7 +56,7 @@ def calculate_glottal_flow(
     beplx: float,
     rhoca_eplx: float,
     rhoca_sg: float,
-    anoise: BlockRunner,
+    anoise: RunnerBase,
 ) -> tuple[float, float, float, float]:
     """2-port glottis update function given current glottal flow
 
@@ -239,7 +240,7 @@ class VocalFoldsBase(VocalFolds):
         n0: int = 0,
         s_in: ArrayLike | None = None,
         noise_free: bool = False,
-    ) -> BlockRunner:
+    ) -> RunnerBase:
         """instantiate a vocal folds element runner
 
         (overloading abc.Element to account for the aspiration noise sub-element)
@@ -282,7 +283,7 @@ class VocalFoldsBase(VocalFolds):
         n0: int = 0,
         s_in: ArrayLike | None = None,
         length: NDArray | None = None,
-    ) -> BlockRunner:
+    ) -> RunnerBase:
 
         noise_model = self.noise_model
 
@@ -303,7 +304,7 @@ class VocalFoldsBase(VocalFolds):
         return noise_model.create_runner(n, n0, s_in, **noise_kws)
 
     def create_result(
-        self, runner: BlockRunner, *extra_items, n0: int = 0
+        self, runner: RunnerBase, *extra_items, n0: int = 0
     ) -> Element.Results:
         """Returns simulation result object"""
 

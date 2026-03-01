@@ -8,6 +8,7 @@ import numpy as np
 import scipy.signal as sps
 from numpy.typing import ArrayLike, NDArray
 
+from .._backend import PyRunnerBase
 from ..constants import c as c_default
 from ..function_generators import Constant
 from ..function_generators.abc import SampleGenerator
@@ -55,7 +56,7 @@ class LeTalkerLips(Lips):
     # override result class
     _ResultsClass = Results
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         A: np.ndarray
         b: np.ndarray
@@ -67,6 +68,8 @@ class LeTalkerLips(Lips):
         def __init__(
             self, nb_steps: int, s: NDArray, A: NDArray, b: NDArray, c: NDArray
         ):
+            super().__init__()
+
             self.n = nb_steps
             self.A = np.ascontiguousarray(A)
             self.b = b
@@ -75,7 +78,7 @@ class LeTalkerLips(Lips):
             self.pout = np.empty(nb_steps)
             self.uout = np.empty(nb_steps)
 
-        def step(self, i: int, flip: float) -> float:
+        def step(self, i: int, flip: float, blip: float) -> float:
 
             Ai = self.A[i if i < self.A.shape[0] else -1]
             bi = self.b[i if i < self.b.shape[0] else -1]
@@ -89,7 +92,7 @@ class LeTalkerLips(Lips):
             self.pout[i] = s[0]
             self.uout[i] = c * (flip - s[1])
 
-            return s[1]
+            return 0.0, s[1]
 
     _area: SampleGenerator = Constant(1.0)
 

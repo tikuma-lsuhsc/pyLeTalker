@@ -6,6 +6,7 @@ from numbers import Number
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
+from .._backend import PyRunnerBase
 from ..constants import PL as default_lung_pressure
 from ..function_generators import ClampedInterpolator, Constant
 from ..function_generators.abc import FunctionGenerator
@@ -79,23 +80,22 @@ class LungsBase(Lungs):
 class LeTalkerLungs(LungsBase):
     """Constant-pressure lung model with impedance matching"""
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         plung: np.ndarray
 
         def __init__(self, nb_steps: int, s: NDArray, plung: NDArray):
+            super().__init__()
+
             self.n = nb_steps
             self.plung = plung
 
-        def step(self, i: int, blung: float) -> float:
+        def step(self, i: int, flung: float, blung: float) -> float:
             """perform one time-step update"""
 
             # ------------- lung_pressure pressure to forward pressure -----------  */
             lung_pressure = self.plung[i if i < self.plung.shape[0] else -1]
-            return 0.9 * lung_pressure - 0.8 * blung
-
-
-    
+            return 0.9 * lung_pressure - 0.8 * blung, 0.0
 
 
 #################################################################
@@ -104,17 +104,19 @@ class LeTalkerLungs(LungsBase):
 class OpenLungs(LungsBase):
     """Constant-pressure lung model with zero-reflection"""
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         plung: np.ndarray
 
         def __init__(self, nb_steps: int, s: NDArray, plung: NDArray):
+            super().__init__()
+
             self.n = nb_steps
             self.plung = plung
 
-        def step(self, i: int, blung: float) -> float:
+        def step(self, i: int, flung: float, blung: float) -> float:
             """perform one time-step update"""
-            return self.plung[i if i < self.plung.shape[0] else -1]
+            return self.plung[i if i < self.plung.shape[0] else -1], 0.0
 
     
 
@@ -125,15 +127,17 @@ class OpenLungs(LungsBase):
 class NullLungs(Lungs):
     """Zero-pressure lung model, only reflecting 80% of the backward pressure"""
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
 
         def __init__(self, nb_steps: int, s_in: NDArray):
+            super().__init__()
+
             self.n = nb_steps
 
         def step(self, i: int, blung: float) -> float:
             """perform one time-step update"""
-            return -0.8 * blung
+            return -0.8 * blung, 0.0
 
 
     @property

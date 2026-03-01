@@ -10,14 +10,15 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
+from .._backend import PyRunnerBase, RunnerBase
 from ..function_generators.abc import SampleGenerator
 from ..function_generators.utils import align_signals
-from .abc import AspirationNoise, BlockRunner, Element, VocalTract
+from .abc import AspirationNoise, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
 
 
 class VocalFoldsAgBase(VocalFoldsBase, metaclass=abc.ABCMeta):
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         R: np.ndarray
         Qa: np.ndarray
@@ -32,13 +33,15 @@ class VocalFoldsAgBase(VocalFoldsBase, metaclass=abc.ABCMeta):
             self,
             nb_steps: int,
             s_in: NDArray,
-            anoise: BlockRunner,
+            anoise: RunnerBase,
             R: NDArray,
             Qa: NDArray,
             a: NDArray,
             rhoca_sg: NDArray,
             rhoca_eplx: NDArray,
         ):
+            super().__init__()
+
             self.n = nb_steps
             self.R = R
             self.Qa = Qa

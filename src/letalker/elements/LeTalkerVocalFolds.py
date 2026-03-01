@@ -9,9 +9,10 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
+from .._backend import PyRunnerBase, RunnerBase
 from ..function_generators import Constant
 from ..function_generators.abc import SampleGenerator
-from .abc import AspirationNoise, BlockRunner, Element, VocalTract
+from .abc import AspirationNoise, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
 
 
@@ -382,7 +383,7 @@ class LeTalkerVocalFolds(VocalFoldsBase):
 
         return L, T, zn, mmat, kmat, kc, bmat
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         L: NDArray  # vf vibrating length
         T: NDArray  # total vf thickness
@@ -410,7 +411,7 @@ class LeTalkerVocalFolds(VocalFoldsBase):
             self,
             nb_steps: int,
             s_in: NDArray,
-            anoise: BlockRunner,
+            anoise: RunnerBase,
             L: NDArray,
             T: NDArray,
             K: NDArray,  # stiffness matrix
@@ -425,6 +426,8 @@ class LeTalkerVocalFolds(VocalFoldsBase):
             c: float,
             dt: float,
         ):
+            super().__init__()
+
             self.n = nb_steps
 
             # flow to pressure conversion

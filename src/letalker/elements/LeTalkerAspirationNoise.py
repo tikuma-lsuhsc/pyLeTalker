@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
+from .._backend import PyRunnerBase
 from ..constants import noise_bpass, noise_dist, noise_psd_level, noise_REc
 from ..function_generators import ColoredNoiseGenerator
 from ..function_generators.abc import NoiseGenerator
@@ -43,7 +44,7 @@ class LeTalkerAspirationNoise(AspirationNoise):
     # override result class
     _ResultsClass = Results
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         nuL_inv: NDArray
         nf: NDArray
@@ -58,6 +59,8 @@ class LeTalkerAspirationNoise(AspirationNoise):
             nf: NDArray,
             RE2b: NDArray,
         ):
+
+            super().__init__()
 
             self.n = nb_steps
             self.nuL_inv = nuL_inv

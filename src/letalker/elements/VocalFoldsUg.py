@@ -7,15 +7,16 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
+from .._backend import PyRunnerBase, RunnerBase
 from ..function_generators.abc import SampleGenerator
-from .abc import AspirationNoise, BlockRunner, Element, VocalTract
+from .abc import AspirationNoise, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
 
 
 class VocalFoldsUg(VocalFoldsBase):
     """Vocal source model with known glottal flow function"""
 
-    class Runner:
+    class Runner(PyRunnerBase):
         n: int
         _ug: np.ndarray
         rhoca_sg: np.ndarray
@@ -27,11 +28,13 @@ class VocalFoldsUg(VocalFoldsBase):
             self,
             nb_steps: int,
             s_in: NDArray,
-            anoise: BlockRunner,
+            anoise: RunnerBase,
             ug: NDArray,
             rhoca_sg: NDArray,
             rhoca_eplx: NDArray,
         ):
+            super().__init__()
+
             self.n = nb_steps
             self._ug = ug
             self.rhoca_sg = rhoca_sg
