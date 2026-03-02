@@ -3,6 +3,7 @@
 
 #include "runner_base.h"
 #include "lungs.h"
+#include "lips.h"
 
 namespace nb = nanobind;
 
@@ -91,4 +92,5 @@ To subclass ``PyRunnerBase``, there are two requirements:
     m.def("sim_loop", &sim_loop, nb::call_guard<nb::gil_scoped_release>());
 
     bind_lungs(m);
+    bind_lips(m);
 }

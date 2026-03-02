@@ -8,7 +8,7 @@ import numpy as np
 import scipy.signal as sps
 from numpy.typing import ArrayLike, NDArray
 
-from .._backend import PyRunnerBase
+from .._backend import LeTalkerLipsRunner
 from ..constants import c as c_default
 from ..function_generators import Constant
 from ..function_generators.abc import SampleGenerator
@@ -56,43 +56,7 @@ class LeTalkerLips(Lips):
     # override result class
     _ResultsClass = Results
 
-    class Runner(PyRunnerBase):
-        n: int
-        A: np.ndarray
-        b: np.ndarray
-        c: np.ndarray
-        s: np.ndarray
-        pout: np.ndarray
-        uout: np.ndarray
-
-        def __init__(
-            self, nb_steps: int, s: NDArray, A: NDArray, b: NDArray, c: NDArray
-        ):
-            super().__init__()
-
-            self.n = nb_steps
-            self.A = np.ascontiguousarray(A)
-            self.b = b
-            self.c = c
-            self.s = np.ascontiguousarray(s)
-            self.pout = np.empty(nb_steps)
-            self.uout = np.empty(nb_steps)
-
-        def step(self, i: int, flip: float, blip: float) -> float:
-
-            Ai = self.A[i if i < self.A.shape[0] else -1]
-            bi = self.b[i if i < self.b.shape[0] else -1]
-            c = self.c[i if i < self.c.shape[0] else -1]
-            s = self.s
-
-            # states: Po_prev, b_prev, f_prev
-            s[:2] = s @ Ai + bi * flip
-            s[-1] = flip
-
-            self.pout[i] = s[0]
-            self.uout[i] = c * (flip - s[1])
-
-            return 0.0, s[1]
+    Runner = LeTalkerLipsRunner
 
     _area: SampleGenerator = Constant(1.0)
 
@@ -108,7 +72,7 @@ class LeTalkerLips(Lips):
     @property
     def _runner_fields_to_results(self) -> list[str]:
         """list of runner fields to store in results"""
-        return ["n", "s", "pout", "uout"]
+        return ["n", "sout", "pout", "uout"]
 
     def generate_sim_params(
         self, n: int, n0: int = 0
@@ -153,11 +117,11 @@ class LeTalkerLips(Lips):
         c3 = a2 / b2
 
         # states: Poprev, bprev, fprev
-        A = np.zeros((n1, 3, 2))
+        A = np.zeros((n1, 2, 3))
         b = np.empty((n1, 2))
         A[:, 0, 0] = A[:, 1, 1] = c1
-        A[:, 2, 0] = c2 - c1
-        A[:, 2, 1] = c2
+        A[:, 0, 2] = c2 - c1
+        A[:, 1, 2] = c2
         b[:, 0] = 1 + c3
         b[:, 1] = c3
 
