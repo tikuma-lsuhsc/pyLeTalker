@@ -1,5 +1,11 @@
 ## vocal tract signal propagation
 
+### Block Diagram
+
+![Block Diagram](wave-reflection-model.svg "Tux")
+
+### Calculations
+
 Inputs: $f_{1,n}$ & $b_{K,n}$
 
 Outputs: $f_{K,n}$ & $b_{1,n}$
