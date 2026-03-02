@@ -12,7 +12,7 @@ struct PyRunnerBase : RunnerBase
 {
     NB_TRAMPOLINE(RunnerBase, 1);
 
-    virtual pressure_pair step(const int i, const double fin, const double bin) override
+    virtual pressure_pair step(const unsigned int i, const double fin, const double bin) override
     {
         NB_OVERRIDE_PURE(step, i, fin, bin);
     }

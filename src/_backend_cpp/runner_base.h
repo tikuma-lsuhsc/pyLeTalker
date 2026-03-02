@@ -18,5 +18,5 @@ typedef dbl_ndarray<nb::ndim<3>> dbl_3darray;
 struct RunnerBase
 {
     virtual ~RunnerBase() = default;
-    virtual pressure_pair step(const int i, const double fin, const double bin) = 0;
+    virtual pressure_pair step(const unsigned int i, const double fin, const double bin) = 0;
 };
