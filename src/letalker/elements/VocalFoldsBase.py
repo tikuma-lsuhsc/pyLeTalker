@@ -5,15 +5,9 @@ import abc
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._backend import FlowNoiseRunnerBase, PyFlowNoiseRunnerBase, RunnerBase
+from .._backend import FlowNoiseRunnerBase, NoFlowNoiseRunner, RunnerBase
 from .abc import AspirationNoise, Element, VocalFolds, VocalTract
 from .LeTalkerAspirationNoise import LeTalkerAspirationNoise
-
-
-class NoAspirationNoiseRunner(PyFlowNoiseRunnerBase):
-    def __init__(self): ...
-    def step(self, i: int, ug: float, geom: np.typing.ArrayLike) -> float:
-        return 0.0
 
 
 def glottal_flow_params(
@@ -270,7 +264,7 @@ class VocalFoldsBase(VocalFolds):
         ns = self._nb_states
 
         an_runner = (
-            NoAspirationNoiseRunner()
+            NoFlowNoiseRunner()
             if noise_free
             else self.create_noise_runner(n, n0, s_in[ns:])
         )
@@ -288,7 +282,7 @@ class VocalFoldsBase(VocalFolds):
         noise_model = self.noise_model
 
         if not noise_model:
-            return NoAspirationNoiseRunner()
+            return NoFlowNoiseRunner()
 
         if not self.known_length and noise_model.need_length:
             raise TypeError(
@@ -311,9 +305,7 @@ class VocalFoldsBase(VocalFolds):
         anoise = (
             self.noise_model.create_result(runner._anoise, n0=n0)
             if self.noise_model
-            and hasattr(
-                runner._anoise, "n"
-            )  # 'n' is not present in NoAspirationNoiseRunner
+            and hasattr(runner._anoise, "n")  # 'n' is not present in NoFlowNoiseRunner
             else None
         )
 
