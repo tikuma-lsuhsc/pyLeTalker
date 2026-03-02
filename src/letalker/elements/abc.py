@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._backend import RunnerBase
+from .._backend import FlowNoiseRunnerBase, RunnerBase
 from ..constants import c as c_default
 from ..constants import mu as mu_default
 from ..constants import rho_air as rho_default
@@ -121,7 +121,7 @@ class Element(TimeSampleHandler, metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
     def Runner(self) -> RunnerBase:
-        """element's runner class and its numba jitclass spec"""
+        """element's runner class"""
 
     @abc.abstractmethod
     def generate_sim_params(
@@ -338,6 +338,11 @@ class AspirationNoise(Element, metaclass=abc.ABCMeta):
     def is_sink(self) -> bool:
         """True if produces no output"""
         return True
+
+    @property
+    @abc.abstractmethod
+    def Runner(self) -> FlowNoiseRunnerBase:
+        """element's runner class"""
 
     @abc.abstractmethod
     def generate_noise(self, N: int, n0: int = 0) -> NDArray: ...

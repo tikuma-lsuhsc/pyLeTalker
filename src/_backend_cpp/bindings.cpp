@@ -19,6 +19,17 @@ struct PyRunnerBase : RunnerBase
     }
 };
 
+
+struct PyFlowNoiseRunnerBase : FlowNoiseRunnerBase
+{
+    NB_TRAMPOLINE(FlowNoiseRunnerBase, 1);
+
+    virtual double step(const unsigned int i, const double uin, const std::list<double> geom) override
+    {
+        NB_OVERRIDE_PURE(step, i, uin, geom);
+    }
+};
+
 void sim_loop(int nb_steps,
               RunnerBase &lungs,
               RunnerBase &trachea,
@@ -89,6 +100,36 @@ To subclass ``PyRunnerBase``, there are two requirements:
         ``Lungs``: ``fin`` is always ``0.0``
         ``Lips``: ``fout`` is ignored by the simulator)")
         .def(nb::init<>());
+
+    nb::class_<FlowNoiseRunnerBase>(m, "FlowNoiseRunnerBase");
+    nb::class_<PyFlowNoiseRunnerBase, FlowNoiseRunnerBase>(m, "PyFlowNoiseRunnerBase", R"(
+Base class for the ``Runner`` classes of every ``FlowNoise`` class
+
+To run the synthesis simulation, every ``FlowNoise`` object (of type 
+``FlowNoiseClass``) will create a runner object of type ``FlowNoiseClass.Runner``.
+A ``Runner`` class may be written in C++ or in Python. ``PyFlowNoiseRunnerBase`` 
+is the required superclass of a Python runner class. 
+
+To subclass ``PyFlowNoiseRunnerBase``, there are two requirements:
+
+1. ``super().__init__()`` must be called during subclass initialization
+2. ``step()`` method must be implemented with the following signature:
+
+     ``def step(self, i: int, uin: float, geom: list[float]) -> float``
+
+    This method performs the element's operation during one simulation step at 
+    time ``i``. The following defines its arguments and outputs:
+
+      Args:
+        i: current simulation step
+        uin: input flow
+        geom: runtime dynamic geometry parameters in a prescribed order 
+            (empty list if none needed to be provided during simulation)
+
+      Returns:
+        flow noise to be injected)")
+        .def(nb::init<>());
+
     m.def("sim_loop", &sim_loop, nb::call_guard<nb::gil_scoped_release>());
 
     bind_lungs(m);

@@ -5,14 +5,14 @@ import abc
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
-from .._backend import RunnerBase
+from .._backend import FlowNoiseRunnerBase, PyFlowNoiseRunnerBase, RunnerBase
 from .abc import AspirationNoise, Element, VocalFolds, VocalTract
 from .LeTalkerAspirationNoise import LeTalkerAspirationNoise
 
 
-class NoAspirationNoiseRunner:
+class NoAspirationNoiseRunner(PyFlowNoiseRunnerBase):
     def __init__(self): ...
-    def step(self, i: int, ug: float) -> float:
+    def step(self, i: int, ug: float, geom: np.typing.ArrayLike) -> float:
         return 0.0
 
 
@@ -56,7 +56,7 @@ def calculate_glottal_flow(
     beplx: float,
     rhoca_eplx: float,
     rhoca_sg: float,
-    anoise: RunnerBase,
+    anoise: FlowNoiseRunnerBase,
 ) -> tuple[float, float, float, float]:
     """2-port glottis update function given current glottal flow
 

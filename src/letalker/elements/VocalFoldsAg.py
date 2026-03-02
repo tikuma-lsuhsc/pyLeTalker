@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
-from .._backend import PyRunnerBase, RunnerBase
+from .._backend import FlowNoiseRunnerBase, PyRunnerBase
 from ..function_generators.abc import SampleGenerator
 from ..function_generators.utils import align_signals
 from .abc import AspirationNoise, Element, VocalTract
@@ -33,7 +33,7 @@ class VocalFoldsAgBase(VocalFoldsBase, metaclass=abc.ABCMeta):
             self,
             nb_steps: int,
             s_in: NDArray,
-            anoise: RunnerBase,
+            anoise: FlowNoiseRunnerBase,
             R: NDArray,
             Qa: NDArray,
             a: NDArray,
@@ -69,7 +69,7 @@ class VocalFoldsAgBase(VocalFoldsBase, metaclass=abc.ABCMeta):
                 Q = -Q
             ug = a * ((R**2 + Q) ** 0.5 - R)
 
-            ug += self._anoise.step(i, ug)
+            ug += self._anoise.step(i, ug, [])
 
             self.ug[i] = ug
 

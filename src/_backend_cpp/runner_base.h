@@ -3,6 +3,7 @@
 #include <utility>
 #include <nanobind/stl/pair.h>
 #include <nanobind/ndarray.h>
+#include <nanobind/stl/list.h>
 
 namespace nb = nanobind;
 
@@ -19,4 +20,10 @@ struct RunnerBase
 {
     virtual ~RunnerBase() = default;
     virtual pressure_pair step(const unsigned int i, const double fin, const double bin) = 0;
+};
+
+struct FlowNoiseRunnerBase
+{
+    virtual ~FlowNoiseRunnerBase() = default;
+    virtual double step(const unsigned int i, const double uin, const std::list<double> geom) = 0;
 };

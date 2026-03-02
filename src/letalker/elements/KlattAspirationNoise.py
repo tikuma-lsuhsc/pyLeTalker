@@ -69,9 +69,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 import numpy as np
-from numpy.typing import NDArray
+from numpy.typing import ArrayLike, NDArray
 
-from .._backend import PyRunnerBase
+from .._backend import PyFlowNoiseRunnerBase
 from ..function_generators import ColoredNoiseGenerator
 from ..function_generators.abc import NoiseGenerator
 from .abc import AspirationNoise, Element
@@ -101,7 +101,7 @@ class KlattAspirationNoise(AspirationNoise):
     # override result class
     _ResultsClass = Results
 
-    class Runner(PyRunnerBase):
+    class Runner(PyFlowNoiseRunnerBase):
         n: int
         nuL_inv: NDArray
         nf: NDArray
@@ -130,7 +130,7 @@ class KlattAspirationNoise(AspirationNoise):
             self.re2 = np.empty(nb_steps)
             self.ug_noise = np.empty(nb_steps)
 
-        def step(self, i: int, ug: float) -> float:
+        def step(self, i: int, ug: float, geom: ArrayLike) -> float:
 
             nuL_inv = self.nuL_inv[i if i < self.nuL_inv.shape[0] else -1]
             nf = self.nf[i if i < self.nf.shape[0] else -1]

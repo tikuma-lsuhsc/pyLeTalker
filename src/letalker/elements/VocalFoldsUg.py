@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
-from .._backend import PyRunnerBase, RunnerBase
+from .._backend import FlowNoiseRunnerBase, PyRunnerBase
 from ..function_generators.abc import SampleGenerator
 from .abc import AspirationNoise, Element, VocalTract
 from .VocalFoldsBase import VocalFoldsBase
@@ -28,7 +28,7 @@ class VocalFoldsUg(VocalFoldsBase):
             self,
             nb_steps: int,
             s_in: NDArray,
-            anoise: RunnerBase,
+            anoise: FlowNoiseRunnerBase,
             ug: NDArray,
             rhoca_sg: NDArray,
             rhoca_eplx: NDArray,
@@ -49,7 +49,7 @@ class VocalFoldsUg(VocalFoldsBase):
             rhoca_eplx = self.rhoca_eplx[i if i < self.rhoca_eplx.shape[0] else -1]
             rhoca_sg = self.rhoca_sg[i if i < self.rhoca_sg.shape[0] else -1]
 
-            ug += self._anoise.step(i, ug)
+            ug += self._anoise.step(i, ug, [])
 
             # compute the forward pressure in epilarnx
             feplx = beplx + ug * rhoca_eplx

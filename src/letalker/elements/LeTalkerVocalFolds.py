@@ -9,7 +9,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
-from .._backend import PyRunnerBase, RunnerBase
+from .._backend import FlowNoiseRunnerBase, PyRunnerBase
 from ..function_generators import Constant
 from ..function_generators.abc import SampleGenerator
 from .abc import AspirationNoise, Element, VocalTract
@@ -411,7 +411,7 @@ class LeTalkerVocalFolds(VocalFoldsBase):
             self,
             nb_steps: int,
             s_in: NDArray,
-            anoise: RunnerBase,
+            anoise: FlowNoiseRunnerBase,
             L: NDArray,
             T: NDArray,
             K: NDArray,  # stiffness matrix
@@ -510,7 +510,7 @@ class LeTalkerVocalFolds(VocalFoldsBase):
             ug = self.calc_flow(fsg, beplx, ga, As, Ae, c, rhoc2)
 
             # inject turbulent noise
-            ug += self._anoise.step(i, ug)
+            ug += self._anoise.step(i, ug, [])
 
             # compute the forward pressure in epilarynx
             feplx = beplx + ug * rhoc / Ae
