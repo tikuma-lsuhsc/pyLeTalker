@@ -5,7 +5,7 @@ from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
-from .._backend import PyFlowNoiseRunnerBase
+from .._backend import LeTalkerAspirationNoiseRunner
 from ..constants import noise_bpass, noise_dist, noise_psd_level, noise_REc
 from ..function_generators import ColoredNoiseGenerator
 from ..function_generators.abc import NoiseGenerator
@@ -44,41 +44,7 @@ class LeTalkerAspirationNoise(AspirationNoise):
     # override result class
     _ResultsClass = Results
 
-    class Runner(PyFlowNoiseRunnerBase):
-        n: int
-        nuL_inv: NDArray
-        nf: NDArray
-        re2b: NDArray
-        ug_noise: NDArray
-
-        def __init__(
-            self,
-            nb_steps: int,
-            s: NDArray,
-            nuL_inv: NDArray,
-            nf: NDArray,
-            RE2b: NDArray,
-        ):
-
-            super().__init__()
-
-            self.n = nb_steps
-            self.nuL_inv = nuL_inv
-            self.nf = nf
-            self.re2b = RE2b
-            self.re2 = np.empty(nb_steps)
-            self.ug_noise = np.empty(nb_steps)
-
-        def step(self, i: int, ug: float) -> float:
-
-            nuL_inv = self.nuL_inv[i if i < self.nuL_inv.shape[0] else -1]
-            nf = self.nf[i if i < self.nf.shape[0] else -1]
-            RE2b = self.re2b[i if i < self.re2b.shape[0] else -1]
-            self.re2[i] = RE2 = (ug * nuL_inv) ** 2.0
-
-            self.ug_noise[i] = u = ((RE2 - RE2b) * nf) if RE2 > RE2b else 0.0
-
-            return u
+    Runner = LeTalkerAspirationNoiseRunner
 
     def __init__(
         self,
@@ -92,7 +58,7 @@ class LeTalkerAspirationNoise(AspirationNoise):
         noise_source, optional
             _description_, by default None
         REc, optional
-            _description_, by default None
+            critical Reynolds number, by default None
         """
         super().__init__()
 
@@ -147,4 +113,4 @@ class LeTalkerAspirationNoise(AspirationNoise):
         nf = self.generate_noise(n, n0)
         RE2b = self.REc**2  # pre-square to save computation
 
-        return np.atleast_1d(nuL_inv), np.atleast_1d(nf), np.atleast_1d(RE2b)
+        return np.atleast_1d(nuL_inv), np.atleast_1d(nf), RE2b
