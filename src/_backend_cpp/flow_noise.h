@@ -45,11 +45,8 @@ struct LeTalkerAspirationNoiseRunner : FlowNoiseRunnerBase
         unsigned offset;
         double nuL_inv_i, nf_i, RE2, u;
 
-        offset = i < nuL_inv.shape(0) ? i : nuL_inv.shape(0) - 1;
-        nuL_inv_i = nuL_inv.data()[offset];
-
-        offset = i < nf.shape(0) ? i : nf.shape(0) - 1;
-        nf_i = nf.data()[offset];
+        nuL_inv_i = *DATA_PTR(nuL_inv, i);
+        nf_i = *DATA_PTR(nf, i);
 
         RE2 = (uin * nuL_inv_i);
         RE2 *= RE2;

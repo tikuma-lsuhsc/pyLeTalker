@@ -27,14 +27,9 @@ struct LeTalkerLipsRunner : RunnerBase
 
     pressure_pair step(const unsigned int i, const double fin, const double bin) override
     {
-        int offset = (i < A.shape(0) ? i : A.shape(0) - 1) * A.stride(0);
-        Eigen::Map<Eigen::Matrix<double, 2, 3, Eigen::RowMajor>> Ai(A.data() + offset);
-
-        offset = (i < b.shape(0) ? i : b.shape(0) - 1) * b.stride(0);
-        Eigen::Map<Eigen::Vector2d> bi(b.data() + offset);
-
-        offset = i < c.shape(0) ? i : c.shape(0) - 1;
-        double ci = c.data()[offset];
+        Eigen::Map<Eigen::Matrix<double, 2, 3, Eigen::RowMajor>> Ai(DATA_PTR(A, i));
+        Eigen::Map<Eigen::Vector2d> bi(DATA_PTR(b, i));
+        double ci = *DATA_PTR(c, i);
 
         s(Eigen::seq(0, 1)) = Ai * s + bi * fin;
         s(2) = fin;

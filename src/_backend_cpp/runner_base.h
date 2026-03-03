@@ -16,6 +16,9 @@ typedef dbl_ndarray<nb::ndim<1>> dbl_1darray;
 typedef dbl_ndarray<nb::ndim<2>> dbl_2darray;
 typedef dbl_ndarray<nb::ndim<3>> dbl_3darray;
 
+#define DATA_PTR(x, i) (x.data() + (i < x.shape(0) ? i : x.shape(0) - 1) * x.stride(0))
+        
+
 struct RunnerBase
 {
     virtual ~RunnerBase() = default;
