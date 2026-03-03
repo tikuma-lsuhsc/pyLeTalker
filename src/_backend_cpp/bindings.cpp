@@ -5,6 +5,7 @@
 #include "lungs.h"
 #include "lips.h"
 #include "flow_noise.h"
+#include "vocalfolds.h"
 
 namespace nb = nanobind;
 
@@ -136,4 +137,5 @@ To subclass ``PyFlowNoiseRunnerBase``, there are two requirements:
     bind_lungs(m);
     bind_lips(m);
     bind_flow_noise(m);
+    bind_vocalfolds(m);
 }
