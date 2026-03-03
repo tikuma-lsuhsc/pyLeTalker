@@ -22,7 +22,7 @@ struct NoFlowNoiseRunner : FlowNoiseRunnerBase
 
 struct LeTalkerAspirationNoiseRunner : FlowNoiseRunnerBase
 {
-    int n;
+    const unsigned int n;
     const dbl_1darray nuL_inv;
     const dbl_1darray nf;
     const double re2b;
@@ -32,7 +32,7 @@ struct LeTalkerAspirationNoiseRunner : FlowNoiseRunnerBase
     std::vector<double> ug_noise;
 
     LeTalkerAspirationNoiseRunner(
-        const int nb_steps,
+        const unsigned int nb_steps,
         const nb::object *s,
         const dbl_1darray nuL_inv_in,
         const dbl_1darray nf_in,
