@@ -38,3 +38,4 @@ testpaths = ["tests"]
 
 [tool.scikit-build]
 wheel.packages = ["src/letalker", "src/pyLeTalker"]
+build-dir="build"
