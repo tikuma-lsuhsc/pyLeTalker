@@ -1,12 +1,4 @@
 import numpy as np
-from matplotlib import pyplot as plt
-
-from letalker.elements import LeTalkerVocalTract
-
-N = 1000
-x = np.random.randn(N, 2)
-
-import numpy as np
 from numpy.typing import NDArray
 
 from letalker import LeTalkerVocalTract
@@ -95,36 +87,21 @@ class FastRunner:
         return f_odd[-1], b_even[0]
 
 
-n = 100
-vt = LeTalkerVocalTract("aa")
-cpp_runner = vt.create_runner(n)
+def test_runner():
 
-params = vt.generate_sim_params(n)
-py_runner = FastRunner(n, np.zeros(vt.nb_states), *params)
+    n = 100
+    vt = LeTalkerVocalTract("aa")
+    cpp_runner = vt.create_runner(n)
 
-fsg = np.random.rand(n) * 100
-beplx = np.random.rand(n) * 100
-fout = np.empty((n, 2))
-bout = np.empty((n, 2))
-for i, (f, b) in enumerate(zip(fsg, beplx)):
-    fout[i, 0], bout[i, 0] = py_runner.step(i, f, b)
-    fout[i, 1], bout[i, 1] = cpp_runner.step(i, f, b)
+    params = vt.generate_sim_params(n)
+    py_runner = FastRunner(n, np.zeros(vt.nb_states), *params)
 
-fig, axes = plt.subplots(1, 2)
-axes[0].plot(fout, ".-")
-axes[1].plot(bout, ".-")
-plt.show()
+    fsg = np.random.rand(n) * 100
+    beplx = np.random.rand(n) * 100
+    cpp_out = np.empty((n, 2))
+    py_out = np.empty((n, 2))
+    for i, (f, b) in enumerate(zip(fsg, beplx)):
+        cpp_out[i] = py_runner.step(i, f, b)
+        py_out[i] = cpp_runner.step(i, f, b)
 
-
-# letalker_dir = path.join(
-#     "." if getcwd().endswith("tests") else "tests", "matlab", "LeTalker1.22"
-# )
-
-# print(letalker_dir)
-
-# octave.addpath(letalker_dir)
-# octave.eval("warning ('off', 'Octave:data-file-in-path')")
-# ymat = octave.test_waverefl(areas, x, nout=1)
-
-# plt.plot(ymat, "--.")
-# plt.show()
+    assert np.array_equal(cpp_out, py_out)
