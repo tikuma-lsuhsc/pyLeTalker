@@ -4,13 +4,14 @@ from numpy.typing import NDArray
 from letalker import LeTalkerVocalTract
 
 
-class FastRunner:
+class Runner:
     n: int
     alph_odd: NDArray  # odd-section propagation gains
     alph_even: NDArray  # even-section propagation gains
     r_odd: NDArray  # odd-junction reflection coefficients
     r_even: NDArray  # even-junction reflection coefficients
     s: np.ndarray
+    p_sections: np.ndarray  # internal pressure (columns: forward/backward)
 
     def __init__(
         self,
@@ -20,6 +21,7 @@ class FastRunner:
         alph_even: NDArray,
         r_odd: NDArray,
         r_even: NDArray,
+        log_sections: bool,
     ):
         super().__init__()
 
@@ -29,6 +31,10 @@ class FastRunner:
         self.r_odd = r_odd
         self.r_even = r_even
         self.s = s
+        self.log = log_sections
+
+        n_sections = r_odd.shape[-1] + r_even.shape[-1]
+        self.p_sections = np.empty((nb_steps, 2, n_sections))
 
     def step(self, i: int, f1: float, bK: float) -> tuple[float, float]:
         """time update
@@ -69,17 +75,28 @@ class FastRunner:
         b_even[:-1] = b_odd + Psi
         b_even[-1] = bK
 
-        f_odd *= alph_odd
-        b_even *= alph_even
+        if self.log:
+            self.p_sections[i, 0, 1::2] = f_even
+            self.p_sections[i, 1, 1::2] = b_even[:-1]
+
+        f_odd *= alph_odd  # f_even input to odd junction
+        b_even *= alph_even  # b_even input to odd junction
 
         # ---odd junctions [(F1,B2),(F3,B4),...]->[(F2,B1),(F4,B3),...]--- */
         Psi = (f_odd - b_even) * r_odd  # [F3,F5,...] - [B2, B4, ...]
         f_odd += Psi
         b_even += Psi
 
+        # grab odd-stage output forward pressure
+        if self.log:
+            self.p_sections[i, 0, ::2] = f_odd
+
         # --- attenuate pressure to "pre-"propagate signal to the output of the section
-        f_odd *= alph_even
-        b_even *= alph_odd
+        f_odd *= alph_even  # misnamed, f_even next state
+        b_even *= alph_odd  # misnamed, b_odd next state
+
+        if self.log:
+            self.p_sections[i, 1, ::2] = b_even  # odd-stage output backward pressure
 
         s[:ns] = f_odd[:-1]
         s[ns:] = b_even[1:]
@@ -90,11 +107,11 @@ class FastRunner:
 def test_runner():
 
     n = 100
-    vt = LeTalkerVocalTract("aa")
+    vt = LeTalkerVocalTract("aa", log_sections=True)
     cpp_runner = vt.create_runner(n)
 
     params = vt.generate_sim_params(n)
-    py_runner = FastRunner(n, np.zeros(vt.nb_states), *params)
+    py_runner = Runner(n, np.zeros(vt.nb_states), *params)
 
     fsg = np.random.rand(n) * 100
     beplx = np.random.rand(n) * 100
@@ -104,4 +121,7 @@ def test_runner():
         cpp_out[i] = py_runner.step(i, f, b)
         py_out[i] = cpp_runner.step(i, f, b)
 
+    vt.create_result(cpp_runner)
+
     assert np.array_equal(cpp_out, py_out)
+    assert np.array_equal(cpp_runner.p_sections, py_runner.p_sections)

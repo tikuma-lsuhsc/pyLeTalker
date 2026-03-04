@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
-from .._backend import PyRunnerBase, WaveReflectionVocalTractFastRunner
+from .._backend import WaveReflectionVocalTractRunner
 from ..constants import (
     vt_atten as atten_default,
 )
@@ -24,105 +24,7 @@ class WaveReflectionVocalTract(VocalTract):
     log_sections: bool = False
     _nb_states: int
 
-    FastRunner = WaveReflectionVocalTractFastRunner
-
-    class LoggedRunner(PyRunnerBase):
-        n: int
-        alph_odd: NDArray  # odd-section propagation gains
-        alph_even: NDArray  # even-section propagation gains
-        r_odd: NDArray  # odd-junction reflection coefficients
-        r_even: NDArray  # even-junction reflection coefficients
-        s: np.ndarray
-        p_sections: np.ndarray  # internal pressure (columns: forward/backward)
-
-        def __init__(
-            self,
-            nb_steps: int,
-            s: NDArray,
-            alph_odd: NDArray,
-            alph_even: NDArray,
-            r_odd: NDArray,
-            r_even: NDArray,
-        ):
-            super().__init__()
-
-            self.n = nb_steps
-            self.alph_odd = alph_odd
-            self.alph_even = alph_even
-            self.r_odd = r_odd
-            self.r_even = r_even
-            self.s = s
-
-            n_sections = r_odd.shape[-1] + r_even.shape[-1]
-            self.p_sections = np.empty((nb_steps, 2, n_sections))
-
-        def step(self, i: int, f1: float, bK: float) -> tuple[float, float]:
-            """time update
-
-            Parameters
-            ----------
-            f1
-                forward pressure input
-            bK
-                backward pressure input
-
-            Returns
-            -------
-                fK
-                    forward pressure output
-                b1
-                    backward pressure output
-
-            """
-
-            alph_odd = self.alph_odd[i if i < self.alph_odd.shape[0] else -1]
-            alph_even = self.alph_even[i if i < self.alph_even.shape[0] else -1]
-            r_odd = self.r_odd[i if i < self.r_odd.shape[0] else -1]
-            r_even = self.r_even[i if i < self.r_even.shape[0] else -1]
-            s = self.s
-
-            ns = r_even.shape[0]
-            f_even = s[:ns]
-            b_odd = s[ns:]
-
-            f_odd = np.empty_like(alph_odd)
-            b_even = np.empty_like(alph_even)
-
-            # ---even junctions [(F2,B3),(F4,B5),...,(FK-2,BK-1)]->[(F3,B2),(F5,B4),...]--- */
-            Psi = (f_even - b_odd) * r_even
-            f_odd[0] = f1
-            f_odd[1:] = f_even + Psi
-            b_even[:-1] = b_odd + Psi
-            b_even[-1] = bK
-
-            self.p_sections[i, 0, 1::2] = f_even
-            self.p_sections[i, 1, 1::2] = b_even[:-1]
-
-            f_odd *= alph_odd  # f_even input to odd junction
-            b_even *= alph_even  # b_even input to odd junction
-
-            # ---odd junctions [(F1,B2),(F3,B4),...]->[(F2,B1),(F4,B3),...]--- */
-            Psi = (f_odd - b_even) * r_odd  # [F3,F5,...] - [B2, B4, ...]
-            f_odd += Psi
-            b_even += Psi
-
-            # grab odd-stage output forward pressure
-            self.p_sections[i, 0, ::2] = f_odd
-
-            # --- attenuate pressure to "pre-"propagate signal to the output of the section
-            f_odd *= alph_even  # misnamed, f_even next state
-            b_even *= alph_odd  # misnamed, b_odd next state
-
-            self.p_sections[i, 1, ::2] = b_even  # odd-stage output backward pressure
-
-            s[:ns] = f_odd[:-1]
-            s[ns:] = b_even[1:]
-
-            return f_odd[-1], b_even[0]
-
-    @property
-    def Runner(self):
-        return self.LoggedRunner if self.log_sections else self.FastRunner
+    Runner = WaveReflectionVocalTractRunner
 
     def __init__(
         self,
@@ -197,7 +99,7 @@ class WaveReflectionVocalTract(VocalTract):
     @property
     def _runner_fields_to_results(self) -> list[str]:
         """list of runner fields to store in results"""
-        return ["n", "s"]
+        return ["n", "sout"]
 
     def generate_sim_params(self, n: int, n0: int = 0, **_) -> tuple[NDArray, ...]:
 
@@ -206,7 +108,13 @@ class WaveReflectionVocalTract(VocalTract):
         alpha = 1 - self._atten / areas**0.5
         r = (areas[..., :-1] - areas[..., 1:]) / (areas[..., :-1] + areas[..., 1:])
 
-        return alpha[..., ::2], alpha[..., 1::2], r[..., ::2], r[..., 1::2]
+        return (
+            alpha[..., ::2],
+            alpha[..., 1::2],
+            r[..., ::2],
+            r[..., 1::2],
+            self.log_sections,
+        )
 
     @property
     def nb_states(self) -> int:
@@ -329,7 +237,7 @@ class WaveReflectionVocalTract(VocalTract):
 
     def create_result(
         self,
-        runner: WaveReflectionVocalTract.Runner | WaveReflectionVocalTract.LoggedRunner,
+        runner: WaveReflectionVocalTractRunner,
         *extra_items,
         n0: int = 0,
     ) -> Element.Results:

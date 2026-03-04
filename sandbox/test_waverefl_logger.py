@@ -6,7 +6,7 @@ from letalker import LeTalkerLungs, LeTalkerVocalTract
 lungs = LeTalkerLungs()
 vocaltract = LeTalkerVocalTract("aa", log_sections=True)
 
-N = 1000
+N = 100
 y = np.empty((N, 2))
 flung = blung = fsg = 0.0
 
@@ -14,7 +14,7 @@ vt_runner = vocaltract.create_runner(N)
 lung_runner = lungs.create_runner(N)
 
 for i in range(N):
-    flung = lung_runner.step(i, blung)
+    flung, _ = lung_runner.step(i, 0.0, blung)
     y[i, 0], y[i, 1] = vt_runner.step(i, flung, 0.0)
 
 vt_res = vocaltract.create_result(vt_runner)
