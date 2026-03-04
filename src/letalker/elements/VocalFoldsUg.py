@@ -56,7 +56,7 @@ class VocalFoldsUg(VocalFoldsBase):
     @property
     def _runner_fields_to_results(self) -> list[str]:
         """list of runner fields to store in results"""
-        return ["n", "_ug", "psg", "peplx"]
+        return ["n", "ug", "psg", "peplx"]
 
     @dataclass
     class Results(Element.Results):
