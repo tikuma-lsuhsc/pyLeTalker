@@ -54,5 +54,7 @@ def test_runner():
         py_runner.step(i, u)
         cpp_runner.step(i, u, [])
 
+    noise.create_result(cpp_runner)
+
     assert np.array_equal(py_runner.re2, cpp_runner.re2)
     assert np.array_equal(py_runner.ug_noise, cpp_runner.ug_noise)

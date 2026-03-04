@@ -88,5 +88,7 @@ def test_runner():
         py_runner.step(i, f, b)
         cpp_runner.step(i, f, b)
 
+    vf.create_result(cpp_runner)
+
     assert np.array_equal(py_runner.peplx, cpp_runner.peplx)
     assert np.array_equal(py_runner.psg, cpp_runner.psg)
