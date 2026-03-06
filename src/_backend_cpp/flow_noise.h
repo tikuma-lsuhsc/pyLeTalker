@@ -3,6 +3,7 @@
 #include <vector>
 
 #include <Eigen/Dense>
+#include <nanobind/nanobind.h>
 #include <nanobind/eigen/dense.h>
 #include <nanobind/ndarray.h> // Required for nb::ndarray
 
