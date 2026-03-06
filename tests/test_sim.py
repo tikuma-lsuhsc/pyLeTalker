@@ -54,9 +54,9 @@ def test_sim_kinematic():
         # "Qp": 0.2,  # phase quotient: phi/2pi (Titze 84 Eq (10))
         # "Qb": 1.0,  # bulging quotient: (|xi01-xi02|/2-(xib-xi02))/xim
     }
-
+    aspiration_noise = True
     po, parts = sim_kinematic(
-        N, 101, **vf_params, vocaltract="aa", aspiration_noise=True
+        N, 101, **vf_params, vocaltract="aa", aspiration_noise=aspiration_noise
     )
 
     vf, lungs = (parts[c] for c in ("vocalfolds", "lungs"))
@@ -65,9 +65,10 @@ def test_sim_kinematic():
     ug, psg, pe = vf.ug, vf.psg, vf.peplx
     vf.glottal_area
     vf.contact_area
-    vf.aspiration_noise.unoise
+    if aspiration_noise:
+        vf.aspiration_noise.unoise
+        vf.aspiration_noise.re2b
     lungs.plung
-    vf.aspiration_noise.re2b
 
 
 if __name__ == "__main__":

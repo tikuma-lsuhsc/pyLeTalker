@@ -303,9 +303,9 @@ class VocalFoldsBase(VocalFolds):
         """Returns simulation result object"""
 
         anoise = (
-            self.noise_model.create_result(runner._anoise, n0=n0)
+            self.noise_model.create_result(runner.anoise, n0=n0)
             if self.noise_model
-            and hasattr(runner._anoise, "n")  # 'n' is not present in NoFlowNoiseRunner
+            and hasattr(runner.anoise, "n")  # 'n' is not present in NoFlowNoiseRunner
             else None
         )
 

@@ -104,7 +104,7 @@ class Runner:
         return f_odd[-1], b_even[0]
 
 
-n = 100
+n = 1000
 vt = LeTalkerVocalTract("aa", log_sections=True)
 cpp_runner = vt.create_runner(n)
 
@@ -120,6 +120,7 @@ for i, (f, b) in enumerate(zip(fsg, beplx)):
     fout[i, 0], bout[i, 0] = py_runner.step(i, f, b)
     fout[i, 1], bout[i, 1] = cpp_runner.step(i, f, b)
 
+vt.create_result(cpp_runner)
 
 from matplotlib import pyplot as plt
 
@@ -130,6 +131,7 @@ axes[1].plot(bout, ".-")
 
 axes[2].plot(cpp_runner.p_sections[:, 1, :2], ".-")
 axes[2].plot(py_runner.p_sections[:, 1, :2], "x--")
+
 
 plt.show()
 

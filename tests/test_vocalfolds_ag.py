@@ -92,3 +92,18 @@ def test_runner():
 
     assert np.array_equal(py_runner.peplx, cpp_runner.peplx)
     assert np.array_equal(py_runner.psg, cpp_runner.psg)
+
+
+def test_runner_with_noise():
+
+    n = 100
+    ug = np.random.rand(n) * 2000
+    vf = VocalFoldsAg(ug, aspiration_noise=True, length=1.5)
+    cpp_runner = vf.create_runner(n)
+
+    fsg = np.random.rand(n) * 100
+    beplx = np.random.rand(n) * 100
+    for i, (f, b) in enumerate(zip(fsg, beplx)):
+        cpp_runner.step(i, f, b)
+
+    vf.create_result(cpp_runner)
