@@ -19,3 +19,4 @@ sphinx-copybutton
 sphinxcontrib.bibtex
 jupytext
 sphinxcontrib-video
+sympy

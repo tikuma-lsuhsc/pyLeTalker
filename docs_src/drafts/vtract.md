@@ -488,3 +488,188 @@ f_{1,n-1}\\
 \mathbf{s}_{\text{lip}, n-1} \\
 \end{bmatrix} + \gamma_1 \ u_{g,n}
 $$
+
+## Yielding Wall (Story 95)
+
+![Tube Section Diagram (p.43)](story95-fig2-4.png)
+
+* $U_1$ - input volume flow from the previous junction
+* $U_2$ - output volume flow to the next junction
+* $U_w$ - wall volume flow
+* $R_w$ - wall resistance (simulates the viscosity of the tissue/energy dissipation)
+* $L_w$ - wall inertance (mass-like qualities of the flesh)
+* $C_w$ - wall compliance (simulates pressure storage capability)
+
+Governing equations. Flow conservation:
+$$
+U_2 = U_1 + U_w
+$$
+Pressure conservation:
+$$
+P = P_l + P_r + P_c,
+$$
+where $P$ is the sectional pressure, and $P_l$, $P_r$, and $P_c$ are the pressure drops across each lumped element. The equivalent circuit is then given by:
+
+![Analog Block Diagram](story95-fig2-5.png)
+
+$$\begin{aligned}
+P(s) &= P_l(s) - P_r(s) - P_c(s)\\
+U_w(s) &= \frac{1}{sL_w} P_l(s)\\
+P_r(s) &= R U_w(s)\\
+P_c(s) &= \frac{1}{sC_w} U_w(s)\\
+\end{aligned}$$
+
+Find the relationship between $P(s)$ and $U_w(s)$:
+
+$$\begin{aligned}
+P(s) &= sL_w U_w(s) - RU_w(s) - \frac{1}{sC_w} U_w(s)\\
+     &= \frac{L_w C_w s^2 - R C_w s -1 }{C_w s} U_w(s)\\
+     &\triangleq H_w(s) U_w(s)
+\end{aligned}$$
+
+The input forward and backward pressure $F_k$ & $B_k$ are measured at the end of
+the segment right at the junction of $k$ and $k+1$st segments. Then, the yielding 
+wall effect of the $(k+1)$-st segment is accounted by the $k$-th junction:
+:
+
+$$\begin{aligned}
+U_1 &= U_2 + U_w\\
+\frac{F_1-B_1}{Z_1} &= \frac{F_2-B_2}{Z_2} + H_w (F_2+B_2)\\
+\frac{1}{Z_1} F_1 - \frac{1}{Z_1} B_1 &= \left(\frac{1}{Z_2} + H_w\right) F_2 - \left(\frac{1}{Z_2} - H_w\right) B_2\\
+\end{aligned}$$
+
+Let
+$$\begin{aligned}
+\tilde{Z}_{2,F} &\triangleq \frac{Z_2}{1 + Z_2 H_w}\\
+\tilde{Z}_{2,B} &\triangleq \frac{Z_2}{1 - Z_2 H_w}\\
+\end{aligned}$$
+
+Then, the junction govering equations are:
+
+$$\begin{aligned}
+\frac{F_1}{Z_1}  - \frac{B_1}{Z_1}  &= \frac{F_2}{\tilde{Z}_{2,F}}  - \frac{B_2}{\tilde{Z}_{2,B}}\\
+F_1 + B_1 &= F_2 + B_2\\
+\end{aligned}$$
+
+Reorganize them into a matrix equation
+$$\begin{aligned}
+\frac{F_2}{\tilde{Z}_{2,F}} + \frac{B_1}{Z_1} &= \frac{F_1}{Z_1} + \frac{B_2}{\tilde{Z}_{2,B}}\\
+F_2 - B_1 &= F_1 - B_2\\
+\begin{bmatrix}F_2\\B_1\end{bmatrix} &= \begin{bmatrix}
+1/\tilde{Z}_{F,2} & 1/Z_1\\
+1 & -1
+\end{bmatrix}^{-1}\begin{bmatrix}1/Z_1 & 1/\tilde{Z}_{B,2}\\
+1 & -1
+\end{bmatrix}\begin{bmatrix}F_1\\B_2\end{bmatrix}\\
+&= \frac{1}{\tilde{Z}_{F,2}+\tilde{Z}_{B,1}}\begin{bmatrix}
+1 & \tilde{Z}_{B,1}\\
+1 & -\tilde{Z}_{F,2}
+\end{bmatrix}\begin{bmatrix}\tilde{Z}_{F,1} & \tilde{Z}_{B,2}\\
+1 & -1
+\end{bmatrix}\begin{bmatrix}F_1\\B_2\end{bmatrix}\\
+&= \begin{bmatrix}F_1\\B_2\end{bmatrix} + \Psi
+\end{aligned}$$
+
+$$\begin{aligned}
+\Psi &= \frac{Z_{F2} - Z_1}{Z_1+Z_{F2}} F_1 + \frac{Z_{F2}(Z_1-Z_{B2})}{Z_{B2}(Z_1+Z_{F2})} B_2\\
+&= \frac{-Z_1 + Z_2-HZ_1Z_2}{Z_1+Z_2+HZ_1Z_2} F_1 + \frac{Z_1-Z_2-HZ_1Z_2}{Z_1+Z_2+HZ_1Z_2} B_2\\
+&= r_1 F_1 + r_2 B_2\\
+\end{aligned}$$
+
+$$\begin{aligned}
+r_1 &= \frac{-Z_1 + Z_2-\alpha}{Z_1+Z_2+\alpha}\\
+r_2 &= \frac{Z_1-Z_2-\alpha}{Z_1+Z_2+\alpha}\\
+\alpha &= Z_1 Z_2 H_w\\
+\end{aligned}$$
+
+### Adding viscous loss (Pressure loss)
+
+![Equivalent Circuit Diagram (p.53)](story95-fig2-6.png)
+
+Define the viscous loss subsystem transfer function
+$$\begin{aligned}
+P_v(s) &= U_1(s) (R_v + sL_v)\\
+G_v(s) &\triangleq (R_v + sL_v)
+\end{aligned}$$
+Then, 
+Governing equations. Flow conservation:
+$$\begin{aligned}
+U_1 &= U_2 + U_w\\
+P_1 &= P_2 + P_v\\
+\end{aligned}$$
+
+# use tube 1 viscous loss and tube 2 yielding wall loss
+
+$$\begin{aligned}
+\frac{F_1-B_1}{Z_1} &= \frac{F_2-B_2}{Z_2} + H_w (F_2+B_2)\\
+(F_1+B_1) &= (F_2+B_2) + G_v\frac{F_1-B_1}{Z_1}\\
+\end{aligned}$$
+
+$$\begin{aligned}
+(\frac{1}{Z_2} + H_w) F_2 + \frac{1}{Z_1}B_1 &= \frac{1}{Z_1}F_1 + (\frac{1}{Z_2} - H_w) B_2\\
+(1 -\frac{G_v}{Z_1})F_1 -B_2 &= F_2 - (1 +\frac{G_v}{Z_1})B_1\\
+\begin{bmatrix}
+\frac{1}{Z_2} + H_w & \frac{1}{Z_1}\\
+1 & - 1 -\frac{G_v}{Z_1}
+\end{bmatrix}
+\begin{bmatrix}F_2\\B_1\end{bmatrix} &=
+\begin{bmatrix}
+\frac{1}{Z_1} & \frac{1}{Z_2} - H_w \\
+1 -\frac{G_v}{Z_1} & - 1\\
+\end{bmatrix}
+\begin{bmatrix}F_1\\B_2\end{bmatrix}
+\end{aligned}$$
+
+
+# use viscous and yielding wall loss on tube 2
+
+$$\begin{aligned}
+\frac{F_1-B_1}{Z_1} &= \frac{F_2-B_2}{Z_2} + H_w (F_2+B_2)\\
+(F_1+B_1) &= (F_2+B_2) + G_v\frac{F_2-B_2}{Z_2}\\
+\end{aligned}$$
+
+$$\begin{aligned}
+(\frac{1}{Z_2} + H_w) F_2 + \frac{1}{Z_1}B_1 &= \frac{1}{Z_1}F_1 + (\frac{1}{Z_2} - H_w) B_2\\
+(\frac{G_v}{Z_2} + 1) F_2 - B_1 &= F_1 + (\frac{G_v}{Z_2} - 1)B_2\\
+\begin{bmatrix}
+\frac{1}{Z_2} + H_w & \frac{1}{Z_1}\\
+\frac{G_v}{Z_2} + 1 & - 1
+\end{bmatrix}
+\begin{bmatrix}F_2\\B_1\end{bmatrix} &=
+\begin{bmatrix}
+\frac{1}{Z_1} & \frac{1}{Z_2} - H_w \\
+1 & \frac{G_v}{Z_2} - 1\\
+\end{bmatrix}
+\begin{bmatrix}F_1\\B_2\end{bmatrix}
+\end{aligned}$$
+
+Solve 
+$$\begin{aligned}
+\begin{bmatrix}F_2\\B_1\end{bmatrix} 
+&= \frac{1}{\tilde{Z}_{F,2}+\tilde{Z}_{B,1}}\begin{bmatrix}
+1 & \tilde{Z}_{B,1}\\
+1 & -\tilde{Z}_{F,2}
+\end{bmatrix}\begin{bmatrix}\tilde{Z}_{F,1} & \tilde{Z}_{B,2}\\
+1 & -1
+\end{bmatrix}\begin{bmatrix}F_1\\B_2\end{bmatrix}\\
+&= \begin{bmatrix}F_1\\B_2\end{bmatrix} + \Psi + 
+\begin{bmatrix}
+-1\\
+1\\
+\end{bmatrix} \frac{G_v}{D} (F_1-B_2) - \frac{2G_vH_wZ_1}{D}
+\begin{bmatrix}
+0\\
+B_2\\
+\end{bmatrix}
+\end{aligned}$$
+
+$$\begin{aligned}
+\Psi &= r_1 F_1 + r_2 B_2 - \frac{\alpha}{D} (F_1+B_2)
+\end{aligned}$$
+
+$$\begin{aligned}
+r_1 &= \frac{-Z_1 + Z_2}{D}\\
+r_2 &= \frac{Z_1-Z_2}{D}\\
+D&=Z_1+Z_2+\alpha+G_v\\
+\alpha &= Z_1 Z_2 H_w\\
+\end{aligned}$$
