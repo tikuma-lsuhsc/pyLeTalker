@@ -7,7 +7,7 @@ import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 from ..__util import format_parameter
-from .._backend import WaveReflectionVocalTractRunner
+from .._backend import Story95VocalTractRunner
 from ..constants import (
     vt_atten as atten_default,
 )
@@ -16,7 +16,7 @@ from ..function_generators.abc import SampleGenerator
 from .abc import Element, VocalTract
 
 
-class WaveReflectionVocalTract(VocalTract):
+class Story95VocalTract(VocalTract):
     """Wave-reflection vocal tract model (Liljencrants, 1985; Story, 1995)"""
 
     _atten: float = atten_default
@@ -24,18 +24,16 @@ class WaveReflectionVocalTract(VocalTract):
     log_sections: bool = False
     _nb_states: int
 
-    Runner = WaveReflectionVocalTractRunner
+    Runner = Story95VocalTractRunner
 
     def __init__(
         self,
         areas: ArrayLike | SampleGenerator,
-        atten: float | None = None,
-        yielding_wall_kws: dict | None = None,
-        viscous_loss_kws: dict | None = None,
-        heat_loss_kws: dict | None = None,
-        kinetic_drop_kws: dict | None = None,
-        flow_noise_kws: dict | None = None,
-        min_areas: float | None = None,
+        M: float | None = None,
+        K: float | None = None,
+        B: float | None = None,
+        omega_v: float | None = None,
+        alpha: float | None = None,
         log_sections: bool = False,
     ):
         """Wave-reflection vocal tract model
@@ -219,7 +217,7 @@ class WaveReflectionVocalTract(VocalTract):
             if self.uout_sections is None:
                 return None
 
-            element = cast(WaveReflectionVocalTract, self.element)
+            element = cast(Story95VocalTract, self.element)
             areas = element.areas(self.n1 - self.n0, self.n0)[:, :-1]
             dia = 2 * (areas / np.pi) ** 0.5
             return dia * self.uout_sections / (element.nu * areas)
@@ -229,20 +227,20 @@ class WaveReflectionVocalTract(VocalTract):
         def areas(self) -> NDArray:
             """cross-sectional areas of the tube sections"""
 
-            element = cast(WaveReflectionVocalTract, self.element)
+            element = cast(Story95VocalTract, self.element)
             return element.areas(self.n1 - self.n0, self.n0)
 
         @property
         def dx(self) -> float:
             """lengh of each tube section in cm"""
-            return cast(WaveReflectionVocalTract, self.element).dz
+            return cast(Story95VocalTract, self.element).dz
 
     # override result class
     _ResultsClass = Results
 
     def create_result(
         self,
-        runner: WaveReflectionVocalTractRunner,
+        runner: Story95VocalTractRunner,
         *extra_items,
         n0: int = 0,
     ) -> Element.Results:
