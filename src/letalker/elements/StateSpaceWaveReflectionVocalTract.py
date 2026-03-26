@@ -12,16 +12,18 @@ from .._backend import WaveReflectionVocalTractRunner
 from ..constants import B, K, M
 from ..constants import c as c_default
 from ..constants import rho_air as rho_air_default
-from ..constants import vt_atten as atten_default
 from ..core import classproperty
-from ..function_generators.abc import NoiseGenerator, SampleGenerator
+from ..function_generators.abc import SampleGenerator
 from .abc import Element, VocalTract
 
 rhoc_default = rho_air_default * c_default
 
-def join_fb_ss(ss1:ct.StateSpace,ss2:ct.StateSpace)->ct.StateSpace:
-    nstates = ss1.
-    # A = 
+
+def join_fb_ss(ss1: ct.StateSpace, ss2: ct.StateSpace) -> ct.StateSpace:
+    ...
+    # nstates = ss1.
+    # A =
+
 
 class LosslessJunctionBlock:
     # Lossless junction VT block with possible independent pressure/flow sources
@@ -173,66 +175,97 @@ class ShuntBlocks:
 class StateSpaceWaveReflectionVocalTract(VocalTract):
     """Wave-reflection vocal tract model (Liljencrants, 1985; Story, 1995)"""
 
-    _ss: tuple[np.ndarray,np.ndarray,np.ndarray,np.ndarray,np.ndarray]
+    _A: np.ndarray
+    _B: np.ndarray
+    _C: np.ndarray
+    _D: np.ndarray
+    _E: np.ndarray
     _nb_states: int
+    _nb_sections: int
 
     approximate_visc_loss: bool = False
-    kinetic_drop_at: list[int] | None = None
+    kinetic_drop: bool = False
     fricative_noise: dict[int, AspirationNoise] | None = None
-    homogenous_sections: Literal['lattice','general',False] = False
+    section_structure: Literal["lattice", "general", "auto"] = "auto"
     log_sections: bool = False
 
     Runner = WaveReflectionVocalTractRunner
 
     def __init__(
         self,
-        A: ArrayLike | None = None,
-        B: ArrayLike | None = None,
-        C: ArrayLike | None = None,
-        D: ArrayLike | None = None,
-        E: ArrayLike|None=None,
+        D: ArrayLike | SampleGenerator | None = None,
+        A: ArrayLike | SampleGenerator | None = None,
+        B: ArrayLike | SampleGenerator | None = None,
+        C: ArrayLike | SampleGenerator | None = None,
+        E: ArrayLike | SampleGenerator | None = None,
         approximate_visc_loss: bool = False,
-        kinetic_drop_at: list[int] | None = None,
+        kinetic_drop: bool | None = None,
         fricative_noise: dict[int, AspirationNoise] | None = None,
-        homogenous_sections: Literal['lattice','general',False] = False,
+        section_structure: Literal["lattice", "general", "auto"] | None = None,
         log_sections: bool = False,
     ):
         """Linear state-space representation of wave-reflection vocal tract model
 
         Args:
+            D: feedthrough matrix. It's shape is ``(nsection,2,2)`` where the
+                number of tube sections ``nsection`` must be a positive even number.
             A: state matrix. Defaults to None.
             B: input matrix. Defaults to None.
             C: output matrix. Defaults to None.
-            D: feedthrough matrix. Defaults to None.
-            E: auxiliary feedthrough matrix. Defaults to None.
-            approximate_visc_loss: True to inject the previous stage's viscous 
+            E: auxiliary feedthrough matrix to allow additional inputs like
+                viscous loss or fricative noise. Defaults to None.
+            approximate_visc_loss: True to inject the previous stage's viscous
                 loss of the previous section per (Story 1995). Defaults to False.
             kinetic_drop_at: _description_. Defaults to None.
             fricative_noise: _description_. Defaults to None.
-            homogenous_sections: _description_. Defaults to False.
+            section_structure: _description_. Defaults to False.
             log_sections: _description_. Defaults to False.
 
         Raises:
             ValueError: _description_
         """
 
-        self._nb_states = A.shape[-1] if 
-        self._ss = (A,B,C,D,E)
+        self._D = format_parameter(D, shape=(-1, 2, 2))
 
-        self._areas = format_parameter(areas, 1)
-        self._min_areas = min_areas or 1e-6
+        self._nb_sections = nseg = self._D.shape[0]
+        if nseg % 2:
+            raise ValueError("Tube must have an even number of sections.")
 
-        if self._areas.shape[-1] % 2:
-            raise ValueError("Tube must have an even number of cross-sectional areas.")
+        self._A = format_parameter(A, shape=(nseg, -1, -1), optional=True)
+        if A is None:
+            self._nb_states = nst = 0
+        else:
+            nseg_, self._nb_states, nst = self._A.shape
+            if nseg_ != nseg:
+                raise ValueError(
+                    "Number of tube sections does not match between D and A matrices"
+                )
+            if nst != self._nb_states:
+                raise ValueError(
+                    "The last two dimensions of the state matrix A must have the same size."
+                )
+        self._B = format_parameter(B, shape=(nseg, nst, 2), optional=True)
+        self._C = format_parameter(C, shape=(nseg, 2, nst), optional=True)
+        self._E = format_parameter(E, shape=(nseg, 2, -1), optional=True)
+        naux = self._E.shape[-1]
 
-        if atten is not None:
-            self._atten = atten
+        self.approximate_visc_loss = bool(approximate_visc_loss)
+        self.kinetic_drop = bool(kinetic_drop)
+        self.fricative_noise = fricative_noise
+
+        if naux != (self.approximate_visc_loss or self.kinetic_drop) + (
+            self.fricative_noise is not None
+        ):
+            raise ValueError(
+                "Dimension of matrix E does not match the number of auxiliary inputs."
+            )
+
+        self.section_structure = section_structure or "auto"
 
         if log_sections:
             self.log_sections = True
 
-    def _detect_lattice(self):
-        ...
+    def _detect_lattice(self): ...
 
     @property
     def nb_sections(self) -> int:

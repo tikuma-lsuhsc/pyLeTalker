@@ -67,7 +67,7 @@ def format_parameter(
     def validate_shape(s: tuple[int, ...], s0: tuple[int, ...]) -> bool:
         if len(s) != len(s0):
             return False
-        return all(si == s0i if si >= 0 else True for si, s0i in zip(s, s0))
+        return all(si == s0i if si >= 0 and s0i > 0 else True for si, s0i in zip(s, s0))
 
     if isinstance(parameter, SampleGenerator):
         is_fixed = parameter.is_fixed
