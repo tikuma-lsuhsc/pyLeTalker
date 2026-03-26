@@ -13,12 +13,12 @@ and functions.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, get_args
-from numpy.typing import NDArray
-
 from functools import lru_cache
 from math import pi
+from typing import TYPE_CHECKING, Literal, get_args
+
 import numpy as np
+from numpy.typing import NDArray
 
 _2pi = 2 * pi
 
@@ -72,8 +72,9 @@ vt_atten: float = 0.002  #: vocal tract attenuation factor
 
 @lru_cache(1)
 def _load_vocaltract_data():
-    from scipy.io.matlab import loadmat
     from os import path
+
+    from scipy.io.matlab import loadmat
 
     datadir = path.join(path.split(__file__)[0], "data")
 
@@ -112,6 +113,12 @@ smb_nlarp_default = 1.0
 smb_xp_default = 3.0948
 smb_xa_coefs = np.array([-2.347, -0.061, -2.052, -0.159, 1.161, 0.143])
 
+#########################
+# Story-1995 constants
+M = 1.5  # g/cm^2 - mass per unit surface area
+K = 33000  # dyne/cm^3 - stiffness per unit surface area
+B = 1060  # dyne s/cm^3 - resistance per unit surface area
+
 
 @lru_cache(4)
 def smb_vt_area_data(data_type: Literal["geom", "optim"], reduced: bool) -> NDArray:
@@ -149,6 +156,7 @@ def smb_vt_area_data(data_type: Literal["geom", "optim"], reduced: bool) -> NDAr
 
     """
     from os import path
+
     import numpy as np
 
     csvfile = path.join(
