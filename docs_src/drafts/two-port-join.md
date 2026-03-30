@@ -95,26 +95,36 @@ $$\begin{align}
 \mathbf{D} &= \mathbf{U}\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{P}_1
 \end{align}
 $$
+
 The derivation of the state update equation follows the same, starting with sustituting (5) and (6) into (1) and (3):
+
 $$\begin{align}
 \dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1 \left(\mathbf{L}\mathbf{y}_2 + \mathbf{U}\mathbf{x}\right) = \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\mathbf{y}_2 + \mathbf{B}_1\mathbf{U}\mathbf{x}\\
 \dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2 \left(\mathbf{U}\mathbf{y}_1 + \mathbf{L}\mathbf{x}\right) = \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2\mathbf{U}\mathbf{y}_1 + \mathbf{B}_2\mathbf{L}\mathbf{x}\\
 \end{align}$$
+
 Substitute (18) and (19) into (24) and (25):
+
 $$\begin{align}
 \dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\left(\mathbf{Q}_2^{-1}(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x})\right) + \mathbf{B}_1\mathbf{U}\mathbf{x}\\
 \dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2\mathbf{U}\left(\mathbf{Q}_1^{-1}(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x})\right) + \mathbf{B}_2\mathbf{L}\mathbf{x}\\
 \end{align}$$
+
 Algebraic simplification leads to
+
 $$\begin{align}
 \dot{\mathbf{s}}_1 &= (\mathbf{A}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{D}_2\mathbf{U}\mathbf{C}_1)\mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{C}_2 \mathbf{s}_2 + \mathbf{B}_1\mathbf{L}(\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{B}_1\mathbf{U})\mathbf{x}\\
 \dot{\mathbf{s}}_2 &= \mathbf{B}_2\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{C}_1 \mathbf{s}_1 + (\mathbf{A}_2 + \mathbf{B}_2\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{D}_1\mathbf{L}\mathbf{C}_2)\mathbf{s}_2 + \mathbf{B}_2\mathbf{U}(\mathbf{Q}_1^{-1}\mathbf{P}_1 + \mathbf{B}_2\mathbf{L})\mathbf{x}\\
 \end{align}$$
+
 Combining the states to be $\mathbf{s} = [\mathbf{s}_1^T\ \mathbf{s}_2^T]^T$ we get
+
 $$
 \dot{\mathbf{s}} = \mathbf{A}\mathbf{s} + \mathbf{B}\mathbf{x}
 $$
+
 where
+
 $$\begin{align}
 \mathbf{A} &= \begin{bmatrix}
 \mathbf{A}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{D}_2\mathbf{U}\mathbf{C}_1
@@ -141,15 +151,20 @@ $$\begin{align}
 The overall $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$ matrices often
 contains $\mathbf{L}\mathbf{Q}_2^{-1}$ and $\mathbf{U}\mathbf{Q}_1^{-1}$. These evalutes
 to
+
 $$\begin{aligned}
 \mathbf{L}\mathbf{Q}_2^{-1} = \gamma^{-1} \mathbf{L}\\
 \mathbf{U}\mathbf{Q}_1^{-1} = \gamma^{-1} \mathbf{U}
 \end{aligned}$$
+
 where
+
 $$
 \gamma \triangleq 1 - d_{1,12}d_{2,21}
 $$
+
 Additional algebraic manipulations yield the following final expressions:
+
 $$\begin{align}
 \mathbf{A} &= 
 \begin{bmatrix}
@@ -163,7 +178,6 @@ $$\begin{align}
 \mathbf{b}_{2,1}\mathbf{c}_{1,1} &
 \mathbf{b}_{2,1}d_{1,12}\mathbf{c}_{2,2} \\
 \end{bmatrix}\\
-
 \mathbf{B} &= 
 \frac{1}{\gamma}
 \begin{bmatrix}
@@ -176,7 +190,6 @@ d_{1,11}d_{2,21} & d_{2,22}\\
 d_{1,11} & d_{1,12}d_{2,22}\\
 0 & \gamma
 \end{bmatrix}\\
-
 \mathbf{C} &= \frac{1}{\gamma}
 \begin{bmatrix}
 d_{2,11}         &      0 & \gamma & d_{1,12}d_{2,11} \\
@@ -186,7 +199,6 @@ d_{1,22}d_{2,21} & \gamma &      0 & d_{1,22}\\
 \mathbf{C}_1 &0\\
 0 & \mathbf{C}_2
 \end{bmatrix}\\
-
 \mathbf{D} &= 
 \frac{1}{\gamma}
 \begin{bmatrix}
@@ -566,18 +578,22 @@ $$\begin{align}
 \end{align}$$
 
 The governing equations are
+
 $$\begin{align}
 F_1+B_1 &= P_v + F_2 + B_2\\
 \frac{1}{Z}(F_1-B_1) &= \frac{1}{Z}(F_2-B_2)
 \end{align}$$
-Here, the tube cross-sectional area is fixed so the impedance is a constant $Z$.
-Substitute (51) into (54) and express (54) and (55) for $F_2$ and $B_1$:
+
+Here, the tube cross-sectional area is fixed so the impedance is a constant $Z$. Substitute (51) into (54) and express (54) and (55) for $F_2$ and $B_1$:
+
 $$\begin{align}
 \mathbf{c}_v \mathbf{s} + d_vZ^{-1} (F_2-B_2) + F_2 + B_2 &= F_1+B_1\\
 (d_vZ^{-1}+1) F_2 - B_1 &= F_1 + (d_vZ^{-1}-1) B_2 - \mathbf{c}_v \mathbf{s}\\
 \frac{1}{Z}(F_2 + B_1) &= \frac{1}{Z}(F_1+B_2)
 \end{align}$$
+
 Solve for $F_2$ and $B_1$ in a matrix-vector format:
+
 $$\begin{aligned}
 \begin{bmatrix}
 d_vZ^{-1}+1 & -1\\
@@ -644,10 +660,13 @@ F_1\\B_2
 \end{aligned}$$
 
 Now, for the state update equation, use partial pressures as the input
+
 $$
 \dot{\mathbf{s}}_v = \mathbf{A}_v \mathbf{s}_v + \mathbf{b}_v\frac{A}{\rho c}(F_1-B_1)
 $$
+
 Substitute the output equation for $B_1$:
+
 $$\begin{aligned}
 \dot{\mathbf{s}}_v &= \mathbf{A}_v \mathbf{s}_v + \mathbf{b}_v\frac{A}{\rho c}\left[F_1-\left(-\mathbf{c}_v\mathbf{s}_v + \frac{1}{A d_v + 2 \rho c}
 \begin{bmatrix}
@@ -656,7 +675,6 @@ A d_v & 2\rho c
 \begin{bmatrix}
 F_1\\B_2
 \end{bmatrix}\right)\right]\\
-
 &= \left[\mathbf{A}_v + \mathbf{b}_v \frac{1}{A d_v + 2 \rho c}\frac{A}{\rho c}\mathbf{c}_v\right]\mathbf{s}_v
 + \mathbf{b}_v\frac{2A}{A d_v + 2 \rho c}
 \begin{bmatrix}
@@ -664,12 +682,11 @@ F_1\\B_2
 \end{bmatrix}
 \begin{bmatrix}
 F_1\\B_2
-\end{bmatrix}
-\\
-
+\end{bmatrix}\\
 \end{aligned}$$
 
 Hence, we have the yielding-wall block:
+
 $$\begin{align}
 \mathbf{A} &= \mathbf{A}_v + \mathbf{b}_v \frac{1}{A d_v + 2 \rho c}\frac{A}{\rho c}\mathbf{c}_v\\
 \mathbf{B} &= \mathbf{b}_v\frac{2A}{A d_v + 2 \rho c}

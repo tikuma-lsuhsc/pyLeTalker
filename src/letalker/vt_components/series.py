@@ -37,7 +37,7 @@ class DefaultViscousLossTF(LTIFactory):
         if rhomu is not None:
             self.rhomu = rhomu
 
-    def __call__(self, area: float, length: float) -> ct.LTI:
+    def __call__(self, area: float, length: float) -> ct.LTI | float:
 
         c = 2 * (area * np.pi) ** 0.5 * length * (self.rhomu / 2) ** 0.5 / area**2
         k = self.omega**0.5
@@ -72,7 +72,7 @@ class DefaultLaminarResistance(LTIFactory):
         if mu is not None:
             self.mu = mu
 
-    def __call__(self, area: float, length: float) -> float:
+    def __call__(self, area: float, length: float) -> ct.LTI | float:
 
         return 8 * np.pi * self.mu * area**-2 * length
 
@@ -85,6 +85,7 @@ class SeriesNetwork(TwoPortSystem):
     # Series networks representing pressure losses
 
     areas: SampleGenerator
+    length: float
     _lti_factories: tuple[LTIFactory]
     rhoc: float = rhoc_default
 
@@ -92,6 +93,7 @@ class SeriesNetwork(TwoPortSystem):
     def __init__(
         self,
         areas: np.ndarray,
+        length: float,
         viscous_loss: LTIFactory,
         /,
         rhoc: float | None = None,
@@ -102,8 +104,10 @@ class SeriesNetwork(TwoPortSystem):
         ----------
         areas
             cross-sectional areas of tube sections
+        length
+            length (in cm) of each tube section
         viscous_loss
-            factory to craete a continuous-time transfer function of viscous loss
+            factory to create a continuous-time transfer function of viscous loss
             (input: flow, output: pressure drop) given a cross-sectional
             area and length of a tube section
         rhoc, optional
@@ -115,6 +119,7 @@ class SeriesNetwork(TwoPortSystem):
     def __init__(
         self,
         areas: np.ndarray,
+        length: float,
         viscous_loss: LTIFactory,
         laminar_resistance: LTIFactory,
         /,
@@ -126,8 +131,10 @@ class SeriesNetwork(TwoPortSystem):
         ----------
         areas
             cross-sectional areas of tube sections
+        length
+            length (in cm) of each tube section
         viscous_loss
-            factory to craete a continuous-time transfer function of viscous loss
+            factory to create a continuous-time transfer function of viscous loss
             (input: flow, output: pressure drop) given a cross-sectional
             area and length of a tube section
         laminar_resistance
@@ -142,6 +149,7 @@ class SeriesNetwork(TwoPortSystem):
     def __init__(
         self,
         areas: np.ndarray,
+        length: float,
         /,
         *u_to_p_lti_systems: tuple[LTIFactory],
         rhoc: float | None = None,
@@ -167,6 +175,7 @@ class SeriesNetwork(TwoPortSystem):
             )
 
         self.areas = format_parameter(areas, 1)
+        self.length = length
         self._lti_factories = u_to_p_lti_systems
         if rhoc is not None:
             self.rhoc = rhoc
@@ -180,16 +189,16 @@ class SeriesNetwork(TwoPortSystem):
         return self.areas.shape[0] - 1
 
     def nb_inputs(self) -> int:
-        """Number of inputs: 2 + number of auxilary sources"""
-        return 2 + self._aux_psrc + self._aux_psrc
+        """Number of inputs: always 2"""
+        return 2
 
     def nb_outputs(self) -> int:
-        """Number of outputs (always 2)"""
+        """Number of outputs: always 2"""
         return 2
 
     def is_lattice(self) -> bool:
         """``True`` if system can be implemented by Story95 lattice structure with 2 reflection coefficients plus a gain"""
-        return True
+        return False
 
     def has_aux_pressure_source(self) -> bool:
         """Always ``False``, no auxiliary pressure source"""
@@ -354,7 +363,7 @@ class SeriesNetwork(TwoPortSystem):
         n0: int = 0,
         sample: bool = True,
         sample_kws: dict[str, Any] | None = None,
-    ) -> Iterator[tuple[int, int, ct.StateSpace]]:
+    ) -> Iterator[tuple[int, int, np.ndarray, np.ndarray, np.ndarray, np.ndarray]]:
         """generate state-space models and iterate over n samples
 
         Args
@@ -409,27 +418,29 @@ class SeriesNetwork(TwoPortSystem):
         sample_kws = (
             default_sample_kws
             if sample_kws is None
-            else {**default_sample_kws, **self._sample_kws}
+            else {**default_sample_kws, **sample_kws}
         )
         rhoc = self.rhoc
+        length = self.length
 
         for i, areas in enumerate(self.areas(n, n0=n0)):
             for j, area in enumerate(areas):
-                Hw = ct.parallel(f(area) for f in self._lti_factories).ss()
-                if isinstance(Hw, ct.TransferFunction):
-                    Hw = ct.tf2ss(Hw)
+                Hv = ct.parallel(f(area, length) for f in self._lti_factories).ss()
+                if isinstance(Hv, ct.TransferFunction):
+                    Hv = ct.tf2ss(Hv)
                 if sample:
-                    Hw = Hw.sample(self.dt, **sample_kws)
+                    Hv = Hv.sample(self.dt, **sample_kws)
 
-                two_area = 2 * area
-                rhoc_d = rhoc * Hw.D
-                den = 1 / (two_area + rhoc_d)
-                k1 = two_area / den
-                k2 = -rhoc / den
-                A = Hw.A - (Hw.B * den) @ Hw.C
-                B = np.tile(Hw.B * k1, (1, 2))
-                C = np.tile(k2 * Hw.C, (2, 1))
-                k3 = k2 * Hw.D
-                D = np.array([k1, k3], [k3, k1])
+                two_rhoc = 2 * rhoc
+                ad = area * Hv.D
+                den = 1 / (ad + two_rhoc)
+                A = Hv.A - (Hv.B * den * area / rhoc) @ Hv.C
+                b = Hv.B * (2 * area * den)
+                B = np.stack([b, -b], 1)
+                c = den * Hv.C
+                C = np.stack([c, -c, 0])
+                k1 = two_rhoc * den
+                k2 = ad * den
+                D = np.array([k1, k2], [k2, k1])
 
                 yield i, j, A, B, C, D

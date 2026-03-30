@@ -1,218 +1,72 @@
-from typing import Any, Iterator, overload
+from typing import Any, Iterator
 
 import control as ct
 import numpy as np
 
-from ..__util import format_parameter
 from ..constants import c as c_default
 from ..constants import rho_air as rho_air_default
-from ..function_generators import SampleGenerator
-from .abc import LTIFactory, TwoPortSystem
+from .abc import TwoPortSystem
 
 rhoc_default = rho_air_default * c_default
 
 
-class DefaultYieldingWallTF(LTIFactory):
-    """Yielding wall model by Milenkvic1988
+class CascadeNetwork(TwoPortSystem):
+    # Interconnection of two-port networks
 
-    Parameters
-    ----------
-    LTIFactory
-        _description_
+    rhoc: float
+    _subnetworks: tuple[TwoPortSystem]
 
-    Returns
-    -------
-        _description_
-    """
-
-    M: float = 1.5  # g/cm^2
-    K: float = 33000  # dyne/cm^3
-    B: float = 1060  # dyne/cm^3
-
-    def __init__(
-        self, Gt: float | None = None, K: float | None = None, B: float | None = None
-    ):
-        super().__init__()
-
-        if M is not None:
-            self.M = M
-        if K is not None:
-            self.K = K
-        if B is not None:
-            self.B = B
-
-    def __call__(self, area: float, length: float) -> ct.LTI | float:
-
-        c = 2 * length * (np.pi * area) ** 0.5
-        Lw = self.M / c
-        Cw = c / self.K
-        Rw = self.B / c
-
-        return ct.tf([Cw, 0], [Lw * Cw, Rw * Cw, 1])
-
-    @property
-    def nb_states(self) -> int:
-        return 2
-
-
-class DefaultHeatLossGain(LTIFactory):
-    """Fixed heat loss model
-
-    Parameters
-    ----------
-    LTIFactory
-        _description_
-
-    Returns
-    -------
-        _description_
-    """
-
-    Gt: float = 8.07e-7 * 1.08 * 1000 * 0.5  # g/cm^2
-
-    def __init__(self, Gt: float | None = None):
-        super().__init__()
-
-        if Gt is not None:
-            self.Gt = Gt
-
-    def __call__(self, area: float, length: float) -> float:
-
-        return self.Gt * length * area**-0.5
-
-    @property
-    def nb_states(self) -> int:
-        return 0
-
-
-class ShuntNetwork(TwoPortSystem):
-    # Shunt networks representing flows into wall
-
-    areas: SampleGenerator
-    length: float
-    _lti_factories: tuple[LTIFactory]
-    rhoc: float = rhoc_default
-
-    @overload
-    def __init__(
-        self,
-        areas: np.ndarray,
-        length: float,
-        yielding_wall: LTIFactory,
-        /,
-        rhoc: float | None = None,
-    ):
-        """shunt system with a yielding wall transfer function
+    def __init__(self, *networks: tuple[TwoPortSystem], rhoc: float | None = None):
+        """generic series system with multiple series flow-to-pressure-drop subsystems
 
         Parameters
         ----------
         areas
             cross-sectional areas of tube sections
-        length
-            length (in cm) of each tube section
-        yielding_wall
-            factory to create a continuous-time transfer function of yielding wall
-            (input: pressure, output: wall volume flow) given a cross-sectional
-            area and length of a tube section
-        rhoc, optional
-            physical constant: air density times speed of sound, by default uses
-            the system constant
-        """
-
-    @overload
-    def __init__(
-        self,
-        areas: np.ndarray,
-        length: float,
-        yielding_wall: LTIFactory,
-        heat_loss: LTIFactory,
-        /,
-        rhoc: float | None = None,
-    ):
-        """shunt system with a yielding wall and heat loss transfer functions
-
-        Parameters
-        ----------
-        areas
-            cross-sectional areas of tube sections
-        length
-            length (in cm) of each tube section
-        yielding_wall
-            factory to create a continuous-time transfer function of yielding wall
-            (input: pressure, output: wall volume flow) given a cross-sectional
-            area and length of a tube section
-        heat_loss
-            factory to create a continuous-time transfer function of heat loss
-            (input: pressure, output: wall volume flow) given a cross-sectional
-            area and length of a tube section
-        rhoc, optional
-            physical constant: air density times speed of sound, by default uses
-            the system constant
-        """
-
-    def __init__(
-        self,
-        areas: np.ndarray,
-        length: float,
-        /,
-        *p_to_uw_lti_systems: tuple[LTIFactory],
-        rhoc: float | None = None,
-    ):
-        """generic shunt system with multiple parallel pressure-to-wall-flow subsystems
-
-        Parameters
-        ----------
-        areas
-            cross-sectional areas of tube sections
-        length
-            length (in cm) of each tube section
-        p_to_uw_lti_systems
-            factories to create continuous-time transfer functions from pressure
-            to wall-flow that are present in parallel.
+        networks
+            Two-port networks to be cascaded in the order given.
         rhoc, optional
             physical constant: air density times speed of sound, by default uses
             the system constant
         """
         super().__init__()
 
-        if len(p_to_uw_lti_systems) == 0:
+        if len(networks) == 0:
             raise ValueError(
                 "At least one pressure-to-wall-flow subsystem must be given."
             )
 
-        self.areas = format_parameter(areas, 1)
-        self.length = length
-        self._lti_factories = p_to_uw_lti_systems
+        self._subnetworks = networks
         if rhoc is not None:
             self.rhoc = rhoc
 
     def nb_states(self) -> int:
         """Number of internal states"""
-        return sum(f.nb_states for f in self._lti_factories)
+        return sum(net.nb_states() for net in self._subnetworks)
 
     def nb_sections(self) -> int:
         """Number of tube junctions (1 less than tube sections)"""
-        return self.areas.shape[0] - 1
+        return self._subnetworks[0].shape[0]
 
     def nb_inputs(self) -> int:
-        """Number of inputs: always 2"""
-        return 2
+        """Number of inputs: 2 to 4"""
+        return max(net.nb_inputs() for net in self._subnetworks)
 
     def nb_outputs(self) -> int:
         """Number of outputs: always 2"""
-        return 2
+        return max(net.nb_outputs() for net in self._subnetworks)
 
     def is_lattice(self) -> bool:
         """``True`` if system can be implemented by Story95 lattice structure with 2 reflection coefficients plus a gain"""
-        return True
+        return all(net.is_lattice() for net in self._subnetworks)
 
     def has_aux_pressure_source(self) -> bool:
-        """Always ``False``, no auxiliary pressure source"""
-        return False
+        """``True`` if a junction therein expects auxiliary pressure source(s)"""
+        return any(net.has_aux_pressure_source() for net in self._subnetworks)
 
     def has_aux_flow_source(self) -> bool:
-        """Always ``False``, no auxiliary flow source"""
-        return False
+        """``True`` if a junction therein expects an auxiliary flow source"""
+        return any(net.has_aux_flow_source() for net in self._subnetworks)
 
     def ss(
         self,
@@ -431,21 +285,24 @@ class ShuntNetwork(TwoPortSystem):
 
         for i, areas in enumerate(self.areas(n, n0=n0)):
             for j, area in enumerate(areas):
-                Hw = ct.parallel(f(area, length) for f in self._lti_factories).ss()
-                if isinstance(Hw, ct.TransferFunction):
-                    Hw = ct.tf2ss(Hw)
+                Hv = ct.parallel(f(area, length) for f in self._subnetworks).ss()
+                if isinstance(Hv, ct.TransferFunction):
+                    Hv = ct.tf2ss(Hv)
                 if sample:
-                    Hw = Hw.sample(self.dt, **sample_kws)
+                    Hv = Hv.sample(self.dt, **sample_kws)
 
-                two_area = 2 * area
-                rhoc_d = rhoc * Hw.D
-                den = 1 / (two_area + rhoc_d)
-                k1 = two_area / den
-                k2 = -rhoc / den
-                A = Hw.A - (Hw.B * den) @ Hw.C
-                B = np.tile(Hw.B * k1, (1, 2))
-                C = np.tile(k2 * Hw.C, (2, 1))
-                k3 = k2 * Hw.D
-                D = np.array([k1, k3], [k3, k1])
+                two_rhoc = 2 * rhoc
+                ad = area * Hv.D
+                den = 1 / (ad + two_rhoc)
+                A = Hv.A - (Hv.B * den * area / rhoc) @ Hv.C
+                b = Hv.B * (2 * area * den)
+                B = np.stack([b, -b], 1)
+                c = den * Hv.C
+                C = np.stack([c, -c, 0])
+                k1 = two_rhoc * den
+                k2 = ad * den
+                D = np.array([k1, k2], [k2, k1])
 
                 yield i, j, A, B, C, D
+
+    def _join(self, ss1: ct.StateSpace, ss2: ct.StateSpace) -> ct.StateSpace: ...
