@@ -87,6 +87,11 @@ class TimeSampleHandler:
         """sampling rate in samples/second"""
         return TimeSampleHandler._fs
 
+    @classproperty
+    def dt(self) -> float:
+        """sampling interval in seconds"""
+        return 1 / TimeSampleHandler._fs
+
     @staticmethod
     def ts(
         nb_samples: int,

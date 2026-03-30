@@ -19,44 +19,13 @@ from .abc import Element, VocalTract
 rhoc_default = rho_air_default * c_default
 
 
+class FricativeNoise(Element): ...
+
+
 def join_fb_ss(ss1: ct.StateSpace, ss2: ct.StateSpace) -> ct.StateSpace:
     ...
     # nstates = ss1.
     # A =
-
-
-class LosslessJunctionBlock:
-    # Lossless junction VT block with possible independent pressure/flow sources
-
-    def ss(
-        self,
-        areas: np.ndarray,
-        has_pressure_source: bool,
-        has_flow_source: bool,
-        *,
-        treat_sources_as_states: bool = True,
-        rhoc: float = rhoc_default,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-        den = (areas[..., :-1] + areas[..., 1:]).reshape(..., 1, 1)
-        nstates = has_pressure_source + has_flow_source
-        m1 = [areas[..., :-1], rhoc] / den
-        m2 = [areas[..., 1:], rhoc] / den
-        d = m1 - m2
-        D = np.empty((*areas.shape[:-1], areas.shape[-1] - 1, 2, 2))
-        D[..., 0, 0] = 2 * m1
-        D[..., 1, 1] = 2 * m2
-        D[..., 0, 1] = -d
-        D[..., 1, 0] = d
-        if nstates == 0:
-            C = np.empty(0)
-        else:
-            C = np.empty((*areas.shape[:-1], areas.shape[-1] - 1, 2, nstates))
-            if has_pressure_source:
-                C[..., 0, 0] = -m1
-                C[..., 1, 0] = m2
-            if has_flow_source:
-                C[..., -min(nstates, 1)] = rhoc / den
-        return np.empty((0, 0)), np.empty((0, C.shape[-1])), C, D
 
 
 class ShuntBlocks:
@@ -184,45 +153,67 @@ class StateSpaceWaveReflectionVocalTract(VocalTract):
     _nb_sections: int
 
     approximate_visc_loss: bool = False
-    kinetic_drop: bool = False
-    fricative_noise: dict[int, AspirationNoise] | None = None
-    section_structure: Literal["lattice", "general", "auto"] = "auto"
+    inject_kinetic_drop: bool = False
+    inject_fricative_noise: dict[int, FricativeNoise] | None = None
+    section_structure: Literal["lattice", "generic", "auto"] = "auto"
     log_sections: bool = False
 
     Runner = WaveReflectionVocalTractRunner
 
     def __init__(
         self,
-        D: ArrayLike | SampleGenerator | None = None,
-        A: ArrayLike | SampleGenerator | None = None,
-        B: ArrayLike | SampleGenerator | None = None,
-        C: ArrayLike | SampleGenerator | None = None,
+        A: ArrayLike | SampleGenerator,
+        B: ArrayLike | SampleGenerator,
+        C: ArrayLike | SampleGenerator,
+        D: ArrayLike | SampleGenerator,
         E: ArrayLike | SampleGenerator | None = None,
+        *,
         approximate_visc_loss: bool = False,
-        kinetic_drop: bool | None = None,
-        fricative_noise: dict[int, AspirationNoise] | None = None,
-        section_structure: Literal["lattice", "general", "auto"] | None = None,
+        kinetic_drop: bool = False,
+        fricative_noise: FricativeNoise | None = None,
+        section_structure: Literal["lattice", "generic"] | None = None,
         log_sections: bool = False,
     ):
         """Linear state-space representation of wave-reflection vocal tract model
 
         Args:
-            D: feedthrough matrix. It's shape is ``(nsection,2,2)`` where the
-                number of tube sections ``nsection`` must be a positive even number.
-            A: state matrix. Defaults to None.
-            B: input matrix. Defaults to None.
-            C: output matrix. Defaults to None.
-            E: auxiliary feedthrough matrix to allow additional inputs like
-                viscous loss or fricative noise. Defaults to None.
-            approximate_visc_loss: True to inject the previous stage's viscous
-                loss of the previous section per (Story 1995). Defaults to False.
-            kinetic_drop_at: _description_. Defaults to None.
-            fricative_noise: _description_. Defaults to None.
-            section_structure: _description_. Defaults to False.
-            log_sections: _description_. Defaults to False.
-
-        Raises:
-            ValueError: _description_
+            A: state matrix of shape ``(n_sec,n_st,n_st)`` where ``n_sec`` is
+                the number of tube sections and ``n_st`` is the number of states
+                per section. ``n_sec`` must be even. If given as a Numpy array,
+                additional time axis may be added as the first dimension.
+            B: input matrix of shape ``(n_sec,n_st,2)``. ``n_sec`` must be even.
+                If given as a Numpy array, additional time axis may be added as
+                the first dimension.
+            C: output matrix of shape ``(n_sec,2,n_st)``. ``n_sec`` must be even.
+                If given as a Numpy array, additional time axis may be added as
+                the first dimension.
+            D: feedthrough matrix of shape ``(n_sec,2,2). ``n_sec`` must be even.
+                If given as a Numpy array, additional time axis may be added as
+                the first dimension.
+            E: optional auxiliary feedthrough matrix of shape ``(n_sec,2,n_aux)``
+                to allow additional inputs at the leading tube junction. ``n_sec``
+                must be even, and ``n_aux`` is either 1 (either pressure or flow
+                input) or 2 (both pressure and flow). The first input is always
+                a pressure input. If given as a Numpy array, additional time axis
+                may be added as the first dimension. Defaults to disable
+                auxiliary input sources.
+            approximate_visc_loss: ``True`` to inject the viscous loss of the
+                previous tube section per (Story 1995). Defaults to ``False``.
+                Enabling the viscous loss requires the ``E`` argument to be
+                specified.
+            kinetic_drop: ``True`` to add a pressure source at tube junctions to
+                model kinetic pressure drop the junction. Defaults to ``False``.
+                Enabling kinetic pressure drop requires the ``E`` argument to be
+                specified.
+            fricative_noise: Specify fricative noise source at tube junctions.
+                Defaults to None. If specified, ``E`` argument must be specified.
+            section_structure: Specify specific implementation of tube sections.
+                Defaults to ``'generic'`` to use the state-space representation
+                as is. If ``'lattice'``, the ``D`` matrix will be converted to
+                reflection coefficients. The correctness of the conversion will
+                not be tested. So, only use ``'lattice'`` when absolutely certain.
+            log_sections: ``True`` to log the pressure and flow outputs of every
+                tube section. Defaults to ``False``.
         """
 
         self._D = format_parameter(D, shape=(-1, 2, 2))
@@ -260,17 +251,15 @@ class StateSpaceWaveReflectionVocalTract(VocalTract):
                 "Dimension of matrix E does not match the number of auxiliary inputs."
             )
 
-        self.section_structure = section_structure or "auto"
+        self.section_structure = section_structure or "generic"
 
         if log_sections:
             self.log_sections = True
 
-    def _detect_lattice(self): ...
-
     @property
     def nb_sections(self) -> int:
         """number of tube sections"""
-        return self._areas.shape[-1]
+        return self._nb_sections
 
     @classproperty
     def dz(cls) -> float:
@@ -297,6 +286,17 @@ class StateSpaceWaveReflectionVocalTract(VocalTract):
 
     def generate_sim_params(self, n: int, n0: int = 0, **_) -> tuple[NDArray, ...]:
 
+        A = self._A(n, n0)
+        B = self._B(n, n0)
+        C = self._C(n, n0)
+        D = self._D(n, n0)
+        E = np.empty(1, self._nb_sections, 2, 0) if self._E is None else self._E(n, n0)
+
+        if self.section_structure == "lattice":
+            alpha = D[:, :, 0, 0] - D[:, :, 1, 0]
+            r1 = D[:, :, 1, 0] / alpha
+            r2 = D[:, :, 0, 1] / alpha
+
         areas = self.areas(n, n0)
 
         alpha = 1 - self._atten / areas**0.5
@@ -313,9 +313,8 @@ class StateSpaceWaveReflectionVocalTract(VocalTract):
     @property
     def nb_states(self) -> int:
         """number of states"""
-        # final output unit-delays are not considered internal
-        M = self.nb_sections // 2
-        return 2 * (M - 1)
+
+        return self._nb_states
 
     @property
     def input_area_is_fixed(self) -> bool:

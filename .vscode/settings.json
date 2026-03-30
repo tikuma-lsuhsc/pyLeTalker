@@ -6,6 +6,6 @@
         "jsdelivr.com",
         "unpkg.com"
     ],
-    "autoDocstring.docstringFormat": "google-notypes",
+    "autoDocstring.docstringFormat": "numpy-notypes",
     "python.analysis.logLevel": "Trace"
 }

@@ -22,6 +22,7 @@ dependencies = [
     "typing_extensions",
     "numpy",
     "scipy",
+    "control",
 ]
 
 [project.urls]
