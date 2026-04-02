@@ -311,18 +311,25 @@ class CascadeNetwork(TwoPortSystem):
         ss2 = ct.ss(sys2)
 
         nst1, nst2 = ss1.nstates, ss2.nstates
-        nst = nst1 + nst2
         nin1, nin2 = ss1.ninputs, ss2.ninputs
-        nin = nin1 + nin2
         nout1, nout2 = ss1.noutputs, ss2.noutputs
-        nout = nout1 + nout2
 
-        b11, b12 = ss1.B.T
-        b21, b22 = ss2.B.T
-        c11, c12 = ss1.C
-        c21, c22 = ss2.C
-        (d111, d112), (d121, d122) = ss1.D
-        (d211, d212), (d221, d222) = ss2.D
+        assert nout1 == 2 and nout2 == 2 and nin1 >= 2 and nin2 >= 2
+
+        naux1 = nin1 - nout1
+        naux2 = nin2 - nout2
+        nout = 2
+
+        naux = naux1 + naux2
+        nin = nout + naux
+        nst = nst1 + nst2
+
+        b12 = ss1.B[:, 1]
+        b21 = ss2.B[:, 0]
+        c11 = ss1.C[0, :]
+        c22 = ss2.C[1, :]
+        (d111, d112), (d121, d122) = ss1.D[:, :nout]
+        (d211, d212), (d221, d222) = ss2.D[:, :nout]
 
         gamma = 1 - d112 * d221
 
@@ -333,12 +340,22 @@ class CascadeNetwork(TwoPortSystem):
         A[:nst1, :nst1] = ss2.A + (b21 * d112) @ c22
 
         B = np.zeros((nst, nin))
-        B[:nst1, :] = ss1.B @ np.array([[1, 0], [d111 * d221 / gamma, d222 / gamma]])
-        B[nst1:, :] = ss2.B @ np.array([[d111 / gamma, d112 * d222 / gamma], [0, 1]])
+        B[:nst1, :nout] = ss1.B[:, :nout] @ np.array(
+            [[1, 0], [d111 * d221 / gamma, d222 / gamma]]
+        )
+        B[nst1:, :nout] = ss2.B[:, :nout] @ np.array(
+            [[d111 / gamma, d112 * d222 / gamma], [0, 1]]
+        )
+        if naux:
+            n1 = nout + naux1
+            B[:nst1, nout:n1] = ss1.B[:, nout:]
+            B[nst1:, n1:] = ss2.B[:, nout:]
 
+        K1 = np.array([[d211 / gamma, 0], [d122 * d221 / gamma, 1]])
+        K2 = np.array([[1, d112 * d211 / gamma], [0, d122 / gamma]])
         C = np.zeros((nout, nst))
-        C[:, :nst1] = np.array([[d211 / gamma, 0], [d122 * d221 / gamma, 1]]) @ ss1.C
-        C[:, :nst2] = np.array([[1, d112 * d211 / gamma], [0, d122 / gamma]]) @ ss2.C
+        C[:, :nst1] = K1 @ ss1.C
+        C[:, :nst2] = K2 @ ss2.C
 
         D = np.array(
             [
@@ -346,5 +363,12 @@ class CascadeNetwork(TwoPortSystem):
                 [d111 * d122 * d221 / gamma + d121, d122 * d222 / gamma],
             ]
         )
+        if naux:
+            D = K1 @ ss1.D[:, nout:]
+            D = K2 @ ss2.D[:, nout:]
+
+            n1 = nout + naux1
+            B[:nst1, nout:n1] = ss1.B[:, nout:]
+            B[nst1:, n1:] = ss2.B[:, nout:]
 
         return ct.ss(A, B, C, D)

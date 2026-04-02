@@ -154,7 +154,7 @@ class SeriesNetwork(TwoPortSystem):
         *u_to_p_lti_systems: tuple[LTIFactory],
         rhoc: float | None = None,
     ):
-        """generic series system with multiple series flow-to-pressure-drop subsystems
+        """generic series system with multiple parallel flow-to-pressure-drop subsystems
 
         Parameters
         ----------
@@ -162,7 +162,7 @@ class SeriesNetwork(TwoPortSystem):
             cross-sectional areas of tube sections
         u_to_p_lti_systems
             factories to create continuous-time transfer functions from flow to
-            pressure drop that are present in series.
+            pressure drop that are present in series (or parallel in systems sense).
         rhoc, optional
             physical constant: air density times speed of sound, by default uses
             the system constant

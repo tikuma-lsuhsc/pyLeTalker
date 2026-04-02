@@ -7,22 +7,28 @@ quickly becomes cumbersome. A generalized approach is to express each subsystem
 in a state-space representation and devise a way to connect two successive subsystems.
 
 Suppose we have two subsystems with state-space models:
+
 $$\begin{align}
-\dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1 \mathbf{x}_1\\
-\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1 \mathbf{x}_1\\
-\dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2 \mathbf{x}_2\\
-\mathbf{y}_2 &= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2 \mathbf{x}_2\\
+\dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1 \mathbf{x}_1 + \mathbf{B}_{\text{aux},1} \mathbf{x}_{\text{aux},1}\\
+\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1 \mathbf{x}_1 + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1}\\
+\dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2 \mathbf{x}_2 + \mathbf{B}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\
+\mathbf{y}_2 &= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2 \mathbf{x}_2 + \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\
 \end{align}$$
+
 where
+
 $$
 \mathbf{x}_1 = \begin{bmatrix}F_1\\B_2\end{bmatrix} \quad 
 \mathbf{y}_1 = \begin{bmatrix}F_2\\B_1\end{bmatrix} \quad 
 \mathbf{x}_2 = \begin{bmatrix}F_2\\B_3\end{bmatrix} \quad 
 \mathbf{y}_2 = \begin{bmatrix}F_3\\B_2\end{bmatrix}
 $$
-And the input and output of the joined system is
+
+and the input and output of the joined system is
+
 $$
 \mathbf{x} = \begin{bmatrix}F_1\\B_3\end{bmatrix} \quad 
+\mathbf{x}_\text{aux} = \begin{bmatrix}\mathbf{x}_{\text{aux},1}\\\mathbf{x}_{\text{aux},2}\end{bmatrix} \quad 
 \mathbf{y} = \begin{bmatrix}F_3\\B_1\end{bmatrix} \quad 
 $$
 
@@ -33,56 +39,74 @@ $$
 What is a state-space represententation of the joined system $(\mathbf{A}, \mathbf{B}, \mathbf{C}, \mathbf{D})$ with state vector $\mathbf{s}\triangleq[\mathbf{s}_1\ \mathbf{s}_2]^T$?
 
 Define picker matrices:
+
 $$
 \mathbf{U} = \begin{bmatrix}1&0\\0&0\end{bmatrix} \quad 
 \mathbf{L} = \begin{bmatrix}0&0\\0&1\end{bmatrix} \quad 
 $$
+
 Then we can define the relationships of the input and output vectors as
+
 $$\begin{align}
 \mathbf{x}_1 &= \mathbf{L}\mathbf{y}_2 + \mathbf{U}\mathbf{x}\\
 \mathbf{x}_2 &= \mathbf{U}\mathbf{y}_1 + \mathbf{L}\mathbf{x}\\
 \mathbf{y} &= \mathbf{U}\mathbf{y}_2 + \mathbf{L}\mathbf{y}_1\\
 \end{align}$$
+
 Substitute (5) and (6) into (2) and (4), respectively:
+
 $$\begin{align}
-\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1 \left(\mathbf{L}\mathbf{y}_2 + \mathbf{U}\mathbf{x}\right) = \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{y}_2 + \mathbf{D}_1\mathbf{U}\mathbf{x}\\
-\mathbf{y}_2 &= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2 \left(\mathbf{U}\mathbf{y}_1 + \mathbf{L}\mathbf{x}\right) = \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{y}_1 + \mathbf{D}_2\mathbf{L}\mathbf{x}\\
+\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1 \left(\mathbf{L}\mathbf{y}_2 + \mathbf{U}\mathbf{x}\right) + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1} = \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{y}_2 + \mathbf{D}_1\mathbf{U}\mathbf{x} + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1}\\\\
+\mathbf{y}_2 &= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2 \left(\mathbf{U}\mathbf{y}_1 + \mathbf{L}\mathbf{x}\right) + \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2} = \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{y}_1 + \mathbf{D}_2\mathbf{L}\mathbf{x}+ \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\\\
 \end{align}$$
+
 Cross-substitute (10) and (11):
+
 $$\begin{align}
-\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\left(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{y}_1 + \mathbf{D}_2\mathbf{L}\mathbf{x}\right) + \mathbf{D}_1\mathbf{U}\mathbf{x}\\
-\mathbf{y}_2 &= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\left(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{y}_2 + \mathbf{D}_1\mathbf{U}\mathbf{x}\right) + \mathbf{D}_2\mathbf{L}\mathbf{x}\\
+\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\left(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{y}_1 + \mathbf{D}_2\mathbf{L}\mathbf{x} + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},2}\right) + \mathbf{D}_1\mathbf{U}\mathbf{x} + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1}\\
+\mathbf{y}_2 &= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\left(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{y}_2 + \mathbf{D}_1\mathbf{U}\mathbf{x} + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1}\right) + \mathbf{D}_2\mathbf{L}\mathbf{x} + \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\
 \end{align}$$
+
 Solve for $\mathbf{y}_1$ and $\mathbf{y}_2$:
+
 $$\begin{align}
-(\mathbf{I} - \mathbf{D}_1\mathbf{L}\mathbf{D}_2\mathbf{U})\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{D}_1(\mathbf{L}\mathbf{D}_2\mathbf{L} + \mathbf{U})\mathbf{x}\\
-(\mathbf{I} - \mathbf{D}_2\mathbf{U}\mathbf{D}_1\mathbf{L})\mathbf{y}_2&= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{D}_2(\mathbf{U}\mathbf{D}_1\mathbf{U} + \mathbf{L})\mathbf{x}\\
+(\mathbf{I} - \mathbf{D}_1\mathbf{L}\mathbf{D}_2\mathbf{U})\mathbf{y}_1 &= \mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{D}_1(\mathbf{L}\mathbf{D}_2\mathbf{L} + \mathbf{U})\mathbf{x}+ \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1} + \mathbf{D}_1\mathbf{L}\mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\
+(\mathbf{I} - \mathbf{D}_2\mathbf{U}\mathbf{D}_1\mathbf{L})\mathbf{y}_2&= \mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{D}_2(\mathbf{U}\mathbf{D}_1\mathbf{U} + \mathbf{L})\mathbf{x} + \mathbf{D}_2\mathbf{U}\mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1} + \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\
 \end{align}$$
+
 Let
+
 $$\begin{align}
 \mathbf{Q}_1 &\triangleq \mathbf{I} - \mathbf{D}_1\mathbf{L}\mathbf{D}_2\mathbf{U}\\
 \mathbf{Q}_2 &\triangleq \mathbf{I} - \mathbf{D}_2\mathbf{U}\mathbf{D}_1\mathbf{L}\\
 \mathbf{P}_1 &\triangleq \mathbf{D}_1(\mathbf{L}\mathbf{D}_2\mathbf{L} + \mathbf{U})\\
 \mathbf{P}_2 &\triangleq \mathbf{D}_2(\mathbf{U}\mathbf{D}_1\mathbf{U} + \mathbf{L})\\
 \end{align}$$
+
 Then, we have
+
 $$\begin{align}
-\mathbf{y}_1 &= \mathbf{Q}_1^{-1}(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x})\\
-\mathbf{y}_2&= \mathbf{Q}_2^{-1}(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x})\\
+\mathbf{y}_1 &= \mathbf{Q}_1^{-1}(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x}+ \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1} + \mathbf{D}_1\mathbf{L}\mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2})\\
+\mathbf{y}_2&= \mathbf{Q}_2^{-1}(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x} + \mathbf{D}_2\mathbf{U}\mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1} + \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2})\\
 \end{align}$$
+
 The joined output equation is found by substituting (18) and (19) into (7):
+
 $$\begin{aligned}
-\mathbf{y} &= \mathbf{U}\mathbf{Q}_2^{-1}\left[\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x}\right] + \mathbf{L}\mathbf{Q}_1^{-1}\left[\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x}\right]\\
+\mathbf{y} &= \mathbf{U}\mathbf{Q}_2^{-1}\left[\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x} + \mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\right] + \mathbf{L}\mathbf{Q}_1^{-1}\left[\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x} + \mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1}\right]\\
 &= 
 (\mathbf{U}\mathbf{Q}_2^{-1}\mathbf{D}_2\mathbf{U} 
 + \mathbf{L}\mathbf{Q}_1^{-1}) \mathbf{C}_1\mathbf{s}_1 
 + (\mathbf{U}\mathbf{Q}_2^{-1}
 + \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{D}_1\mathbf{L})\mathbf{C}_2\mathbf{s}_2 
 + (\mathbf{U}\mathbf{Q}_2^{-1}\mathbf{P}_2
-+ \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{P}_1)\mathbf{x}        \\
-&= \mathbf{C} \mathbf{s} + \mathbf{D}\mathbf{x}\\
++ \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{P}_1)\mathbf{x}
++ \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{D}_{\text{aux},1} \mathbf{x}_{\text{aux},1} + \mathbf{U}\mathbf{Q}_2^{-1}\mathbf{D}_{\text{aux},2} \mathbf{x}_{\text{aux},2}\\
+&= \mathbf{C} \mathbf{s} + \mathbf{D}\mathbf{x} + \mathbf{D}_{\text{aux}} \mathbf{x}_{\text{aux}}\\
 \end{aligned}$$
+
 with
+
 $$\begin{align}
 \mathbf{C} &=
 \begin{bmatrix}
@@ -92,35 +116,45 @@ $$\begin{align}
 (\mathbf{U}\mathbf{Q}_2^{-1}  + 
 \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{D}_1\mathbf{L})\mathbf{C}_2
 \end{bmatrix}\\
-\mathbf{D} &= \mathbf{U}\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{P}_1
+\mathbf{D} &= \mathbf{U}\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{L}\mathbf{Q}_1^{-1}\mathbf{P}_1\\
+\mathbf{D}_\text{aux} &=
+\begin{bmatrix}
+(\mathbf{L}\mathbf{Q}_1^{-1}  + 
+\mathbf{U}\mathbf{Q}_2^{-1}\mathbf{D}_2\mathbf{U})\mathbf{D}_{\text{aux},1}
+&
+(\mathbf{U}\mathbf{Q}_2^{-1}  + 
+\mathbf{L}\mathbf{Q}_1^{-1}\mathbf{D}_1\mathbf{L})\mathbf{D}_{\text{aux},2}
+\end{bmatrix}\\
 \end{align}
 $$
 
 The derivation of the state update equation follows the same, starting with sustituting (5) and (6) into (1) and (3):
 
 $$\begin{align}
-\dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1 \left(\mathbf{L}\mathbf{y}_2 + \mathbf{U}\mathbf{x}\right) = \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\mathbf{y}_2 + \mathbf{B}_1\mathbf{U}\mathbf{x}\\
-\dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2 \left(\mathbf{U}\mathbf{y}_1 + \mathbf{L}\mathbf{x}\right) = \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2\mathbf{U}\mathbf{y}_1 + \mathbf{B}_2\mathbf{L}\mathbf{x}\\
+\dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1 \left(\mathbf{L}\mathbf{y}_2 + \mathbf{U}\mathbf{x}\right) + \mathbf{B}_{\text{aux},1}\mathbf{x}_{\text{aux},1}
+= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\mathbf{y}_2 + \mathbf{B}_1\mathbf{U}\mathbf{x} + \mathbf{B}_{\text{aux},1}\mathbf{x}_{\text{aux},1}\\
+\dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2 \left(\mathbf{U}\mathbf{y}_1 + \mathbf{L}\mathbf{x}\right) + \mathbf{B}_{\text{aux},2}\mathbf{x}_{\text{aux},2} 
+= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2\mathbf{U}\mathbf{y}_1 + \mathbf{B}_2\mathbf{L}\mathbf{x} + \mathbf{B}_{\text{aux},2}\mathbf{x}_{\text{aux},2}\\
 \end{align}$$
 
 Substitute (18) and (19) into (24) and (25):
 
 $$\begin{align}
-\dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\left(\mathbf{Q}_2^{-1}(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x})\right) + \mathbf{B}_1\mathbf{U}\mathbf{x}\\
-\dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2\mathbf{U}\left(\mathbf{Q}_1^{-1}(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x})\right) + \mathbf{B}_2\mathbf{L}\mathbf{x}\\
+\dot{\mathbf{s}}_1 &= \mathbf{A}_1 \mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\left(\mathbf{Q}_2^{-1}(\mathbf{C}_2 \mathbf{s}_2 + \mathbf{D}_2\mathbf{U}\mathbf{C}_1\mathbf{s}_1 + \mathbf{P}_2\mathbf{x})\right) + \mathbf{B}_1\mathbf{U}\mathbf{x} + \mathbf{B}_{\text{aux},1}\mathbf{x}_{\text{aux},1}\\
+\dot{\mathbf{s}}_2 &= \mathbf{A}_2 \mathbf{s}_2 + \mathbf{B}_2\mathbf{U}\left(\mathbf{Q}_1^{-1}(\mathbf{C}_1 \mathbf{s}_1 + \mathbf{D}_1\mathbf{L}\mathbf{C}_2\mathbf{s}_2 + \mathbf{P}_1\mathbf{x})\right) + \mathbf{B}_2\mathbf{L}\mathbf{x} + \mathbf{B}_{\text{aux},2}\mathbf{x}_{\text{aux},2}\\
 \end{align}$$
 
 Algebraic simplification leads to
 
 $$\begin{align}
-\dot{\mathbf{s}}_1 &= (\mathbf{A}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{D}_2\mathbf{U}\mathbf{C}_1)\mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{C}_2 \mathbf{s}_2 + \mathbf{B}_1\mathbf{L}(\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{B}_1\mathbf{U})\mathbf{x}\\
-\dot{\mathbf{s}}_2 &= \mathbf{B}_2\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{C}_1 \mathbf{s}_1 + (\mathbf{A}_2 + \mathbf{B}_2\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{D}_1\mathbf{L}\mathbf{C}_2)\mathbf{s}_2 + \mathbf{B}_2\mathbf{U}(\mathbf{Q}_1^{-1}\mathbf{P}_1 + \mathbf{B}_2\mathbf{L})\mathbf{x}\\
+\dot{\mathbf{s}}_1 &= (\mathbf{A}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{D}_2\mathbf{U}\mathbf{C}_1)\mathbf{s}_1 + \mathbf{B}_1\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{C}_2 \mathbf{s}_2 + \mathbf{B}_1\mathbf{L}(\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{B}_1\mathbf{U})\mathbf{x} + \mathbf{B}_{\text{aux},1}\mathbf{x}_{\text{aux},1}\\
+\dot{\mathbf{s}}_2 &= \mathbf{B}_2\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{C}_1 \mathbf{s}_1 + (\mathbf{A}_2 + \mathbf{B}_2\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{D}_1\mathbf{L}\mathbf{C}_2)\mathbf{s}_2 + \mathbf{B}_2\mathbf{U}(\mathbf{Q}_1^{-1}\mathbf{P}_1 + \mathbf{B}_2\mathbf{L})\mathbf{x} + \mathbf{B}_{\text{aux},2}\mathbf{x}_{\text{aux},2}\\
 \end{align}$$
 
 Combining the states to be $\mathbf{s} = [\mathbf{s}_1^T\ \mathbf{s}_2^T]^T$ we get
 
 $$
-\dot{\mathbf{s}} = \mathbf{A}\mathbf{s} + \mathbf{B}\mathbf{x}
+\dot{\mathbf{s}} = \mathbf{A}\mathbf{s} + \mathbf{B}\mathbf{x}  + \mathbf{B}_\text{aux}\mathbf{x}_\text{aux}
 $$
 
 where
@@ -146,10 +180,14 @@ $$\begin{align}
 \mathbf{B}_1(\mathbf{L}\mathbf{Q}_2^{-1}\mathbf{P}_2 + \mathbf{U})\\
 \mathbf{B}_2(\mathbf{U}\mathbf{Q}_1^{-1}\mathbf{P}_1 + \mathbf{L})
 \end{bmatrix}\\
+\mathbf{B}_\text{aux} &=\begin{bmatrix}
+\mathbf{B}_{\text{aux},1} & \mathbf{0}\\
+\mathbf{0} & \mathbf{B}_{\text{aux},2}
+\end{bmatrix}
 \end{align}$$
 
 The overall $\mathbf{A}$, $\mathbf{B}$, $\mathbf{C}$, and $\mathbf{D}$ matrices often
-contains $\mathbf{L}\mathbf{Q}_2^{-1}$ and $\mathbf{U}\mathbf{Q}_1^{-1}$. These evalutes
+contains $\mathbf{L}\mathbf{Q}_2^{-1}$ and $\mathbf{U}\mathbf{Q}_1^{-1}$. These evalute
 to
 
 $$\begin{aligned}
@@ -190,14 +228,18 @@ d_{1,11}d_{2,21} & d_{2,22}\\
 d_{1,11} & d_{1,12}d_{2,22}\\
 0 & \gamma
 \end{bmatrix}\\
+\mathbf{B}_\text{aux} &=\begin{bmatrix}
+\mathbf{B}_{\text{aux},1} & \mathbf{0}\\
+\mathbf{0} & \mathbf{B}_{\text{aux},2}
+\end{bmatrix}\\
 \mathbf{C} &= \frac{1}{\gamma}
 \begin{bmatrix}
 d_{2,11}         &      0 & \gamma & d_{1,12}d_{2,11} \\
 d_{1,22}d_{2,21} & \gamma &      0 & d_{1,22}\\
 \end{bmatrix}
 \begin{bmatrix}
-\mathbf{C}_1 &0\\
-0 & \mathbf{C}_2
+\mathbf{C}_1 &\mathbf{0}\\
+\mathbf{0} & \mathbf{C}_2
 \end{bmatrix}\\
 \mathbf{D} &= 
 \frac{1}{\gamma}
@@ -216,6 +258,15 @@ d_{1,11} & 0 \\
 0 & d_{2,12} \\
 d_{1,21} & 0
 \end{bmatrix}\\
+\mathbf{D}_\text{aux} &= \frac{1}{\gamma}
+\begin{bmatrix}
+d_{2,11}         &      0 & \gamma & d_{1,12}d_{2,11} \\
+d_{1,22}d_{2,21} & \gamma &      0 & d_{1,22}\\
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{D}_{\text{aux},1} & \mathbf{0}\\
+\mathbf{0} & \mathbf{D}_{\text{aux},2}
+\end{bmatrix}\\
 \end{align}$$
 
 # State-space representation of a lossless tube junction
@@ -227,14 +278,18 @@ $$\begin{align}
 F_1+B_1 + P_e = F_2 + B_2\\
 \frac{1}{Z_1}(F_1-B_1) + U_n = \frac{1}{Z_2}(F_2-B_2)
 \end{align}$$
+
 where
+
 $$\begin{align}
 Z_1 &\triangleq \frac{\rho c}{A_1}\\
 Z_2 &\triangleq \frac{\rho c}{A_2}\\
 \end{align}$$
+
 are the acoustic impedance of each tube sections.
 
 Solve (28) and (29) for $F_1$ and $B_2$:
+
 $$\begin{aligned}
 \begin{bmatrix}
 1 & -1\\
@@ -243,53 +298,78 @@ Z_2^{-1} & Z_1^{-1}
 \begin{bmatrix}F_2\\B_1\end{bmatrix}
 &= 
 \begin{bmatrix}
-1 & -1 & -1 & 0\\
-Z_1^{-1} & Z_2^{-1} & 0 & 1
+1 & -1\\
+Z_1^{-1} & Z_2^{-1}
 \end{bmatrix}
-\begin{bmatrix}F_1\\B_2\\P_e\\U_n\end{bmatrix}\\
+\begin{bmatrix}F_1\\B_2\end{bmatrix}
++\begin{bmatrix}
+-1 & 0\\
+0 & 1
+\end{bmatrix}
+\begin{bmatrix}P_e\\U_n\end{bmatrix}\\
 \begin{bmatrix}F_2\\B_1\end{bmatrix}
 &= 
 \begin{bmatrix}
 Z_1^{-1} & 1\\
 -Z_2^{-1} & 1
 \end{bmatrix}
+\left(
 \begin{bmatrix}
-1 & -1 & -1 & 0\\
-Z_1^{-1} & Z_2^{-1} & 0 & 1
+1 & -1\\
+Z_1^{-1} & Z_2^{-1}
 \end{bmatrix}
-\begin{bmatrix}F_1\\B_2\\P_e\\U_n\end{bmatrix}\\
+\begin{bmatrix}F_1\\B_2\end{bmatrix}
+\begin{bmatrix}
+-1 & 0\\
+0 & 1
+\end{bmatrix}
+\begin{bmatrix}P_e\\U_n\end{bmatrix}\right)\\
 &= 
 \frac{1}{Z_1^{-1}+Z_2^{-1}}
 \begin{bmatrix}
-2Z_1^{-1} & Z_2^{-1}-Z_1^{-1} & -Z_1^{-1} & 1\\
-Z_1^{-1}-Z_2^{-1} & 2Z_2^{-1} & Z_2^{-1} & 1
-\end{bmatrix}\\
+2Z_1^{-1} & Z_2^{-1}-Z_1^{-1}\\
+Z_1^{-1}-Z_2^{-1} & 2Z_2^{-1}
+\end{bmatrix}
+\begin{bmatrix}F_1\\B_2\end{bmatrix}
++\frac{1}{Z_1^{-1}+Z_2^{-1}}
+\begin{bmatrix}
+-Z_1^{-1} & 1\\
+Z_2^{-1} & 1
+\end{bmatrix}
+\begin{bmatrix}P_e\\U_n\end{bmatrix}
+\\
 &= 
 \frac{1}{Z_1+Z_2}
 \begin{bmatrix}
-2Z_2 & Z_1-Z_2 & -Z_2 & Z_1Z_2\\
-Z_2-Z_1 & 2Z_1 & Z_1 & Z_1Z_2
-\end{bmatrix}\\
+2Z_2 & Z_1-Z_2\\
+Z_2-Z_1 & 2Z_1
+\end{bmatrix}\begin{bmatrix}F_1\\B_2\end{bmatrix}
++\frac{1}{Z_1+Z_2}
+\begin{bmatrix}
+-Z_2 & Z_1Z_2\\
+Z_1 & Z_1Z_2
+\end{bmatrix}\begin{bmatrix}P_e\\U_n\end{bmatrix}\\
 &= 
 \frac{1}{A_1+A_2}
 \begin{bmatrix}
-2A_1 & A_2-A_1 & -A_1 & \rho c\\
-A_1-A_2 & 2A_2 & A_2 & \rho c
+2A_1 & A_2-A_1\\
+A_1-A_2 & 2A_2
 \end{bmatrix}
-\begin{bmatrix}F_1\\B_2\\P_e\\U_n\end{bmatrix}
-\end{aligned}$$
-
-In order to conform this system to the 2-in/2-out system, we treat the two 
-external inputs $P_e$ and $U_n$ as an independent states (technically $P_e$ 
-depends on $F_1$ and $B_2$). Then, we have the $\mathbf{C}$ and $\mathbf{D}$ 
-matrices as
-$$\begin{align}
-\mathbf{C} &= 
-\frac{1}{A_1+A_2}
+\begin{bmatrix}F_1\\B_2\end{bmatrix}
++\frac{1}{A_1+A_2}
 \begin{bmatrix}
 -A_1 & \rho c\\
- A_2 & \rho c
-\end{bmatrix}\\
+A_2 & \rho c
+\end{bmatrix}
+\begin{bmatrix}P_e\\U_n\end{bmatrix}
+\end{aligned}$$
+
+The two external inputs $P_e$ and $U_n$ are combined as an auxiliary input vector 
+$\mathbf{x}_\text{aux} \triangleq \begin{bmatrix}P_e & U_n\end{bmatrix}^T$, 
+and we have the $\mathbf{D}$ and $\mathbf{D}_\text{aux}$
+matrices as
+
+$$\begin{align}
 \mathbf{D} &= 
 \frac{1}{A_1+A_2}
 \begin{bmatrix}
@@ -300,14 +380,16 @@ A_1-A_2 & 2A_2
 \frac{A_1-A_2}{A_1+A_2}
 \begin{bmatrix}
 1 & -1\\1 & -1
-\end{bmatrix}
+\end{bmatrix}\\
+\mathbf{D}_\text{aux} &= 
+\frac{1}{A_1+A_2}
+\begin{bmatrix}
+-A_1 & \rho c\\
+ A_2 & \rho c
+\end{bmatrix}\\
 \end{align}$$
-with the states
-$$
-\mathbf{s} = \begin{bmatrix}P_e \\ U_n \end{bmatrix}
-$$
-and $\mathbf{A}$ and $\mathbf{B}$ are unnecessary as thes "states" are updated
-external to the system.
+
+Both $\mathbf{A}$ and $\mathbf{B}$ matrices are "empty" as this block is stateless.
 
 # State-space representation of a yielding wall block
 
@@ -533,6 +615,7 @@ of this coupling is the $D_2/D_1$ term, suggesting that if the vocal tract widen
 from Tube 1 to Tube 2, the amount of flow exchange with the wall increases in Tube 2.
 
 Finally, here are the state update matrices:
+
 $$\begin{aligned}
 \mathbf{A} &= \mathbf{A}_2  + 
 \frac{d_{1,12}}{\gamma}\mathbf{b}_{2,1}\mathbf{c}_{2,2} \\
@@ -551,6 +634,7 @@ $$\begin{aligned}
 \mathbf{b}_w 
 \begin{bmatrix}A_1 & A_2 \end{bmatrix}\\
 \end{aligned}$$
+
 Like the $\mathbf{C}$ matrix, the interaction between the junction and the yielding wall
 is on full display. The external (to the yielding wall) connections modifies the
 state matrix $\mathbf{A}_w$, and also the contribution of the forward input pressure 
@@ -770,6 +854,7 @@ d &= \frac{d_rA - \rho c}{d_rA+\rho c}\\
 Since there is no foward pressure output, appending this block to another reduces
 the joined system to be SISO and $\mathbf{B}$, $\mathbf{C}$ and $\mathbf{D}$ 
 matrices in (32)-(34) reduce to
+
 $$\begin{align}
 \mathbf{b} &= 
 \frac{1}{\gamma}
@@ -782,7 +867,6 @@ $$\begin{align}
 d_{1,11}d_{2,21}\\
 d_{1,11}\\
 \end{bmatrix}\\
-
 \mathbf{c} &= \frac{1}{\gamma}
 \begin{bmatrix}
 d_{1,22}d_{2,21} & \gamma &  d_{1,22}\\
@@ -791,7 +875,6 @@ d_{1,22}d_{2,21} & \gamma &  d_{1,22}\\
 \mathbf{C}_1 &0\\
 0 & \mathbf{c}_2
 \end{bmatrix}\\
-
 d &= \frac{d_{1,22}d_{2,21}d_{1,11}+d_{1,21}}{\gamma}\\
 \end{align}$$
 
@@ -799,11 +882,13 @@ d &= \frac{d_{1,22}d_{2,21}d_{1,11}+d_{1,21}}{\gamma}\\
 
 At the nasal junction, we have a three-way branch, at which the pressure and flow
 are conserved as follows:
+
 $$\begin{align}
 P_1 &= P_2 + P_{v,2}\\
 P_1 &= P_3 + P_{v,3}\\
 U_1 + U_n &= U_2 + U_3\\
 \end{align}$$
+
 The cross-sectional areas and impedances are notated by $Z_k$ and $A_k$, $k=1,2,3$.
 
 In terms of the partial pressures, $F_1$, $B_2$, and $B_3$ are the input pressures,
@@ -813,7 +898,6 @@ $$\begin{aligned}
 F_1 + B_1 - P_e &= F_2+B_2\\
 F_1 + B_1 - P_e &= F_3+B_3\\
 Z_1^{-1}F_1 - Z_1^{-1}B_1 + U_n &= Z_2^{-1}F_2 - Z_2^{-1}B_2 + Z_3^{-1} F_3 - Z_3^{-1}B_3\\
-
 \begin{bmatrix}
 1 & 0 & -1\\
 0 & 1 & -1\\
@@ -839,7 +923,6 @@ F_1\\B_2\\B_3
 \begin{bmatrix}
 P_e \\ U_n
 \end{bmatrix}\\
-
 \begin{bmatrix}
 F_2\\F_3\\B_1
 \end{bmatrix}&=
@@ -866,7 +949,6 @@ F_1\\B_2\\B_3
 \begin{bmatrix}
 P_e \\ U_n
 \end{bmatrix}\right)\\
-
 &=
 \frac{1}{Z_1^{-1}+Z_2^{-1}+Z_3^{-1}}\left(
 \begin{bmatrix}
@@ -943,7 +1025,6 @@ $$\begin{align}
 -A_2 & 0\\
 0 & -\rho c\\
 \end{bmatrix}\\
-
 \mathbf{D} &=
 \frac{1}{A_1+A_2+A3}
 \begin{bmatrix}
