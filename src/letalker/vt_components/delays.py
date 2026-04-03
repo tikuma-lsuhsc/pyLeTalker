@@ -10,63 +10,50 @@ from .abc import TwoPortSystem
 rhoc_default = rho_air_default * c_default
 
 
-class CascadeNetwork(TwoPortSystem):
-    # Interconnection of two-port networks
+class ForwardDelay(TwoPortSystem):
+    # Series networks representing pressure losses
 
-    rhoc: float
-    _subnetworks: tuple[TwoPortSystem]
+    delay: int
 
-    def __init__(self, *networks: tuple[TwoPortSystem], rhoc: float | None = None):
-        """generic series system with multiple series flow-to-pressure-drop subsystems
+    def __init__(self, delay: int = 1):
+        """generic forward path sample delay
 
         Parameters
         ----------
-        areas
-            cross-sectional areas of tube sections
-        networks
-            Two-port networks to be cascaded in the order given.
-        rhoc, optional
-            physical constant: air density times speed of sound, by default uses
-            the system constant
+        delay
+            propagation delay in samples
         """
         super().__init__()
 
-        if len(networks) == 0:
-            raise ValueError(
-                "At least one pressure-to-wall-flow subsystem must be given."
-            )
-
-        self._subnetworks = networks
-        if rhoc is not None:
-            self.rhoc = rhoc
+        self.delay = delay
 
     def nb_states(self) -> int:
         """Number of internal states"""
-        return sum(net.nb_states() for net in self._subnetworks)
+        return self.delay
 
     def nb_sections(self) -> int:
-        """Number of tube junctions (1 less than tube sections)"""
-        return self._subnetworks[0].shape[0]
+        """Number of tube sections"""
+        return 1
 
     def nb_inputs(self) -> int:
-        """Number of inputs: 2 to 4"""
-        return max(net.nb_inputs() for net in self._subnetworks)
+        """Number of inputs: always 2"""
+        return 2
 
     def nb_outputs(self) -> int:
         """Number of outputs: always 2"""
-        return max(net.nb_outputs() for net in self._subnetworks)
+        return 2
 
     def is_lattice(self) -> bool:
         """``True`` if system can be implemented by Story95 lattice structure with 2 reflection coefficients plus a gain"""
-        return all(net.is_lattice() for net in self._subnetworks)
+        return False
 
     def has_aux_pressure_source(self) -> bool:
-        """``True`` if a junction therein expects auxiliary pressure source(s)"""
-        return any(net.has_aux_pressure_source() for net in self._subnetworks)
+        """Always ``False``, no auxiliary pressure source"""
+        return False
 
     def has_aux_flow_source(self) -> bool:
-        """``True`` if a junction therein expects an auxiliary flow source"""
-        return any(net.has_aux_flow_source() for net in self._subnetworks)
+        """Always ``False``, no auxiliary flow source"""
+        return False
 
     def ss(
         self,
@@ -131,6 +118,8 @@ class CascadeNetwork(TwoPortSystem):
             ``'gbt'`` with ``alpha = 0.5`` and ignored otherwise.
 
         """
+
+        assert sample is True
 
         nsec = self.nb_sections
         nst = self.nb_states
@@ -285,7 +274,7 @@ class CascadeNetwork(TwoPortSystem):
 
         for i, areas in enumerate(self.areas(n, n0=n0)):
             for j, area in enumerate(areas):
-                Hv = ct.parallel(f(area, length) for f in self._subnetworks).ss()
+                Hv = ct.parallel(f(area, length) for f in self._lti_factories).ss()
                 if isinstance(Hv, ct.TransferFunction):
                     Hv = ct.tf2ss(Hv)
                 if sample:
@@ -304,66 +293,3 @@ class CascadeNetwork(TwoPortSystem):
                 D = np.array([k1, k2], [k2, k1])
 
                 yield i, j, A, B, C, D
-
-    def _join(self, sys1: ct.LTI, sys2: ct.LTI) -> ct.StateSpace:
-
-        ss1 = ct.ss(sys1)
-        ss2 = ct.ss(sys2)
-
-        nst1, nst2 = ss1.nstates, ss2.nstates
-        nin1, nin2 = ss1.ninputs, ss2.ninputs
-        nout1, nout2 = ss1.noutputs, ss2.noutputs
-
-        assert nout1 == 2 and nout2 == 2 and nin1 >= 2 and nin2 >= 2
-
-        naux1 = nin1 - nout1
-        naux2 = nin2 - nout2
-        nout = 2
-
-        naux = naux1 + naux2
-        nin = nout + naux
-        nst = nst1 + nst2
-
-        b12 = ss1.B[:, 1]
-        b21 = ss2.B[:, 0]
-        c11 = ss1.C[0, :]
-        c22 = ss2.C[1, :]
-        (d111, d112), (d121, d122) = ss1.D[:, :nout]
-        (d211, d212), (d221, d222) = ss2.D[:, :nout]
-
-        gamma = 1 - d112 * d221
-
-        A = np.zeros((nst, nst))
-        A[:nst1, :nst1] = ss1.A + (b12 * d221 / gamma) @ c11
-        A[:nst1, nst1:] = (b12 / gamma) @ c22
-        A[nst1:, :nst1] = (b21 / gamma) @ c11
-        A[:nst1, :nst1] = ss2.A + (b21 * d112) @ c22
-
-        B = np.zeros((nst, nin))
-        B[:nst1, :nout] = ss1.B[:, :nout] @ np.array(
-            [[1, 0], [d111 * d221 / gamma, d222 / gamma]]
-        )
-        B[nst1:, :nout] = ss2.B[:, :nout] @ np.array(
-            [[d111 / gamma, d112 * d222 / gamma], [0, 1]]
-        )
-        if naux1:
-            B[:nst1, nout:-naux2] = ss1.B[:, nout:]
-        if naux2:
-            B[nst1:, -naux2:] = ss2.B[:, nout:]
-
-        K1 = np.array([[d211 / gamma, 0], [d122 * d221 / gamma, 1]])
-        K2 = np.array([[1, d112 * d211 / gamma], [0, d122 / gamma]])
-        C = np.zeros((nout, nst))
-        C[:, :nst1] = K1 @ ss1.C
-        C[:, :nst2] = K2 @ ss2.C
-
-        D = np.zeros((nout, nin))
-        D[0, :nout] = [d111 * d211 / gamma, d112 * d211 * d222 / gamma + d212]
-        D[1, :nout] = [d111 * d122 * d221 / gamma + d121, d122 * d222 / gamma]
-
-        if naux1:
-            D[0, nout:-naux2] = K1 @ ss1.D[:, nout:]
-        if naux2:
-            D[1, -naux2:] = K2 @ ss2.D[:, nout:]
-
-        return ct.ss(A, B, C, D)
