@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from math import pi
-from typing import TYPE_CHECKING, Literal, get_args
+from typing import TYPE_CHECKING, Literal, TypeAlias, get_args
 
 import numpy as np
 from numpy.typing import NDArray
@@ -88,7 +88,7 @@ def _load_vocaltract_data():
     }
 
 
-TwoLetterVowelLiteral = Literal[
+TwoLetterVowelLiteral: TypeAlias = Literal[
     tuple(_load_vocaltract_data().keys())
 ]  # Two-letter vowels
 
@@ -102,7 +102,7 @@ vocaltract_resolution = c / (2 * fs)  #: vocal tract tube segment length
 # The Six-Parameter Model data provided by Stone, Marxen, & Birkholz 2018
 
 # fmt: off
-SMB2018VocalTractSound = Literal['a:','e:','i:','o:','u:','E:','oe:','y:','a','E','I','O','U','oE','Y','@','f','l','s','S','C','x']
+SMB2018VocalTractSound:TypeAlias = Literal['a:','e:','i:','o:','u:','E:','oe:','y:','a','E','I','O','U','oE','Y','@','f','l','s','S','C','x']
 #                        Literal['aː','eː','iː','oː','uː','ɛː','ø:', 'y:','a','ɛ','ɪ','ɔ','ʊ','œ', 'ʏ','ə','f','l','s','ʃ','ç','x']
 #                        Literal['AAː','EYː','IYː','OWː','UWː','EHː','ø:', 'y:','AA','EH','ɪ','ɔ','ʊ','œ', 'ʏ','AX','f','l','s','ʃ','ç','x']
 # fmt: on
