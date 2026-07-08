@@ -785,6 +785,73 @@ A d_v & 2\rho c
 \end{bmatrix}
 \end{align}$$
 
+## For the loss model in an improper first-order TF 
+Now if the series block is represented by an improper first-order transfer function, a la the RL viscous loss model, Story Eq (2.72)...
+
+$$\begin{equation}
+P_v = R_v U + L_v \dot{U}
+\end{equation}$$
+
+This system does not have a state-space representation, so the above derivation cannot be used. Here, we use $U$ as the state variable $s$, and solve the system of equations for $F_2$, $B_1$, and $\dot{s}$. The governing equations are
+
+$$\begin{align}
+F_1 + B_1 &= R_v s + L_v \dot{s} + F_2 + B_2\\
+s &= \frac{1}{Z}(F_1-B_1)\\
+s &= \frac{1}{Z}(F_2-B_2)\\
+\end{align}$$
+
+Manipulate the questions so that $F_2$, $B_1$, and $\dot{s}$ appear on the left hand side and $F_1$, $B_2$, and $s$ appear on the right hand side:
+
+$$\begin{align}
+L_v\dot{s} + F_2 - B_1 &= -R_vs+F_1 - B_2\\
+\frac{1}{Z}B_1 &= -s + \frac{1}{Z}F_1 \\
+\frac{1}{Z} F_2  &= s + \frac{1}{Z}B_2\\
+\end{align}$$
+
+Convert the equations to a matrix-vector equation and solve for $[\dot{s}\ F_2\ B_1]^T$:
+
+$$\begin{align}
+\begin{bmatrix} 
+L_v & 1 & -1\\
+0 & 0 & 1/Z\\
+0 & 1/Z & 0\\
+\end{bmatrix} \begin{bmatrix}\dot{s}\\F_2\\B_1\end{bmatrix} &= \begin{bmatrix}-R_v & 1 & -1\\
+-1 & 1/Z & 0\\
+1 & 0 & 1/Z\\
+\end{bmatrix} \begin{bmatrix}s\\F_1\\B_2\end{bmatrix}\\
+\begin{bmatrix}\dot{s}\\F_2\\B_1\end{bmatrix} &= 
+\begin{bmatrix}
+    1/L_v & Z/L_v & Z/L_v\\
+    0 & 0 & Z\\
+    0 & Z & 0
+\end{bmatrix} 
+\begin{bmatrix}
+    -R_v & 1 & -1\\
+    -1 & 1/Z & 0\\
+    1 & 0 & 1/Z
+\end{bmatrix} \\
+\begin{bmatrix}s\\F_1\\B_2\end{bmatrix}
+&= 
+\begin{bmatrix}
+    -\frac{R_v+2Z}{L_v} & \frac{2}{L_v} & -\frac{2}{L_v}\\
+    Z & 0 & 1\\
+    -Z & 1 & 0
+\end{bmatrix} 
+\begin{bmatrix}s\\F_1\\B_2\end{bmatrix}
+\end{align}$$
+
+Accordingly, the resulting statespace coefficients are:
+
+$$\begin{align}
+A &= -\frac{R_v+2Z}{L_v} \\
+\mathbf{B} &= \frac{2}{L_v} \begin{bmatrix} 1 & -1\end{bmatrix}\\
+\mathbf{C} &= Z \begin{bmatrix}1\\-1\end{bmatrix}\\
+\mathbf{D} &= \begin{bmatrix}
+     0 & 1\\
+    1 & 0
+\end{bmatrix}\\
+\end{align}$$
+
 # State-space representation of the radiation impedance load
 
 Flanagan estimated the radiation load by a piston in an infinite baffle. This model

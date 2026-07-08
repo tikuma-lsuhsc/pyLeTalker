@@ -11,11 +11,35 @@ from ..core import TimeSampleHandler
 __all__ = ["TwoPortSystem"]
 
 
-class LTIFactory(Protocol):
-    def __call__(self, area: float, length: float) -> ct.LTI | float: ...
+class LTISegmentFactory(Protocol):
+    def __call__(
+        self,
+        area: float,
+        length: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.LTI:
+        """Generate an LTI model for a vocal tract segment
 
-    @property
-    def nb_states(self) -> int: ...
+        Parameters
+        ----------
+        area
+            cross-sectional area in cm²
+        length
+            segment length in cm
+        fs, optional
+            sampling rate in samples/second to create a discrete-time model,
+            by default the created model will be a continuous-time model.
+        sample_kws, optional
+            Keyword arguments to run ``ct.sample()`` function to discretize
+            the model, by default the default parameters of ``ct.sample()`` will
+            be used.
+
+        Returns
+        -------
+            Generated model
+        """
 
 
 class TwoPortSystem(TimeSampleHandler, metaclass=abc.ABCMeta):
@@ -56,17 +80,14 @@ class TwoPortSystem(TimeSampleHandler, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def ss(
-        self, *, sample: bool = True, sample_kws: dict[str, Any] | None = None
+        self, *, fs: float | None = None, sample_kws: dict[str, Any] | None = None
     ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """generate state-space matrices of all sections as a sample generator
 
         Parameters
         ----------
-        sample, optional
-            ``True`` (default) to convert the system to discrete-time system, sampled at
-            the ``self.fs`` sampling rate. ``False`` to return a continuous-time
-            system. Control Systems Library package's ``sample()`` method is used
-            to make the conversion.
+        fs, optional
+            Sampling rate in samples/second. If specified, the
         sample_kws, optional
             Specify the continuous-to-discrete time conversion options. See below
             for a brief summary of the available options or see Control Systems
