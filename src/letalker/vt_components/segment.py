@@ -243,16 +243,14 @@ class ShuntNetwork(LTISegmentFactory):
             else ct.tf([0.0], [1.0], fs and 1 / fs)  # no shunt loss
         ).to_ss()
 
-        two_area = 2 * area
-        rhoc_d = self.rhoc * Hw.D[0, 0]
-        den = 1 / (two_area + rhoc_d)
-        k1 = two_area / den
-        k2 = -self.rhoc / den
-        A = Hw.A - (Hw.B * den) @ Hw.C
-        B = np.tile(Hw.B * k1, (1, 2))
-        C = np.tile(k2 * Hw.C, (2, 1))
-        k3 = k2 * Hw.D[0, 0]
-        D = np.array([[k1, k3], [k3, k1]])
+        Y = area / self.rhoc
+        dw = Hw.D[0, 0]
+        den = 2 * Y + dw
+
+        C = np.tile(-Hw.C / den, (2, 1))
+        D = np.array([[2 * Y, -dw], [-dw, 2 * Y]]) / den
+        A = Hw.A + Hw.B @ C[1:]
+        B = Hw.B @ (D[1:] + np.array([[1, 0]]))
 
         return ct.StateSpace(A, B, C, D, dt=Hw.dt)
 
