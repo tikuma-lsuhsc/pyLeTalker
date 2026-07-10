@@ -123,16 +123,26 @@ class DefaultViscousLossTF(LTISegmentFactory):
         _description_
     """
 
-    omega: float = np.pi * 2000
+    omega: float = np.pi * 2000  # default: 1000 Hz (Story, 1995)
+    rho: float = rho_air_default
     rhomu: float = rho_air_default * mu_default
 
-    def __init__(self, omega: float | None = None, rhomu: float | None = None):
+    def __init__(
+        self,
+        omega: float | None = None,
+        rho: float | None = None,
+        mu: float | None = None,
+    ):
         super().__init__()
 
         if omega is not None:
             self.omega = omega
-        if rhomu is not None:
-            self.rhomu = rhomu
+        if rho is not None or mu is not None:
+            if rho is None:
+                rho = self.rho
+            else:
+                self.rho = rho
+            self.rhomu = rho * (mu or mu_default)
 
     def __call__(
         self,
@@ -143,10 +153,15 @@ class DefaultViscousLossTF(LTISegmentFactory):
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.LTI:
 
-        c = 2 * (area * np.pi) ** 0.5 * length * (self.rhomu / 2) ** 0.5 / area**2
+        r = (area / np.pi) ** 0.5
+        c = (self.rhomu / 2) ** 0.5
+
+        2 * (area * np.pi) ** 0.5 * length * (self.rhomu / 2) ** 0.5 / area**2
         k = self.omega**0.5
         Rvsc = c * k
         Lvsc = c / k
+
+        La = rho / area * length
 
         tf = ct.tf([Lvsc, Rvsc], [1])
         assert isinstance(tf, ct.LTI)
@@ -240,7 +255,7 @@ class ShuntNetwork(LTISegmentFactory):
         Hw: ct.StateSpace = (
             ct.parallel(*(f(area, length, **kws) for f in self._lti_factories))
             if nsys
-            else ct.tf([0.0], [1.0], fs and 1 / fs)  # no shunt loss
+            else ct.tf([0.0], [1.0], fs and 1 / fs)  # no flow loss
         ).to_ss()
 
         Y = area / self.rhoc
@@ -311,9 +326,7 @@ class SeriesNetwork(LTISegmentFactory):
         Hv: ct.TransferFunction = (
             ct.parallel(*(f(area, length, **kws) for f in self._lti_factories))
             if nsys
-            else ct.tf(
-                [rhoc / area], [1.0], dt=fs and 1 / fs
-            )  # no loss flow-pressure conversion
+            else ct.tf([0], [1], dt=fs and 1 / fs)  # no pressure loss
         ).to_tf()
 
         if len(Hv.den[0][0]) == 1 and len(Hv.num[0][0]) == 2:
@@ -331,12 +344,12 @@ class SeriesNetwork(LTISegmentFactory):
             den = 1 / (ad + two_rhoc)
             A = Hv.A - (Hv.B * den * area / rhoc) @ Hv.C
             b = Hv.B * (2 * area * den)
-            B = np.stack([b, -b], 1)
+            B = np.concatenate([b, -b], 1)
             c = den * Hv.C
-            C = np.stack([c, -c, 0])
+            C = np.concatenate([c, -c])
             k1 = two_rhoc * den
             k2 = ad * den
-            D = np.array([k1, k2], [k2, k1])
+            D = np.array([[k1, k2], [k2, k1]])
 
         return ct.StateSpace(A, B, C, D, dt=Hv.dt)
 
