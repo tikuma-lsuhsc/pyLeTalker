@@ -824,13 +824,13 @@ L_v & 1 & -1\\
     1/L_v & Z/L_v & Z/L_v\\
     0 & 0 & Z\\
     0 & Z & 0
-\end{bmatrix} 
+\end{bmatrix}
 \begin{bmatrix}
     -R_v & 1 & -1\\
     -1 & 1/Z & 0\\
     1 & 0 & 1/Z
 \end{bmatrix} \\
-\begin{bmatrix}s\\F_1\\B_2\end{bmatrix}
+\begin{bmatrix}\dot{s}\\F_2\\B_1\end{bmatrix}
 &= 
 \begin{bmatrix}
     -\frac{R_v+2Z}{L_v} & \frac{2}{L_v} & -\frac{2}{L_v}\\

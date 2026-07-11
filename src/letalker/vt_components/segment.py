@@ -125,7 +125,10 @@ class DefaultViscousLossTF(LTISegmentFactory):
 
     omega: float = np.pi * 2000  # default: 1000 Hz (Story, 1995)
     rho: float = rho_air_default
-    rhomu: float = rho_air_default * mu_default
+    mu: float = mu_default
+
+    _r_const: float = (rho_air_default * mu_default / 2 * omega) ** 0.5
+    _l_const: float = (rho_air_default * mu_default / (2 * omega)) ** 0.5
 
     def __init__(
         self,
@@ -135,14 +138,25 @@ class DefaultViscousLossTF(LTISegmentFactory):
     ):
         super().__init__()
 
-        if omega is not None:
-            self.omega = omega
-        if rho is not None or mu is not None:
+        if omega is not None or rho is not None or mu is not None:
             if rho is None:
                 rho = self.rho
             else:
                 self.rho = rho
-            self.rhomu = rho * (mu or mu_default)
+            if mu is None:
+                mu = self.mu
+            else:
+                self.mu = mu
+            if rho is None:
+                rho = self.rho
+            else:
+                self.rho = rho
+
+            self.sqrt_rhomu_half = ((rho * (mu or mu_default)) / 2) ** 0.5
+
+            c = rho * mu / 2
+            self._r_const = (c * omega) ** 0.5
+            self._l_const = (c / omega) ** 0.5
 
     def __call__(
         self,
@@ -153,15 +167,12 @@ class DefaultViscousLossTF(LTISegmentFactory):
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.LTI:
 
-        r = (area / np.pi) ** 0.5
-        c = (self.rhomu / 2) ** 0.5
+        # r = (area / np.pi) ** 0.5
+        # S = 2 * np.pi * r
+        a = 2 * (np.pi / area) ** 0.5 / area
 
-        2 * (area * np.pi) ** 0.5 * length * (self.rhomu / 2) ** 0.5 / area**2
-        k = self.omega**0.5
-        Rvsc = c * k
-        Lvsc = c / k
-
-        La = rho / area * length
+        Rvsc = a * self._r_const * length
+        Lvsc = (self.rho / area + a * self._l_const) * length
 
         tf = ct.tf([Lvsc, Rvsc], [1])
         assert isinstance(tf, ct.LTI)
@@ -357,14 +368,20 @@ class SeriesNetwork(LTISegmentFactory):
 ######################
 
 
-class TSegment(LTISegmentFactory):
+class SegmentBase(LTISegmentFactory):
     series: SeriesNetwork
     shunt: ShuntNetwork
 
-    def __init__(self, series: SeriesNetwork, shunt: ShuntNetwork):
-        self.series = series
-        self.shunt = shunt
+    def __init__(
+        self, series: SeriesNetwork | None = None, shunt: ShuntNetwork | None = None
+    ):
+        self.series = series or SeriesNetwork(
+            DefaultLaminarResistance(), DefaultViscousLossTF()
+        )
+        self.shunt = shunt or ShuntNetwork(DefaultHeatLossGain(), DefaultYieldingWall())
 
+
+class TSegment(SegmentBase):
     def __call__(
         self,
         area: float,
@@ -374,20 +391,13 @@ class TSegment(LTISegmentFactory):
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.LTI:
 
-        series = self.series(area, length / 2)
-        shunt = self.shunt(area, length)
+        series = self.series(area, length / 2, fs=fs, sample_kws=sample_kws)
+        shunt = self.shunt(area, length, fs=fs, sample_kws=sample_kws)
 
         return cascade(cascade(series, shunt), series)
 
 
-class PiSegment(LTISegmentFactory):
-    series: SeriesNetwork
-    shunt: ShuntNetwork
-
-    def __init__(self, series: SeriesNetwork, shunt: ShuntNetwork):
-        self.series = series
-        self.shunt = shunt
-
+class PiSegment(SegmentBase):
     def __call__(
         self,
         area: float,
@@ -397,7 +407,7 @@ class PiSegment(LTISegmentFactory):
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.LTI:
 
-        shunt = self.shunt(area, length / 2)
-        series = self.series(area, length)
+        shunt = self.shunt(area, length / 2, fs=fs, sample_kws=sample_kws)
+        series = self.series(area, length, fs=fs, sample_kws=sample_kws)
 
         return cascade(cascade(shunt, series), shunt)

@@ -67,8 +67,8 @@ class LosslessJunction(LTIJunctionFactory):
         area1: float,
         area2: float,
         *,
-        has_pressure_source: bool,
-        has_flow_source: bool,
+        has_pressure_source: bool = False,
+        has_flow_source: bool = False,
     ) -> ct.StateSpace:
         """create a feed-through only two-port junction system
 
@@ -78,13 +78,11 @@ class LosslessJunction(LTIJunctionFactory):
             cross-sectional area in cm² of the upstream section
         area2
             cross-sectional area in cm² of the downstream section
-        areas
-            cross-sectional areas of tube sections
-        has_pressure_source
+        has_pressure_source, optional
             ``True`` if there is any pressure source at junction, i.e., kinetic
-            pressure drop or approximated viscous loss of the previous section
-        has_flow_source
-            ``True`` if there is a turbulent flow source at junction
+            pressure drop or approximated viscous loss of the previous section, by default False
+        has_flow_source, optional
+            ``True`` if there is a turbulent flow source at junction, by default False
 
         Returns
         -------
