@@ -100,7 +100,16 @@ F_2\\B_2
 \end{bmatrix}
 \right]
 $$
-Define
+Compact the notation to
+$$
+\begin{equation}
+\begin{bmatrix}
+F_2\\B_2
+\end{bmatrix}
+=\mathbf{C}_c \mathbf{s}+\mathbf{D}_c\mathbf{x}
+\end{equation}
+$$
+by defining
 $$
 \begin{align}
 \mathbf{C}_c &= \left(
@@ -116,83 +125,103 @@ $$
 \end{bmatrix}
 \end{align}
 $$
-we get
-$$
-\begin{bmatrix}
-F_2\\B_2
-\end{bmatrix}
-=\mathbf{C}_c \mathbf{s}+\mathbf{D}_c\mathbf{x}
-$$
 
-Combined system equations
+Combined the system equations of two subsytems and separate their inputs:
 $$
 \begin{align}
 \dot{\mathbf{s}} 
 &= \begin{bmatrix}\mathbf{A}_1 & \mathbf{0}\\\mathbf{0}&\mathbf{A}_2\end{bmatrix} \mathbf{s}
 +\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}
-\begin{bmatrix}
-F_2\\B_2
-\end{bmatrix}
-+\begin{bmatrix}
-\tilde{\mathbf{B}}_{11} & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_{22}
-\end{bmatrix}
-\mathbf{x}\\
-&= \begin{bmatrix}\mathbf{A}_1 & \mathbf{0}\\\mathbf{0}&\mathbf{A}_2\end{bmatrix} \mathbf{s}
-+\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}\left(\tilde{\mathbf{C}} \mathbf{s}+\tilde{\mathbf{D}}\mathbf{x}\right)
-+\begin{bmatrix}
-\tilde{\mathbf{B}}_{11} & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_{22}
-\end{bmatrix}
-\mathbf{x}\\
-&= \left(\begin{bmatrix}\mathbf{A}_1 & \mathbf{0}\\\mathbf{0}&\mathbf{A}_2\end{bmatrix} 
-+\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}\tilde{\mathbf{C}}\right) \mathbf{s}
-+\left(\begin{bmatrix}
-\tilde{\mathbf{B}}_{11} & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_{22}
-\end{bmatrix}+\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}\tilde{\mathbf{D}}
-\right)
-\mathbf{x}\\
-\end{align}
-$$
-$$
-\begin{align}
-\mathbf{y}
-&= \begin{bmatrix}F_3\\\vdots\\B_1\\\vdots\end{bmatrix}
-=\begin{bmatrix}\mathbf{0} & \tilde{\mathbf{C}}_2\\\tilde{\mathbf{C}}_1 & \mathbf{0}\end{bmatrix} \mathbf{s}
-+\begin{bmatrix}
-\mathbf{0} & \tilde{\mathbf{D}}_{22} \\ \tilde{\mathbf{D}}_{11} & \mathbf{0}
+\tilde{\mathbf{B}}_1 & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_2
 \end{bmatrix}
 \mathbf{x}
 +\begin{bmatrix}
-\mathbf{0} & \mathbf{d}_{112} \\ \mathbf{d}_{221} & \mathbf{0}
+\mathbf{0} & \mathbf{b}_{1b} \\ \mathbf{b}_{2f} & \mathbf{0}
 \end{bmatrix}
 \begin{bmatrix}
 F_2\\B_2
-\end{bmatrix}\\
-&= \begin{bmatrix}\mathbf{A}_1 & \mathbf{0}\\\mathbf{0}&\mathbf{A}_2\end{bmatrix} \mathbf{s}
-+\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}\left(\tilde{\mathbf{C}} \mathbf{s}+\tilde{\mathbf{D}}\mathbf{x}\right)
-+\begin{bmatrix}
-\tilde{\mathbf{B}}_{11} & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_{22}
 \end{bmatrix}
-\mathbf{x}\\
+\\
+\mathbf{y} = \begin{bmatrix}\mathbf{\tilde{y}}_2\\\mathbf{\tilde{y}}_1\end{bmatrix}
+&=\begin{bmatrix}
+\mathbf{0} & \tilde{\mathbf{C}}_2\\
+\tilde{\mathbf{C}}_1 & \mathbf{0}\\
+\end{bmatrix} \mathbf{s}
++\begin{bmatrix}
+\mathbf{0} & \tilde{\mathbf{D}}_2\\
+\tilde{\mathbf{D}}_1 & \mathbf{0}\\
+\end{bmatrix} \mathbf{x}
++\begin{bmatrix}
+\mathbf{d}_{2f} & \mathbf{0}\\
+\mathbf{0} & \mathbf{d}_{1b}\\ 
+\end{bmatrix}
+\begin{bmatrix}F_2\\B_2\end{bmatrix}
+\end{align}
+$$
+Substitution of (9) into (12) and (13) and subsequent simplification yield
+$$
+\begin{align}
+\dot{\mathbf{s}} 
 &= \left(\begin{bmatrix}\mathbf{A}_1 & \mathbf{0}\\\mathbf{0}&\mathbf{A}_2\end{bmatrix} 
 +\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}\tilde{\mathbf{C}}\right) \mathbf{s}
+\mathbf{0} & \mathbf{b}_{1b} \\ \mathbf{b}_{2f} & \mathbf{0}
+\end{bmatrix}\mathbf{C}_c \right)\mathbf{s}
 +\left(\begin{bmatrix}
-\tilde{\mathbf{B}}_{11} & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_{22}
-\end{bmatrix}+\begin{bmatrix}
-\mathbf{0} & \mathbf{b}_{11} \\ \mathbf{b}_{22} & \mathbf{0}
-\end{bmatrix}\tilde{\mathbf{D}}
-\right)
-\mathbf{x}\\
+\tilde{\mathbf{B}}_1 & \mathbf{0} \\ \mathbf{0} & \tilde{\mathbf{B}}_2
+\end{bmatrix}
++\begin{bmatrix}
+\mathbf{0} & \mathbf{b}_{1b} \\ \mathbf{b}_{2f} & \mathbf{0}
+\end{bmatrix}\mathbf{D}_c\right)\mathbf{x}
+\\
+\mathbf{y}&=\left(\begin{bmatrix}
+\mathbf{0} & \tilde{\mathbf{C}}_2\\
+\tilde{\mathbf{C}}_1 & \mathbf{0}\\
+\end{bmatrix} 
++\begin{bmatrix}
+\mathbf{d}_{2f} & \mathbf{0}\\
+\mathbf{0} & \mathbf{d}_{1b}\\ 
+\end{bmatrix} \mathbf{C}_c\right) \mathbf{s}
++\left(\begin{bmatrix}
+\mathbf{0} & \tilde{\mathbf{D}}_2\\
+\tilde{\mathbf{D}}_1 & \mathbf{0}\\
+\end{bmatrix} 
++\begin{bmatrix}
+\mathbf{d}_{2f} & \mathbf{0}\\
+\mathbf{0} & \mathbf{d}_{1b}\\ 
+\end{bmatrix}\mathbf{D}_c\right)\mathbf{x}
+\end{align}
+$$
+Accordingly, the state-space matrices of the combined system are
+$$
+\begin{align}
+\mathbf{A} &=\begin{bmatrix}
+\mathbf{A}_1 & \mathbf{0}\\
+\mathbf{0} & \mathbf{A}_2\\
+\end{bmatrix} 
++\begin{bmatrix}
+\mathbf{0} & \mathbf{b}_{1b} \\ \mathbf{b}_{2f} & \mathbf{0}
+\end{bmatrix} \mathbf{C}_c\\
+\mathbf{B} &=\begin{bmatrix}
+\tilde{\mathbf{B}}_1 & \mathbf{0}\\
+\mathbf{0} & \tilde{\mathbf{B}}_2\\
+\end{bmatrix} 
++\begin{bmatrix}
+\mathbf{0} & \mathbf{b}_{1b} \\ 
+\mathbf{b}_{2f} & \mathbf{0}
+\end{bmatrix}\mathbf{D}_c\\
+\mathbf{C} &=\begin{bmatrix}
+\mathbf{0} & \tilde{\mathbf{C}}_2\\
+\tilde{\mathbf{C}}_1 & \mathbf{0}\\
+\end{bmatrix} 
++\begin{bmatrix}
+\mathbf{d}_{2f} & \mathbf{0}\\\mathbf{0} & \mathbf{d}_{1b}
+\end{bmatrix} \mathbf{C}_c\\
+\mathbf{D} &=\begin{bmatrix}
+\mathbf{0} & \tilde{\mathbf{D}}_2\\
+\tilde{\mathbf{D}}_1 & \mathbf{0}\\
+\end{bmatrix} 
++\begin{bmatrix}
+\mathbf{d}_{2f} & \mathbf{0}\\\mathbf{0} & \mathbf{d}_{1b}
+\end{bmatrix}\mathbf{D}_c\\
 \end{align}
 $$

@@ -23,7 +23,14 @@ def cascade(*systems: tuple[ct.LTI]) -> ct.StateSpace:
     return sys
 
 
-def _cascade(sys1: ct.LTI, sys2: ct.LTI) -> ct.StateSpace:
+def _cascade(
+    sys1: ct.LTI,
+    sys2: ct.LTI,
+    fwd_out: int = 0,
+    bwd_in: int = 1,
+    bwd_out: int = 1,
+    fwd_in: int = 0,
+) -> ct.StateSpace:
     """cascade two wave-reflection vocal tract subsystems
 
     Parameters
@@ -32,6 +39,14 @@ def _cascade(sys1: ct.LTI, sys2: ct.LTI) -> ct.StateSpace:
         leading subsystem, its first 2 outputs connects to sys2 inputs
     sys2
         following subsystem, its first 2 inputs connects to sys1 outputs
+    fwd_out, optional
+        sys1 forward output port index, by default 0
+    bwd_in, optional
+        sys1 backward input port index, by default 1
+    bwd_out, optional
+        sys2 backward output port index, by default 1
+    fwd_in, optional
+        sys2 forward input port index, by default 0
 
     Returns
     -------
@@ -47,95 +62,45 @@ def _cascade(sys1: ct.LTI, sys2: ct.LTI) -> ct.StateSpace:
     assert (
         nin1 is not None
         and nin2 is not None
-        and nout1 == 2
-        and nout2 == 2
+        and nout1 >= 2
+        and nout2 >= 2
         and nin1 >= 2
         and nin2 >= 2
+        and ss1.dt == ss2.dt
     )
 
-    naux1 = nin1 - nout1
-    naux2 = nin2 - nout2
-    nout = 2
+    b1b = ss1.B[:, bwd_in]
+    b2f = ss2.B[:, fwd_in]
+    c1f = ss1.C[fwd_out, :]
+    c2b = ss2.C[bwd_out, :]
 
-    naux = naux1 + naux2
-    nin = nout + naux
-    nst = nst1 + nst2
+    in1 = np.ones(nin1, bool)
+    in1[bwd_in] = False
+    in2 = np.ones(nin2, bool)
+    in2[fwd_in] = False
 
-    A1 = ss1.A
-    B1 = ss1.B[:, :nin1]
-    C1 = ss1.C[:nout1, :]
-    D1 = ss1.D[:nout1, :nin1]
+    out1 = np.ones(nout1, bool)
+    out1[fwd_out] = False
+    out2 = np.ones(nout2, bool)
+    out2[bwd_out] = False
 
-    A2 = ss2.A
-    B2 = ss2.B[:, :nin2]
-    C2 = ss2.C[:nout2, :]
-    D2 = ss2.D[:nout2, :nin2]
+    B1t = ss1.B[:, in1]
+    B2t = ss2.B[:, in2]
+    C1t = ss1.C[out1, :]
+    C2t = ss2.C[out2, :]
 
-    gamma = 1 - D1[0, 1] * D2[1, 0]
+    d1fb = ss1.D[fwd_out, bwd_in]
+    d1f = ss1.D[fwd_out, in1]
+    d1b = ss1.D[out1, bwd_in]
+    D1t = ss1.D[out1, in1]
+    d2bf = ss2.D[bwd_out, fwd_in]
+    d2b = ss2.D[bwd_out, in2]
+    d2f = ss2.D[out2, fwd_in]
+    D2t = ss2.D[out2, in2]
 
-    U = np.array([[1, 0], [0, 0]])
-    L = np.array([[0, 0], [0, 1]])
-    I = np.eye(2)
+    Qc = np.eye(2) - np.array([[0, d1fb], [d2bf, 0]])
+    Cc = np.linalg.lstsq(Qc, np.block([[c1f, np.zeros(1, nst2)], [np.zeros(1, nst1), c2b]]))
+    Dc = np.linalg.lstsq(Qc, np.block([[d1f, np.zeros(1, nin2)], [np.zeros(1, nin1), d2b]]))
 
-    Q1 = I - D1 @ L @ D2 @ U
-    Q2 = I - D2 @ U @ D1 @ L
-
-    P1 = D1 @ (L @ D2 @ L + U)
-    P2 = D2 @ (U @ D1 @ U + L)
-
-    LQ1 = L @ np.linalg.inv(Q1)
-    LQ2 = L / gamma  # L @ np.linalg.inv(Q2)
-    UQ1 = U / gamma  # U @ np.linalg.inv(Q1)
-    UQ2 = U @ np.linalg.inv(Q2)
-
-    # I = np.eye(4)
-    # np.linalg.block_diag(D1@L,D2@U)
-
-    C = np.block([(LQ1 + UQ2 @ D2 @ U) @ C1, (UQ2 + LQ1 @ D1 @ L) @ C2])
-    D = UQ2 @ P2 + LQ1 @ P1
-
-    A = np.block(
-        [
-            [A1 + B1 @ LQ2 @ D2 @ U @ C1, B1 @ LQ2 @ C2],
-            [B2 @ UQ1 @ C1, A2 + B2 @ UQ1 @ D1 @ L @ C2],
-        ]
-    )
-    B = np.block([[B1 @ (LQ2 @ P2 + U)], [B2 @ (UQ1 @ P1 + L)]])
-
-    # b12 = B1[:, 1:2]
-    # b21 = B2[:, 0:1]
-    # c11 = C1[0:1, :]
-    # c22 = C2[1:2, :]
-    # (d111, d112), (d121, d122) = D1
-    # (d211, d212), (d221, d222) = D2
-
-    # A = np.zeros((nst, nst))
-    # A[:nst1, :nst1] = A1 + (b12 * d221 / gamma) @ c11
-    # A[:nst1, nst1:] = (b12 / gamma) @ c22
-    # A[nst1:, :nst1] = (b21 / gamma) @ c11
-    # A[nst1:, nst1:] = A2 + (b21 * d112) @ c22
-
-    # B = np.zeros((nst, nin))
-    # B[:nst1, :nout] = B1 @ np.array([[1, 0], [d111 * d221 / gamma, d222 / gamma]])
-    # B[nst1:, :nout] = B2 @ np.array([[d111 / gamma, d112 * d222 / gamma], [0, 1]])
-    # if naux1:
-    #     B[:nst1, nout:-naux2] = ss1.B[:, nout:]
-    # if naux2:
-    #     B[nst1:, -naux2:] = ss2.B[:, nout:]
-
-    # K1 = np.array([[d211 / gamma, 0], [d122 * d221 / gamma, 1]])
-    # K2 = np.array([[1, d112 * d211 / gamma], [0, d122 / gamma]])
-    # C = np.zeros((nout, nst))
-    # C[:, :nst1] = K1 @ C1
-    # C[:, nst1:] = K2 @ C2
-
-    # D = np.zeros((nout, nin))
-    # D[0, :nout] = [d111 * d211 / gamma, d112 * d211 * d222 / gamma + d212]
-    # D[1, :nout] = [d111 * d122 * d221 / gamma + d121, d122 * d222 / gamma]
-
-    # if naux1:
-    #     D[0, nout:-naux2] = K1 @ ss1.D[:, nout:]
-    # if naux2:
-    #     D[1, -naux2:] = K2 @ ss2.D[:, nout:]
-
+    
     return ct.ss(A, B, C, D, dt=ss1.dt)
