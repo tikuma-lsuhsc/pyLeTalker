@@ -21,7 +21,7 @@ series = segment.SeriesNetwork(viscous_loss, laminar_resistance)
 # pi_seg = segment.PiSegment(series, shunt)
 
 # H1, H2 = yielding_wall(areas[0], length), heat_loss(areas[0], length)
-# fs = 44100
+fs = 44100
 # sys = shunt(areas[0], length, fs=fs, sample_kws={"method": "bilinear"})
 # print(sys.ninputs)
 # x = np.random.randn(2, 10000)
@@ -46,11 +46,11 @@ s2 = segm(areas[1], length)
 
 sys1 = segment.cascade(s1, j)
 sys2 = segment.cascade(j, s2)
-
-sys = segm(areas[0], length)
+sample_kws = {"method": "bilinear"}
+sys = segm(areas[0], length, fs=fs, sample_kws=sample_kws)
 for area, prev_area in zip(areas[1:], areas[:-1]):
-    sys = segment.cascade(sys, jct(prev_area, area))
-    sys = segment.cascade(sys, segm(area, length))
+    sys = segment.cascade(sys, jct(prev_area, area, fs=fs, sample_kws=sample_kws))
+    sys = segment.cascade(sys, segm(area, length, fs=fs, sample_kws=sample_kws))
 
 print(sys)
 ct.bode_plot(

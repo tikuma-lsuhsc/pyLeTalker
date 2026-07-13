@@ -42,6 +42,80 @@ class LTISegmentFactory(Protocol):
         """
 
 
+class LTISourceFactory(Protocol):
+    @property
+    def ninputs(self) -> int:
+        """number of input signals to drive the source"""
+
+    def __call__(
+        self,
+        area: float,
+        length: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.LTI:
+        """Generate an LTI model with ninputs+1 (Backward port + source signal)
+            inputs and 1 output (Forward port)
+
+        Parameters
+        ----------
+        area
+            cross-sectional area in cm²
+        length
+            segment length in cm
+        fs, optional
+            sampling rate in samples/second to create a discrete-time model,
+            by default the created model will be a continuous-time model.
+        sample_kws, optional
+            Keyword arguments to run ``ct.sample()`` function to discretize
+            the model, by default the default parameters of ``ct.sample()`` will
+            be used.
+
+        Returns
+        -------
+            Generated model
+        """
+
+
+class LTISinkFactory(Protocol):
+    """acoustic radiation model factory"""
+
+    @property
+    def noutputs(self) -> int:
+        """number of output signals to the sink produces"""
+
+    def __call__(
+        self,
+        area: float,
+        length: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.LTI:
+        """Generate an LTI model with 1 input (Forward port)
+            and 1+noutputs output (Backwards port + radiation outputs)
+
+        Parameters
+        ----------
+        area
+            cross-sectional area in cm²
+        length
+            segment length in cm
+        fs, optional
+            sampling rate in samples/second to create a discrete-time model,
+            by default the created model will be a continuous-time model.
+        sample_kws, optional
+            Keyword arguments to run ``ct.sample()`` function to discretize
+            the model, by default the default parameters of ``ct.sample()`` will
+            be used.
+
+        Returns
+        -------
+            Generated model
+        """
+
+
 class TwoPortSystem(TimeSampleHandler, metaclass=abc.ABCMeta):
     @property
     def nb_elements(self) -> int:

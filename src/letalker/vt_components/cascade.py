@@ -2,7 +2,28 @@ import control as ct
 import numpy as np
 
 
-def cascade(sys1: ct.LTI, sys2: ct.LTI) -> ct.StateSpace:
+def cascade(*systems: tuple[ct.LTI]) -> ct.StateSpace:
+    """cascade two wave-reflection vocal tract subsystems
+
+    Parameters
+    ----------
+    sys1
+        leading subsystem, its first 2 outputs connects to sys2 inputs
+    sys2
+        following subsystem, its first 2 inputs connects to sys1 outputs
+
+    Returns
+    -------
+        cascaded system
+    """
+
+    sys = systems[0]
+    for s in systems[1:]:
+        sys = _cascade(sys, s)
+    return sys
+
+
+def _cascade(sys1: ct.LTI, sys2: ct.LTI) -> ct.StateSpace:
     """cascade two wave-reflection vocal tract subsystems
 
     Parameters

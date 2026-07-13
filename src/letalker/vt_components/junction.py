@@ -1,4 +1,4 @@
-from typing import Protocol
+from typing import Any, Protocol
 
 import control as ct
 import numpy as np
@@ -69,6 +69,8 @@ class LosslessJunction(LTIJunctionFactory):
         *,
         has_pressure_source: bool = False,
         has_flow_source: bool = False,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
     ) -> ct.StateSpace:
         """create a feed-through only two-port junction system
 
@@ -109,8 +111,5 @@ class LosslessJunction(LTIJunctionFactory):
             D[:, -1] = rhoc / den
 
         return ct.ss(
-            np.empty((0, 0)),
-            np.empty((0, nin)),
-            np.empty((2, 0)),
-            D,
+            np.empty((0, 0)), np.empty((0, nin)), np.empty((2, 0)), D, dt=fs and 1 / fs
         )
