@@ -6,6 +6,7 @@ import numpy as np
 from ..constants import c as c_default
 from ..constants import mu as mu_default
 from ..constants import rho_air as rho_air_default
+from ..constants import vt_atten as atten_default
 from .abc import LTISegmentFactory, LTISinkFactory, LTISourceFactory
 from .cascade import cascade
 
@@ -147,10 +148,10 @@ class DefaultViscousLossTF(LTISegmentFactory):
                 mu = self.mu
             else:
                 self.mu = mu
-            if rho is None:
-                rho = self.rho
+            if omega is None:
+                omega = self.omega
             else:
-                self.rho = rho
+                self.omega = omega
 
             self.sqrt_rhomu_half = ((rho * (mu or mu_default)) / 2) ** 0.5
 
@@ -422,11 +423,11 @@ class PiSegment(SegmentBase):
 
 
 class DTDelaySegmentBase(LTISegmentFactory):
-    alpha: float = 0.995
+    atten: float = atten_default
 
-    def __init__(self, alpha: float | None = None):
-        if alpha is not None:
-            self.alpha = alpha
+    def __init__(self, atten: float | None = None):
+        if atten is not None:
+            self.atten = atten
 
 
 class DTForwardDelay(DTDelaySegmentBase):
@@ -439,12 +440,14 @@ class DTForwardDelay(DTDelaySegmentBase):
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.LTI:
 
-        assert fs is not None
+        assert fs is not None, 'DTForwardDelay is discrete-time only'
+
+        alpha = 1 - self.atten / area**0.5
 
         A = np.zeros((1, 1))
-        B = np.array([[self.alpha, 0]])
+        B = np.array([[alpha, 0]])
         C = np.array([[1], [0]])
-        D = np.array([[0, 0], [0, self.alpha]])
+        D = np.array([[0, 0], [0, alpha]])
 
         return ct.ss(A, B, C, D, 1 / fs)
 
@@ -459,96 +462,13 @@ class DTBackwardDelay(DTDelaySegmentBase):
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.LTI:
 
-        assert fs is not None
+        assert fs is not None, 'DTBackwardDelay is discrete-time only'
+
+        alpha = 1 - self.atten / area**0.5
 
         A = np.zeros((1, 1))
-        B = np.array([[0, self.alpha]])
+        B = np.array([[0, alpha]])
         C = np.array([[0], [1]])
-        D = np.array([[self.alpha, 0], [0, 0]])
+        D = np.array([[alpha, 0], [0, 0]])
 
         return ct.ss(A, B, C, D, 1 / fs)
-
-
-class StoryLungPressureSource(LTISourceFactory):
-    z_ratio: float = 0.1  # impedance ratio
-
-    def __init__(self, z_ratio: float | None = None):
-
-        if z_ratio is not None:
-            self.z_ratio = z_ratio
-
-    @property
-    def ninputs(self) -> int:
-        return 1
-
-    def __call__(
-        self,
-        area: float,
-        length: float,
-        *,
-        fs: float | None = None,
-        sample_kws: dict[str, Any] | None = None,
-    ):
-        c = 1 / (1 + self.z_ratio)
-        return ct.ss([[]], [[]], [[]], [[self.z_ratio * c, c]])
-
-
-class AcousticRadiationSink(LTISinkFactory):
-    """Flanagan's a-piston-in-an-infinite-baffle model"""
-
-    c: float = c_default
-    rho: float = rho_air_default
-
-    def __init__(
-        self,
-        rho: float | None = None,
-        c: float | None = None,
-    ):
-        super().__init__()
-
-        if rho is not None:
-            self.rho = rho
-        if c is not None:
-            self.c = c
-
-    @property
-    def noutputs(self) -> int:
-        return 1
-
-    def __call__(
-        self,
-        area: float,
-        length: float,
-        *,
-        fs: float | None = None,
-        sample_kws: dict[str, Any] | None = None,
-    ):
-        """generate a 1x2 system (F -> [Pr;B])
-
-        Parameters
-        ----------
-        area
-            _description_
-        length
-            _description_
-        fs, optional
-            _description_, by default None
-        sample_kws, optional
-            _description_, by default None
-
-        Returns
-        -------
-            _description_
-        """
-        rhoc = self.rho * self.c
-        ZM = rhoc / area
-        a = (area / np.pi) ** 0.5
-
-        R = 128 * ZM / (9 * np.pi**2)
-        L = 8 * a * ZM / (3 * np.pi * self.c)
-
-        s = ct.TransferFunction.s  # or ct.tf('s')
-        Hr = ((s * R * L) / (R + L * s)).to_ss()
-
-        c = 1 / (Hr.d * area + rhoc)
-        return ct.ss([[]], [[]], [[]], [[self.z_ratio * c, c]])

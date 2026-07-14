@@ -1,35 +1,39 @@
+from typing import cast
 import control as ct
 import numpy as np
 
 
-def cascade(*systems: tuple[ct.LTI]) -> ct.StateSpace:
-    """cascade two wave-reflection vocal tract subsystems
+def chain(*systems: *tuple[ct.LTI]) -> ct.StateSpace:
+    """cascade a chain of single-port I/O subsystems
 
     Parameters
     ----------
-    sys1
-        leading subsystem, its first 2 outputs connects to sys2 inputs
-    sys2
-        following subsystem, its first 2 inputs connects to sys1 outputs
+    *systems
+        N systems to be chained in the presented order. Every system
+        must have the forward ports as the first input and output
+        and the backward ports as the second input and output.
 
     Returns
     -------
-        cascaded system
+        cascaded system, of which the first two inputs are [F1,BN] and 
+        the last two outputs are [FN,B1]
     """
 
     sys = systems[0]
     for s in systems[1:]:
-        sys = _cascade(sys, s)
+        sys = cascade(sys, s)
+
     return sys
 
 
-def _cascade(
+def cascade(
     sys1: ct.LTI,
     sys2: ct.LTI,
     fwd_out: int = 0,
     bwd_in: int = 1,
     bwd_out: int = 1,
     fwd_in: int = 0,
+    bubble: bool=True
 ) -> ct.StateSpace:
     """cascade two wave-reflection vocal tract subsystems
 
@@ -52,8 +56,8 @@ def _cascade(
     -------
         cascaded system
     """
-    ss1 = ct.ss(sys1)
-    ss2 = ct.ss(sys2)
+    ss1 = cast(ct.StateSpace,ct.ss(sys1))
+    ss2 = cast(ct.StateSpace,ct.ss(sys2))
 
     nst1, nst2 = ss1.nstates, ss2.nstates
     nin1, nin2 = ss1.ninputs, ss2.ninputs
@@ -65,10 +69,10 @@ def _cascade(
     assert (
         nin1 is not None
         and nin2 is not None
-        and nout1 >= 2
-        and nout2 >= 2
-        and nin1 >= 2
-        and nin2 >= 2
+        and nout1 >= 1
+        and nout2 >= 1
+        and nin1 >= 1
+        and nin2 >= 1
         and ss1.dt == ss2.dt
     )
 
@@ -128,4 +132,27 @@ def _cascade(
         + Dcc @ Dc
     )
 
-    return ct.ss(A, B, C, D, dt=ss1.dt)
+    sys = cast(ct.StateSpace,ct.ss(A, B, C, D, dt=ss1.dt))
+
+    # fwd_out, optional
+    #     sys1 forward output port index, by default 0
+    # bwd_in, optional
+    #     sys1 backward input port index, by default 1
+    # bwd_out, optional
+    #     sys2 backward output port index, by default 1
+    # fwd_in, optional
+
+    if nin1>2:
+        # reorder the columns of D matrix so that the inputs are [F1,B3,xaux1,xaux2]
+        # place the B3 at index bwd_in
+        i_from = nin1+fwd_in
+        i_to = bwd_in
+        sys.D
+    if nout2>2:
+        # reorder the rows of C & D matrices so that the outputs are [F3,B1,yaux1,yaux2]
+        # place the B1 at index bwd_out
+        i_from = nin2+fwd_out
+        ito = bwd_out
+        sys.C
+
+    return sys
