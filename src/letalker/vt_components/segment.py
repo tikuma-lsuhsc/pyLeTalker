@@ -442,8 +442,8 @@ class DTForwardDelay(DTDelaySegmentBase):
         assert fs is not None
 
         A = np.zeros((1, 1))
-        B = np.array([[1, 0]])
-        C = np.array([[self.alpha], [0]])
+        B = np.array([[self.alpha, 0]])
+        C = np.array([[1], [0]])
         D = np.array([[0, 0], [0, self.alpha]])
 
         return ct.ss(A, B, C, D, 1 / fs)
@@ -462,8 +462,8 @@ class DTBackwardDelay(DTDelaySegmentBase):
         assert fs is not None
 
         A = np.zeros((1, 1))
-        B = np.array([[0, 1]])
-        C = np.array([[0], [self.alpha]])
+        B = np.array([[0, self.alpha]])
+        C = np.array([[0], [1]])
         D = np.array([[self.alpha, 0], [0, 0]])
 
         return ct.ss(A, B, C, D, 1 / fs)

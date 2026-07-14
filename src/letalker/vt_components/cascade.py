@@ -59,6 +59,9 @@ def _cascade(
     nin1, nin2 = ss1.ninputs, ss2.ninputs
     nout1, nout2 = ss1.noutputs, ss2.noutputs
 
+    nin1t, nin2t = nin1 - 1, nin2 - 1
+    nout1t, nout2t = nout1 - 1, nout2 - 1
+
     assert (
         nin1 is not None
         and nin2 is not None
@@ -69,10 +72,10 @@ def _cascade(
         and ss1.dt == ss2.dt
     )
 
-    b1b = ss1.B[:, bwd_in]
-    b2f = ss2.B[:, fwd_in]
-    c1f = ss1.C[fwd_out, :]
-    c2b = ss2.C[bwd_out, :]
+    b1b = ss1.B[:, bwd_in : bwd_in + 1]
+    b2f = ss2.B[:, fwd_in : fwd_in + 1]
+    c1f = ss1.C[fwd_out : fwd_out + 1, :]
+    c2b = ss2.C[bwd_out : bwd_out + 1, :]
 
     in1 = np.ones(nin1, bool)
     in1[bwd_in] = False
@@ -99,8 +102,30 @@ def _cascade(
     D2t = ss2.D[out2, in2]
 
     Qc = np.eye(2) - np.array([[0, d1fb], [d2bf, 0]])
-    Cc = np.linalg.lstsq(Qc, np.block([[c1f, np.zeros(1, nst2)], [np.zeros(1, nst1), c2b]]))
-    Dc = np.linalg.lstsq(Qc, np.block([[d1f, np.zeros(1, nin2)], [np.zeros(1, nin1), d2b]]))
+    Cc = np.linalg.lstsq(
+        Qc, np.block([[c1f, np.zeros((1, nst2))], [np.zeros((1, nst1)), c2b]])
+    )[0]
+    Dc = np.linalg.lstsq(
+        Qc, np.block([[d1f, np.zeros((1, nin2t))], [np.zeros((1, nin1t)), d2b]])
+    )[0]
 
-    
+    Bcc = np.block([[np.zeros((nst1, 1)), b1b], [b2f, np.zeros((nst2, 1))]])
+    A = (
+        np.block([[ss1.A, np.zeros((nst1, nst2))], [np.zeros((nst2, nst1)), ss2.A]])
+        + Bcc @ Cc
+    )
+    B = (
+        np.block([[B1t, np.zeros((nst1, nin2t))], [np.zeros((nst2, nin1t)), B2t]])
+        + Bcc @ Dc
+    )
+    Dcc = np.block([[d2f, np.zeros((nout2t, 1))], [np.zeros((nout1t, 1)), d1b]])
+    C = (
+        np.block([[np.zeros((nout2t, nst1)), C2t], [C1t, np.zeros((nout1t, nst2))]])
+        + Dcc @ Cc
+    )
+    D = (
+        np.block([[np.zeros((nout2t, nin1t)), D2t], [D1t, np.zeros((nout1t, nin2t))]])
+        + Dcc @ Dc
+    )
+
     return ct.ss(A, B, C, D, dt=ss1.dt)
