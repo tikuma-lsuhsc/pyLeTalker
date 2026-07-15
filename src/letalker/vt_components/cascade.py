@@ -73,7 +73,7 @@ def cascade(
         and nout2 >= 1
         and nin1 >= 1
         and nin2 >= 1
-        and ss1.dt == ss2.dt
+        and np.isclose(ss1.dt, ss2.dt)
     )
 
     b1b = ss1.B[:, bwd_in : bwd_in + 1]
@@ -133,6 +133,17 @@ def cascade(
     )
 
     sys = cast(ct.StateSpace, ct.ss(A, B, C, D, dt=ss1.dt))
+
+    # label the signals
+    names1in = [name for i, name in enumerate(ss1.input_labels) if i != bwd_in]
+    names1out = [name for i, name in enumerate(ss1.output_labels) if i != fwd_out]
+    names2in = [name for i, name in enumerate(ss2.input_labels) if i != fwd_in]
+    names2out = [name for i, name in enumerate(ss2.output_labels) if i != bwd_out]
+    sys.update_names(
+        inputs=[*names1in, *names2in],
+        outputs=[*names2out, *names1out],
+        states=[*ss1.state_labels, *ss2.state_labels],
+    )
 
     # fwd_out, optional
     #     sys1 forward output port index, by default 0

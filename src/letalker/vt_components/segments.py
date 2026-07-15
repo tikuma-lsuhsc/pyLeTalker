@@ -53,6 +53,7 @@ class DefaultYieldingWall(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """Create a tf model of one vocal tract segment
 
@@ -106,6 +107,7 @@ class DefaultHeatLossGain(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
 
         return ct.tf([self.Gt * length * area**-0.5], [1.0], dt=fs and 1 / fs)
@@ -166,6 +168,7 @@ class DefaultViscousLossTF(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
 
         # r = (area / np.pi) ** 0.5
@@ -203,6 +206,7 @@ class DefaultLaminarResistance(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
 
         return ct.tf([8 * np.pi * self.mu * area**-2 * length], [1.0], dt=fs and 1 / fs)
@@ -250,6 +254,7 @@ class ShuntNetwork(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """generate state-space models and iterate over n samples
 
@@ -320,6 +325,7 @@ class SeriesNetwork(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """generate a 2-in/2-out state-space model of from (F1,B2)->(F2,B1)
 
@@ -390,6 +396,7 @@ class TSegment(SegmentBase):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
 
         series = self.series(area, length / 2)
@@ -411,6 +418,7 @@ class PiSegment(SegmentBase):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
 
         shunt = self.shunt(area, length / 2)
@@ -438,9 +446,12 @@ class DTForwardDelay(DTDelaySegmentBase):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
+        input_id: int = 1,
+        output_id: int = 2,
     ) -> ct.LTI:
 
-        assert fs is not None, 'DTForwardDelay is discrete-time only'
+        assert fs is not None, "DTForwardDelay is discrete-time only"
 
         alpha = 1 - self.atten / area**0.5
 
@@ -449,7 +460,17 @@ class DTForwardDelay(DTDelaySegmentBase):
         C = np.array([[1], [0]])
         D = np.array([[0, 0], [0, alpha]])
 
-        return ct.ss(A, B, C, D, 1 / fs)
+        return ct.ss(
+            A,
+            B,
+            C,
+            D,
+            1 / fs,
+            name="forward_delay",
+            inputs=[f"F{input_id}", f"B{output_id}"],
+            outputs=[f"F{output_id}", f"B{input_id}"],
+            states=[f"next_F{output_id}"]
+        )
 
 
 class DTBackwardDelay(DTDelaySegmentBase):
@@ -460,9 +481,12 @@ class DTBackwardDelay(DTDelaySegmentBase):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
+        input_id: int = 1,
+        output_id: int = 2,
     ) -> ct.LTI:
 
-        assert fs is not None, 'DTBackwardDelay is discrete-time only'
+        assert fs is not None, "DTBackwardDelay is discrete-time only"
 
         alpha = 1 - self.atten / area**0.5
 
@@ -471,4 +495,14 @@ class DTBackwardDelay(DTDelaySegmentBase):
         C = np.array([[0], [1]])
         D = np.array([[alpha, 0], [0, 0]])
 
-        return ct.ss(A, B, C, D, 1 / fs)
+        return ct.ss(
+            A,
+            B,
+            C,
+            D,
+            1 / fs,
+            name="forward_delay",
+            inputs=[f"F{input_id}", f"B{output_id}"],
+            outputs=[f"F{output_id}", f"B{input_id}"],
+            states=[f"next_B{input_id}"]
+        )

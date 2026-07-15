@@ -19,6 +19,7 @@ class LTISegmentFactory(Protocol):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """Generate an LTI model for a vocal tract segment
 
@@ -35,6 +36,10 @@ class LTISegmentFactory(Protocol):
             Keyword arguments to run ``ct.sample()`` function to discretize
             the model, by default the default parameters of ``ct.sample()`` will
             be used.
+        sample_last, optional
+            True to generate the subsystems in the continuous-time then
+            convert to the discrete time at the end, by default False to sample
+            the original continous-time systems
 
         Returns
         -------
@@ -54,6 +59,7 @@ class LTISourceFactory(Protocol):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """Generate an LTI model with ninputs+1 (Backward port + source signal)
             inputs and 1 output (Forward port)
@@ -92,6 +98,7 @@ class LTISinkFactory(Protocol):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """Generate an LTI model with 1 input (Forward port)
             and 1+noutputs output (Backwards port + radiation outputs)

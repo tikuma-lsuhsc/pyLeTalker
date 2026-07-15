@@ -23,6 +23,7 @@ dependencies = [
     "numpy",
     "scipy",
     "control",
+    "slycot",
 ]
 
 [project.urls]

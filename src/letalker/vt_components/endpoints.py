@@ -16,6 +16,7 @@ class LTISinkFactory(Protocol):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.LTI:
         """Create a sink model (e.g., mouth/nose radiation)
 
@@ -78,6 +79,7 @@ class LeTalkerLungs(LTISourceFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.StateSpace:
 
         return ct.StateSpace(
@@ -120,6 +122,7 @@ class FlanaganRadiationLoad(LTISinkFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.TransferFunction:
         """Create a tf model of one vocal tract segment
 
@@ -153,14 +156,24 @@ class FlanaganRadiationLoad(LTISinkFactory):
         )
 
 
-class TwoPortFlanaganRadiator(LTISinkFactory):
+class TwoPortAcousticRadiator(LTISinkFactory):
     rhoc: float = rhoc_default
     u_to_rad: LTISinkFactory = FlanaganRadiationLoad()
 
-    def __init__(self, sys: LTISinkFactory | None = None, rhoc: float | None = None):
+    def __init__(
+        self, rad_load: LTISinkFactory | None = None, rhoc: float | None = None
+    ):
+        """Two-port radiator based on a radiation impedance (a U->P system)
 
-        if sys is not None:
-            self.u_to_rad = sys
+        Parameters
+        ----------
+        rad_load, optional
+            radiation load system factory, by default FlanaganRadiationLoad is used
+        rhoc, optional
+            _description_, by default None
+        """
+        if rad_load is not None:
+            self.u_to_rad = rad_load
         if rhoc is not None:
             self.rhoc = rhoc
 
@@ -170,6 +183,7 @@ class TwoPortFlanaganRadiator(LTISinkFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.StateSpace:
         """Two-port reflective version of Flanagan's model with a piston in an infinite baffle
 
@@ -188,27 +202,118 @@ class TwoPortFlanaganRadiator(LTISinkFactory):
 
             The radiated pressure output replaces the standard forward output term.
         """
-        ss = cast(ct.StateSpace, self.u_to_rad(area).to_ss())
+
+        ss = cast(
+            ct.StateSpace,
+            (
+                self.u_to_rad(area)
+                if sample_last
+                else self.u_to_rad(area, fs=fs, sample_kws=sample_kws)
+            ).to_ss(),
+        )
+
         assert ss.ninputs == 1 and ss.noutputs == 1
 
         z = self.rhoc / area
-        dz = cast(float, ss.D[0, 0]) / z
+        a = cast(float, ss.D[0, 0]) / z
 
-        Q = np.array([[1 + dz, 0], [dz, 1]])
-        C = np.linalg.lstsq(Q, np.full((2, 1), ss.C))[0]
-        D = np.linalg.lstsq(Q, np.array([[dz - 1], [dz]]))[0]
-        A = ss.A - ss.B @ C[0, :]
-        B = ss.B * (1 / z - D[0, 0])
+        nst = ss.nstates
 
-        sys = cast(ct.StateSpace, ct.ss(A, B, C, D))
+        den = a + 1
+        c0 = ss.C / den
+        d0 = (a - 1) / den
 
-        if fs is not None:
+        C = np.tile(c0, (2, 1))
+        D = np.array([[d0], [1 + d0]])
+        # Q = np.array([[0, a + 1], [1, -1]])
+        # C = np.linalg.lstsq(Q, np.block([[ss.C], [np.zeros((1, nst))]]))[0]
+        # D = np.linalg.lstsq(Q, np.array([[a - 1], [1]]))[0]
+        A = ss.A - ss.B @ C[0, :] / z
+        B = ss.B * ((1 - D[0, 0]) / z)
+
+        sys = cast(ct.StateSpace, ct.ss(A, B, C, D, dt=ss.dt))
+
+        if sample_last and fs is not None:
             sys = sys.sample(1 / fs, **(sample_kws or {}))
 
         return sys
 
 
+class TwoPortStoryRadiator(LTISinkFactory):
+    rhoc: float = rhoc_default
+    u_to_rad: LTISinkFactory = FlanaganRadiationLoad()
+
+    def __init__(self, sys: LTISinkFactory | None = None, rhoc: float | None = None):
+
+        if sys is not None:
+            self.u_to_rad = sys
+        if rhoc is not None:
+            self.rhoc = rhoc
+
+    def __call__(
+        self,
+        area: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
+    ) -> ct.TransferFunction:
+        """Two-port reflective version of Flanagan's model with a piston in an infinite baffle
+
+        Parameters
+        ----------
+        area
+            _description_
+        fs, optional
+            _description_, by default None
+        sample_kws, optional
+            _description_, by default None
+
+        Returns
+        -------
+            one-input (forward pressure)/two-output (radiated pressure & backward pressure)
+
+            The radiated pressure output replaces the standard forward output term.
+        """
+        ss = cast(ct.TransferFunction, self.u_to_rad(area))
+        assert ss.ninputs == 1 and ss.noutputs == 1
+        assert fs is not None
+
+        L, R = ss.den[0][0]
+
+        z = self.rhoc / area
+
+        Rp = R / z
+        Lp = 2 * fs * L / z
+        RLp = Rp * Lp
+
+        # TF coefficients
+        a2 = -Rp - Lp + RLp
+        a1 = -Rp + Lp - RLp
+        b2 = Rp + Lp + RLp
+        b1 = -Rp + Lp + RLp
+
+        B1num = [a2 / b2, a1 / b2]
+        B1den = [1, -b1 / b2]
+        Pnum = [(b2 + a2) / b2, (a1 - b1) / b2]
+        Pden = [1, -b1 / b2]
+
+        # [B1;P] <- [F1]
+        return ct.tf([[B1num], [Pnum]], [[B1den], [Pden]], 1 / fs)
+
+
 class VFFlowSource(LTISourceFactory):
+    """Superior face of vocal folds interfacing the the first segment of the vocal tract
+
+    Parameters
+    ----------
+    LTISourceFactory
+        _description_
+
+    Returns
+    -------
+        _description_
+    """    
     rhoc: float = rhoc_default
 
     def __init__(self, rhoc: float | None = None):
@@ -222,12 +327,13 @@ class VFFlowSource(LTISourceFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
     ) -> ct.StateSpace:
 
         return ct.StateSpace(
             np.zeros([0, 0]),
             np.zeros([0, 2]),
             np.zeros([1, 0]),
-            np.array([[self.rhoc / area, 0.9]]),
+            np.array([[self.rhoc / area, 1.0]]),
             fs and 1 / fs,
         )

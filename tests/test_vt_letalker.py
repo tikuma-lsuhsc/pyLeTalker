@@ -27,11 +27,15 @@ def test_junction():
 
 
 def test_lips():
-    lips = endpoints.TwoPortFlanaganRadiator()
+    lips = endpoints.TwoPortAcousticRadiator()
 
     area = vocaltract_areas["aa"][-1]
     fs = 44100
-    lips(area, fs=fs)
+    sys = lips(area, fs=fs, sample_kws={"method": "bilinear"}).to_tf()
+
+    ss = endpoints.FlanaganRadiationLoad()(area, fs=fs)
+    ss1 = endpoints.TwoPortStoryRadiator()(area, fs=fs)
+    assert ss1 == sys
 
 
 def _test_chain():
@@ -82,9 +86,11 @@ def _test_vt_components_letalker():
     for area1, area2, s2 in zip(areas[1::2], areas[2::2], segms[1:]):
         sys = cascade.chain(sys, jct(area1, area2, fs=fs), s2)
 
-    lips = endpoints.TwoPortFlanaganRadiator()
+    sample_kws = {"method": "bilinear"}
+    lips = endpoints.TwoPortAcousticRadiator()
+    # lips = endpoints.TwoPortStoryRadiator()#TwoPortAcousticRadiator()
     sys = cascade.cascade(
-        sys, lips(areas[-1], fs=fs, sample_kws={"method": "bilinear"})
+        sys, lips(areas[-1], fs=fs, sample_kws=sample_kws)
     )
 
     vf_src = endpoints.VFFlowSource()

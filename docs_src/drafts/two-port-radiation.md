@@ -1,16 +1,13 @@
 # State-space representation of the radiation impedance load
 
-Flanagan estimated the radiation load by a piston in an infinite baffle. This model
-represents the termination by a first-order system
-
+Flanagan estimated the radiation load by a piston in an infinite baffle. This model represents the termination of a wave-reflection two-port transmission-line model by a first-order LTI subsystem
 $$
 \begin{equation}
-H_r(s) \triangleq \frac{P_r}{U_r} = \frac{sRL}{R+sL}
+H(s) \triangleq \frac{P}{U} = \frac{sRL}{R+sL}
 \end{equation}
 $$
-
-where $P_r$ is the pressure across the impedance and $U_r$ is the flow through
-the impedance., and
+where $P$ is the pressure across the impedance and $U$ is the flow through
+the impedance, 
 $$
 R = \frac{128 Z}{9\pi^2} \text{ and } L = \frac{8aZ}{3\pi c}.
 $$
@@ -19,118 +16,59 @@ Here, $A$ and $Z = \rho c/A$ are respectively the cross-sectional area and the c
 Let a state-space model representation of this system as
 $$
 \begin{align}
-\dot{\mathbf{s}} &= \mathbf{A} \mathbf{s} + \mathbf{b} U\\
-P &= \mathbf{c} \mathbf{s} + d U\\
+\dot{\mathbf{s}} &= \mathbf{A}_r \mathbf{s} + \mathbf{b}_r U\\
+P &= \mathbf{c}_r \mathbf{s} + d_r U\\
 \end{align}
 $$
-The partial pressures $F$ and $B$ are defined by
+(We generically assume unknown number of states though (1) is a first-order system.) The partial pressures $F$ and $B$ are defined by
 $$
 \begin{align}
 F + B &= P\\
 \frac{F - B}{Z} &= U\\
 \end{align}
 $$
-Substituting the output equation and the flow preservation equation into the pressure preservation equation yields
+Substituting the flow preservation equation (5) into the output equation (3)  then into the pressure preservation equation (4) yields
 $$
 \begin{align}
-P &= \mathbf{c} \mathbf{s} + \frac{d}{Z} \left(F-B\right)\\
-F + B &= \mathbf{c} \mathbf{s} + \frac{d}{Z} \left(F-B\right)\\
+F + B &= \mathbf{c}_r \mathbf{s} + \frac{d_r}{Z} \left(F-B\right)\\
 \end{align}
 $$
-Solve for $B$
+Gather $B$ to the left-hand side:
+$$
+\begin{equation}
+\left(\frac{d_r}{Z} +1\right)B = \mathbf{c}_r \mathbf{s} + \left(\frac{d_r}{Z} - 1\right)F
+\end{equation}
+$$
+Manipulate the pressure preservation equation (4) so that the $P$ and $B$ are on the left-hand side, and combine it with (7) as a vector-matrix equation:
+$$
+\begin{bmatrix}0 & \frac{d_r}{Z}+1\\1 & -1\end{bmatrix}
+\begin{bmatrix}P\\B\end{bmatrix} 
+=\begin{bmatrix}\mathbf{c}_r \\ \mathbf{0}\end{bmatrix}\mathbf{s} 
++\begin{bmatrix}\frac{d_r}{Z} - 1 \\ 1\end{bmatrix}F
+$$
+Let
+$$
+\mathbf{Q} = \begin{bmatrix}0 & \frac{d_r}{Z}+1\\1 & -1\end{bmatrix}
+$$
+so that the output and feedthrough matrices of the two-port system are given by
 $$
 \begin{align}
-\left(\frac{d}{Z} +1\right)B &= \mathbf{c} \mathbf{s} + \left(\frac{d}{Z} - 1\right)F\\
-B &= \frac{\mathbf{c}}{\frac{d}{Z} +1} \mathbf{s} + \frac{\frac{d}{Z} - 1}{\frac{d}{Z} +1}F\\
+\mathbf{C} &= \mathbf{Q}^{-1}\begin{bmatrix}\mathbf{c}_r\\\mathbf{0}\end{bmatrix} \in \mathbb{R}^{2 \times n_{st}}\\
+\mathbf{d} &= \mathbf{Q}^{-1}\begin{bmatrix}\frac{d_r}{Z} - 1 \\ 1\end{bmatrix} \in \mathbb{R}^2
 \end{align}
 $$
-Hence,
+To convert the state equation, substitute (5) into (2):
 $$
 \begin{align}
-\begin{bmatrix}
-P \\ B\\
-\end{bmatrix}
-&= 
-\frac{1}{\frac{d}{Z} +1}
-\begin{bmatrix}
-\mathbf{c} \\ \mathbf{c}\\
-\end{bmatrix}
-\mathbf{s}
-+
-\frac{1}{\frac{d}{Z} +1}
-\begin{bmatrix}
-2 \frac{d}{Z}\\
-\frac{d}{Z} - 1\\
-\end{bmatrix}
-F
+\dot{\mathbf{s}} &= \mathbf{A}_r \mathbf{s} + \mathbf{b}_r \frac{F - B}{Z}\\
+ &= \mathbf{A}_r \mathbf{s} + \mathbf{b}_r \frac{F - (\mathbf{c}_0 \mathbf{s} + d_0 F)}{Z}\\
 \end{align}
 $$
-
-$$
-\begin{equation}\begin{aligned}
-(1 + d_rZ^{-1})B &= \mathbf{c}_r \mathbf{s} + (d_rZ^{-1} - 1)F\\
-B &= \frac{1}{d_rZ^{-1}+1}\mathbf{c}_r \mathbf{s} + \frac{d_rZ^{-1} - 1}{d_rZ^{-1}+1}F\\
-  &= \frac{\rho c}{d_rA+\rho c}\mathbf{c}_r \mathbf{s} + \frac{d_rA - \rho c}{d_rA+\rho c}F\\
-\end{aligned}\end{equation}
-$$
-
-Then, the radiated pressure is calculated by
-
-$$
-\begin{aligned}
-P_r &= F+B \\
-    &= F + \frac{\rho c}{d_rA+\rho c}\mathbf{c}_r \mathbf{s} + \frac{d_rA - \rho c}{d_rA+\rho c}F\\
-    &= \frac{\rho c}{d_rA+\rho c}\mathbf{c}_r \mathbf{s} + \frac{2d_rA}{d_rA+\rho c}F\\  
-\end{aligned}
-$$
-
-The state update equation in (64) is converted to take $F$ as the input by
-substituting (67) and then (68), followed by algebraic simplification:
-
-$$
-\begin{equation}\begin{aligned}
-\dot{\mathbf{s}} &= \mathbf{A}_r \mathbf{s} + \mathbf{b}_r Z^{-1} \left[F-\left(\frac{1}{d_rZ^{-1}+1}\mathbf{c}_r \mathbf{s} + \frac{d_rZ^{-1} - 1}{d_rZ^{-1}+1}F\right)\right]\\
-&= \left[\mathbf{A}_r - \mathbf{b}_r \frac{Z^{-1}}{d_rZ^{-1}+1}\mathbf{c}_r\right] \mathbf{s} + \mathbf{b}_r \left[\frac{2Z^{-1}}{d_rZ^{-1}+1}\right]F\\
-&= \left[\mathbf{A}_r - \mathbf{b}_r \frac{A}{d_rA+\rho c}\mathbf{c}_r\right] \mathbf{s} + \mathbf{b}_r \left[\frac{2A}{d_rA+\rho c}\right]F
-\end{aligned}\end{equation}
-$$
-
-In summary,
-
+where $\mathbf{c}_0$ is the first row of $\mathbf{C}$ in (8) and $d_0$ is the first element of $\mathbf{d}$ in (9), respectively.
+The final simplification yields
 $$
 \begin{align}
-\mathbf{A} &= \mathbf{A}_r - \mathbf{b}_r \frac{A}{d_rA+\rho c}\mathbf{c}_r\\
-\mathbf{b} &= \mathbf{b}_r \left[\frac{2A}{d_rA+\rho c}\right]\\
-\mathbf{c} &= \frac{1}{d_rZ^{-1}+1}\mathbf{c}_r\\
-d &= \frac{d_rA - \rho c}{d_rA+\rho c}\\
-\end{align}
-$$
-
-Since there is no foward pressure output, appending this block to another reduces
-the joined system to be SISO and $\mathbf{B}$, $\mathbf{C}$ and $\mathbf{D}$
-matrices in (32)-(34) reduce to
-
-$$
-\begin{align}
-\mathbf{b} &= 
-\frac{1}{\gamma}
-\begin{bmatrix}
-\mathbf{B}_1 & \mathbf{0}\\
-\mathbf{0} & \mathbf{b}_2 \\
-\end{bmatrix}
-\begin{bmatrix}
-\gamma\\
-d_{1,11}d_{2,21}\\
-d_{1,11}\\
-\end{bmatrix}\\
-\mathbf{c} &= \frac{1}{\gamma}
-\begin{bmatrix}
-d_{1,22}d_{2,21} & \gamma &  d_{1,22}\\
-\end{bmatrix}
-\begin{bmatrix}
-\mathbf{C}_1 &0\\
-0 & \mathbf{c}_2
-\end{bmatrix}\\
-d &= \frac{d_{1,22}d_{2,21}d_{1,11}+d_{1,21}}{\gamma}\\
+\mathbf{A} &= \mathbf{A}_r - \mathbf{b}_r\frac{1}{Z}\mathbf{c}_0 \in \mathbb{R}^{n_{st} \times n_{st}}\\
+\mathbf{b} &= \mathbf{b}_r \left(1 - d_0\right) \frac{1}{Z} \in \mathbb{R}^{n_{st}}\\
 \end{align}
 $$
