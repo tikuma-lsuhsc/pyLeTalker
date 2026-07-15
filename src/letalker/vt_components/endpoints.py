@@ -1,5 +1,4 @@
-from typing import Any, Protocol
-from typing import cast
+from typing import Any, Protocol, cast
 
 import control as ct
 import numpy as np
@@ -172,7 +171,23 @@ class TwoPortFlanaganRadiator(LTISinkFactory):
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.StateSpace:
+        """Two-port reflective version of Flanagan's model with a piston in an infinite buffle
 
+        Parameters
+        ----------
+        area
+            _description_
+        fs, optional
+            _description_, by default None
+        sample_kws, optional
+            _description_, by default None
+
+        Returns
+        -------
+            one-input (forward pressure)/two-output (radiated pressure & backward pressure)
+
+            The radiated pressure output replaces the standard forward output term.
+        """
         ss = cast(ct.StateSpace, self.u_to_rad(area).to_ss())
         assert ss.ninputs == 1 and ss.noutputs == 1
 
@@ -191,3 +206,28 @@ class TwoPortFlanaganRadiator(LTISinkFactory):
             sys = sys.sample(1 / fs, **(sample_kws or {}))
 
         return sys
+
+
+class VFFlowSource(LTISourceFactory):
+    rhoc: float = rhoc_default
+
+    def __init__(self, rhoc: float | None = None):
+
+        if rhoc is not None:
+            self.rhoc = rhoc
+
+    def __call__(
+        self,
+        area: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.StateSpace:
+
+        return ct.StateSpace(
+            np.zeros([0, 0]),
+            np.zeros([0, 2]),
+            np.zeros([1, 0]),
+            np.array([[self.rhoc / area, 0.9]]),
+            fs and 1 / fs,
+        )

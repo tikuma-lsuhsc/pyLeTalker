@@ -1,4 +1,5 @@
 from typing import cast
+
 import control as ct
 import numpy as np
 
@@ -15,7 +16,7 @@ def chain(*systems: *tuple[ct.LTI]) -> ct.StateSpace:
 
     Returns
     -------
-        cascaded system, of which the first two inputs are [F1,BN] and 
+        cascaded system, of which the first two inputs are [F1,BN] and
         the last two outputs are [FN,B1]
     """
 
@@ -33,7 +34,6 @@ def cascade(
     bwd_in: int = 1,
     bwd_out: int = 1,
     fwd_in: int = 0,
-    bubble: bool=True
 ) -> ct.StateSpace:
     """cascade two wave-reflection vocal tract subsystems
 
@@ -56,8 +56,8 @@ def cascade(
     -------
         cascaded system
     """
-    ss1 = cast(ct.StateSpace,ct.ss(sys1))
-    ss2 = cast(ct.StateSpace,ct.ss(sys2))
+    ss1 = cast(ct.StateSpace, ct.ss(sys1))
+    ss2 = cast(ct.StateSpace, ct.ss(sys2))
 
     nst1, nst2 = ss1.nstates, ss2.nstates
     nin1, nin2 = ss1.ninputs, ss2.ninputs
@@ -132,7 +132,7 @@ def cascade(
         + Dcc @ Dc
     )
 
-    sys = cast(ct.StateSpace,ct.ss(A, B, C, D, dt=ss1.dt))
+    sys = cast(ct.StateSpace, ct.ss(A, B, C, D, dt=ss1.dt))
 
     # fwd_out, optional
     #     sys1 forward output port index, by default 0
@@ -142,16 +142,16 @@ def cascade(
     #     sys2 backward output port index, by default 1
     # fwd_in, optional
 
-    if nin1>2:
+    if nin1 > 2:
         # reorder the columns of D matrix so that the inputs are [F1,B3,xaux1,xaux2]
         # place the B3 at index bwd_in
-        i_from = nin1+fwd_in
+        i_from = nin1 + fwd_in
         i_to = bwd_in
         sys.D
-    if nout2>2:
+    if nout2 > 2:
         # reorder the rows of C & D matrices so that the outputs are [F3,B1,yaux1,yaux2]
         # place the B1 at index bwd_out
-        i_from = nin2+fwd_out
+        i_from = nin2 + fwd_out
         ito = bwd_out
         sys.C
 

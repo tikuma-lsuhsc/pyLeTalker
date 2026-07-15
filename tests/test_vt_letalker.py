@@ -4,7 +4,7 @@ from scipy.signal import freqz
 
 from letalker.constants import vocaltract_areas
 from letalker.constants import vocaltract_resolution as length
-from letalker.vt_components import junctions, segments, cascade, endpoints
+from letalker.vt_components import cascade, endpoints, junctions, segments
 
 
 def test_junction():
@@ -67,7 +67,15 @@ def _test_vt_components_letalker():
         sys = cascade.chain(sys, jct(area1, area2, fs=fs), s2)
 
     lips = endpoints.TwoPortFlanaganRadiator()
-    sys = cascade.cascade(sys,lips(areas[-1],fs=fs,sample_kws={'method':'bilinear'}))
+    sys = cascade.cascade(
+        sys, lips(areas[-1], fs=fs, sample_kws={"method": "bilinear"})
+    )
+
+    vf_src = endpoints.VFFlowSource()
+    sys = cascade.cascade(vf_src(areas[0], fs=fs), sys)
+
+    print(sys.C[1, :])
+    print(sys.D[1, :])
 
     sys = sys.to_tf()
 
