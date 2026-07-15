@@ -26,6 +26,14 @@ def test_junction():
     assert np.allclose(sys2.D, D)
 
 
+def test_lips():
+    lips = endpoints.TwoPortFlanaganRadiator()
+
+    area = vocaltract_areas["aa"][-1]
+    fs = 44100
+    lips(area, fs=fs)
+
+
 def _test_chain():
     areas = vocaltract_areas["aa"]
 
@@ -45,8 +53,16 @@ def _test_chain():
     print(sys)
 
 
+def test_vt_src_conn():
+    fs = 44100
+    area = vocaltract_areas["aa"][0]
+    bsegm = segments.DTBackwardDelay()(area, length, fs=fs)
+    vf_src = endpoints.VFFlowSource()(area, fs=fs)
+    sys = cascade.cascade(vf_src, bsegm)
+
+
 def _test_vt_components_letalker():
-    areas = vocaltract_areas["aa"]
+    areas = vocaltract_areas["ii"]
 
     fsegm = segments.DTForwardDelay()
     bsegm = segments.DTBackwardDelay()
@@ -74,13 +90,11 @@ def _test_vt_components_letalker():
     vf_src = endpoints.VFFlowSource()
     sys = cascade.cascade(vf_src(areas[0], fs=fs), sys)
 
-    print(sys.C[1, :])
-    print(sys.D[1, :])
-
     sys = sys.to_tf()
 
-    f, H = freqz(sys.num[0][0], sys.den[0][0], fs=fs)
+    f, H = freqz(sys.num[0][0], sys.den[0][0], fs=fs, worN=fs)
     plt.plot(f, 20 * np.log10(np.abs(H)))
+    plt.xlim(0, 4000)
     plt.show()
 
 

@@ -91,19 +91,19 @@ def cascade(
     out2 = np.ones(nout2, bool)
     out2[bwd_out] = False
 
-    B1t = ss1.B[:, in1]
-    B2t = ss2.B[:, in2]
-    C1t = ss1.C[out1, :]
-    C2t = ss2.C[out2, :]
+    B1t = ss1.B[:, in1].reshape(nst1, nin1t)
+    B2t = ss2.B[:, in2].reshape(nst2, nin2t)
+    C1t = ss1.C[out1, :].reshape(nout1t, nst1)
+    C2t = ss2.C[out2, :].reshape(nout2t, nst2)
 
     d1fb = ss1.D[fwd_out, bwd_in]
-    d1f = ss1.D[fwd_out, in1]
-    d1b = ss1.D[out1, bwd_in]
-    D1t = ss1.D[out1, in1]
+    d1f = ss1.D[fwd_out, in1].reshape(1, -1)
+    d1b = ss1.D[out1, bwd_in].reshape(-1, 1)
+    D1t = ss1.D[out1, in1].reshape(nout1t, nin1t)
     d2bf = ss2.D[bwd_out, fwd_in]
-    d2b = ss2.D[bwd_out, in2]
-    d2f = ss2.D[out2, fwd_in]
-    D2t = ss2.D[out2, in2]
+    d2b = ss2.D[bwd_out, in2].reshape(1, -1)
+    d2f = ss2.D[out2, fwd_in].reshape(-1, 1)
+    D2t = ss2.D[out2, in2].reshape(nout2t, nin2t)
 
     Qc = np.eye(2) - np.array([[0, d1fb], [d2bf, 0]])
     Cc = np.linalg.lstsq(

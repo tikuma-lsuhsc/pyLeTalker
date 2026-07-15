@@ -171,7 +171,7 @@ class TwoPortFlanaganRadiator(LTISinkFactory):
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
     ) -> ct.StateSpace:
-        """Two-port reflective version of Flanagan's model with a piston in an infinite buffle
+        """Two-port reflective version of Flanagan's model with a piston in an infinite baffle
 
         Parameters
         ----------
