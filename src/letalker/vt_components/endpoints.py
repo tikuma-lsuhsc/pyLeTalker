@@ -217,21 +217,22 @@ class TwoPortAcousticRadiator(LTISinkFactory):
         z = self.rhoc / area
         a = cast(float, ss.D[0, 0]) / z
 
-        nst = ss.nstates
+        # IN: F1
+        # OUT: Prad, B1
 
         den = a + 1
         c0 = ss.C / den
         d0 = (a - 1) / den
 
         C = np.tile(c0, (2, 1))
-        D = np.array([[d0], [1 + d0]])
-        # Q = np.array([[0, a + 1], [1, -1]])
-        # C = np.linalg.lstsq(Q, np.block([[ss.C], [np.zeros((1, nst))]]))[0]
-        # D = np.linalg.lstsq(Q, np.array([[a - 1], [1]]))[0]
-        A = ss.A - ss.B @ C[0, :] / z
-        B = ss.B * ((1 - D[0, 0]) / z)
+        D = np.array([[1 + d0], [d0]])
+        A = ss.A - ss.B @ C[1, :] / z
+        B = ss.B * ((1 - D[1, 0]) / z)
 
-        sys = cast(ct.StateSpace, ct.ss(A, B, C, D, dt=ss.dt))
+        sys = cast(
+            ct.StateSpace,
+            ct.ss(A, B, C, D, dt=ss.dt, inputs=["F1"], outputs=["Prad", "B1"]),
+        )
 
         if sample_last and fs is not None:
             sys = sys.sample(1 / fs, **(sample_kws or {}))
@@ -258,7 +259,7 @@ class TwoPortStoryRadiator(LTISinkFactory):
         sample_kws: dict[str, Any] | None = None,
         sample_last: bool = False,
     ) -> ct.TransferFunction:
-        """Two-port reflective version of Flanagan's model with a piston in an infinite baffle
+        """Discrete-time two-port reflective version of Flanagan's model with a piston in an infinite baffle
 
         Parameters
         ----------
@@ -298,8 +299,14 @@ class TwoPortStoryRadiator(LTISinkFactory):
         Pnum = [(b2 + a2) / b2, (a1 - b1) / b2]
         Pden = [1, -b1 / b2]
 
-        # [B1;P] <- [F1]
-        return ct.tf([[B1num], [Pnum]], [[B1den], [Pden]], 1 / fs)
+        # [P;B1] <- [F1]
+        return ct.tf(
+            [[Pnum], [B1num]],
+            [[Pden], [B1den]],
+            1 / fs,
+            inputs=["F1"],
+            outputs=["Prad", "B1"],
+        )
 
 
 class VFFlowSource(LTISourceFactory):
@@ -313,7 +320,8 @@ class VFFlowSource(LTISourceFactory):
     Returns
     -------
         _description_
-    """    
+    """
+
     rhoc: float = rhoc_default
 
     def __init__(self, rhoc: float | None = None):
@@ -335,5 +343,70 @@ class VFFlowSource(LTISourceFactory):
             np.zeros([0, 2]),
             np.zeros([1, 0]),
             np.array([[self.rhoc / area, 1.0]]),
+            fs and 1 / fs,
+        )
+
+
+class VFFlowSink(LTISinkFactory):
+    """Inferior face of vocal folds interfacing the the first segment of the vocal tract
+
+    Parameters
+    ----------
+    LTISourceFactory
+        _description_
+
+    Returns
+    -------
+        _description_
+    """
+
+    rhoc: float = rhoc_default
+
+    def __init__(self, rhoc: float | None = None):
+
+        if rhoc is not None:
+            self.rhoc = rhoc
+
+    def __call__(
+        self,
+        area: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
+    ) -> ct.StateSpace:
+
+        # input: F1, Ug
+        # output: B2
+
+        return ct.StateSpace(
+            np.zeros([0, 0]),
+            np.zeros([0, 2]),
+            np.zeros([1, 0]),
+            np.array([[1.0, -self.rhoc / area]]),
+            fs and 1 / fs,
+        )
+
+
+class ResistiveLoadSink(LTISinkFactory):
+    def __call__(
+        self,
+        area: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+        sample_last: bool = False,
+    ) -> ct.StateSpace:
+
+        # INPUT: F1
+        # OUTPUT: P, B1
+
+        r = 0.9
+
+        return ct.StateSpace(
+            np.zeros([0, 0]),
+            np.zeros([0, 1]),
+            np.zeros([2, 0]),
+            np.array([[1 + r], [r]]),
             fs and 1 / fs,
         )

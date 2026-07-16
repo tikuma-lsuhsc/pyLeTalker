@@ -6,7 +6,7 @@ from letalker.constants import vocaltract_areas
 from letalker.constants import vocaltract_resolution as length
 from letalker.vt_components import cascade, endpoints, junctions, segments
 
-areas = vocaltract_areas["ii"]
+areas = vocaltract_areas["aa"]
 
 fsegm = segments.DTForwardDelay()
 bsegm = segments.DTBackwardDelay()
@@ -39,6 +39,6 @@ sys = cascade.cascade(vf_src(areas[0], fs=fs), sys)
 sys = sys.to_tf()
 
 f, H = freqz(sys.num[0][0], sys.den[0][0], fs=fs, worN=fs)
-plt.plot(f, 20 * np.log10(np.abs(H)))
-plt.xlim(0, 4000)
+plt.plot(f[1:], 20 * np.log10(np.abs(H[1:])))
+plt.xlim(0, 5000)
 plt.show()
