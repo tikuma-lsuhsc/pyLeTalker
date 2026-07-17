@@ -1,222 +1,211 @@
 # State-space representation of a series acoustic impedance (propagation delay/viscous/laminar loss)
 
 A series (per-unit-length) acoustic impedance modeled by an LTI transfer function $Z_p(s) = P_p(s)/U(s)$. This model may represent signal propagation, viscous loss, a laminar loss, or a combination thereof. As the acoustic wave flows through a segment at a rate $U$, its input pressure $P_1$ and the output pressure $P_2$ differ and satisfies the pressure conseration:
+
 $$
 P_1 = P_p + P_2 = Z_pU + P_2
 $$
-In terms of the partial pressures, we get
+
+The partial pressures are governed by
+
 $$
 \begin{align}
-F_1 + B_1 &= Z_p U + F_2 + B_2\\
+F_1 + B_1 &= P_p + F_2 + B_2\\
 \frac{F_1-B_1}{Z} &= \frac{F_2-B_2}{Z} = U\\
 \end{align}
 $$
+
 where $Z = \rho c / A$ with the tube segment's cross-sectional area $A$.
 
+We want to find a two-port representation of  this series impedance in the form:
 
-
-
-
-Let $\mathbf{A}_v$, $\mathbf{b}_v$, $\mathbf{c}_v$, and $d_v$
-as the state-space matrices of this transfer function. (Though $H_v$ is a 
-first-order system, we assume $H_v$ is of an arbitrary order.) Then, we have
-$$\begin{align}
-\dot{\mathbf{s}} &= \mathbf{A}_v \mathbf{s} + \mathbf{b}_v U\\
-P_v &= \mathbf{c}_v \mathbf{s} + d_v U\\
-\end{align}$$
-We want to find an encompassing system:
-$$\begin{align}
+$$
+\begin{align}
 \dot{\mathbf{s}} &= \mathbf{A} \mathbf{s} + \mathbf{B}\begin{bmatrix}F_1\\B_2\end{bmatrix}\\
 \begin{bmatrix}F_2\\B_1\end{bmatrix} &= \mathbf{C} \mathbf{s} + \mathbf{D} \begin{bmatrix}F_1\\B_2\end{bmatrix}\\
-\end{align}$$
-
-The governing equations are
-
-$$\begin{align}
-F_1+B_1 &= P_v + F_2 + B_2\\
-\frac{1}{Z}(F_1-B_1) &= \frac{1}{Z}(F_2-B_2)
-\end{align}$$
-
-Here, the tube cross-sectional area is fixed so the impedance is a constant $Z$. Substitute (51) into (54) and express (54) and (55) for $F_2$ and $B_1$:
-
-$$\begin{align}
-\mathbf{c}_v \mathbf{s} + d_vZ^{-1} (F_2-B_2) + F_2 + B_2 &= F_1+B_1\\
-(d_vZ^{-1}+1) F_2 - B_1 &= F_1 + (d_vZ^{-1}-1) B_2 - \mathbf{c}_v \mathbf{s}\\
-\frac{1}{Z}(F_2 + B_1) &= \frac{1}{Z}(F_1+B_2)
-\end{align}$$
-
-Solve for $F_2$ and $B_1$ in a matrix-vector format:
-
-$$\begin{aligned}
-\begin{bmatrix}
-d_vZ^{-1}+1 & -1\\
-Z^{-1} & Z^{-1}
-\end{bmatrix}
-\begin{bmatrix}F_2\\B_1\end{bmatrix}
-&=
-\begin{bmatrix}
--\mathbf{c}_v\\
-0\\
-\end{bmatrix}\mathbf{s}_w
-+
-\begin{bmatrix}
-1 & d_vZ^{-1}-1\\
-Z^{-1} & Z^{-1}
-\end{bmatrix}
-\begin{bmatrix}F_1\\B_2\end{bmatrix}\\
-\begin{bmatrix}F_2\\B_1\end{bmatrix}
-&=
-\frac{1}{d_vZ^{-1} + 2}
-\begin{bmatrix}
--1 & d_v-Z\\
-1 & -Z
-\end{bmatrix}
-\left(
-\begin{bmatrix}
--\mathbf{c}_v\\
-0\\
-\end{bmatrix}\mathbf{s}_w
-+
-\begin{bmatrix}
-1 & d_vZ^{-1}-1\\
-Z^{-1} & Z^{-1}
-\end{bmatrix}
-\begin{bmatrix}F_1\\B_2\end{bmatrix}\\
-\right)\\
-&=
-\frac{1}{d_vZ^{-1} + 2}
-\left(
-\begin{bmatrix}
-\mathbf{c}_v\\
--\mathbf{c}_v\\
-\end{bmatrix}\mathbf{s}_w
-+
-\begin{bmatrix}
-2 & Z^{-1}d_v\\
-Z^{-1}d_v & 2
-\end{bmatrix}
-\begin{bmatrix}F_1\\B_2\end{bmatrix}\right)\\
-&=
-\frac{1}{A d_v + 2 \rho c}\left(
-\begin{bmatrix}
-\mathbf{c}_v\\
--\mathbf{c}_v\\
-\end{bmatrix}\mathbf{s}_w
-+
-\begin{bmatrix}
-2\rho c & A d_v\\
-A d_v & 2\rho c
-\end{bmatrix}
-\begin{bmatrix}
-F_1\\B_2
-\end{bmatrix}\right)\\
-\end{aligned}$$
-
-Now, for the state update equation, use partial pressures as the input
-
-$$
-\dot{\mathbf{s}}_v = \mathbf{A}_v \mathbf{s}_v + \mathbf{b}_v\frac{A}{\rho c}(F_1-B_1)
+\end{align}
 $$
 
-Substitute the output equation for $B_1$:
+## Case 1: Proper $Z_p(s)$
 
-$$\begin{aligned}
-\dot{\mathbf{s}}_v &= \mathbf{A}_v \mathbf{s}_v + \mathbf{b}_v\frac{A}{\rho c}\left[F_1-\left(-\mathbf{c}_v\mathbf{s}_v + \frac{1}{A d_v + 2 \rho c}
+If $Z_p(s)$ is proper, there exists a state-space representation:
+
+$$
+\begin{align}
+\dot{\mathbf{s}} &= \mathbf{A}_p \mathbf{s} + \mathbf{b}_p U\\
+P_p &= \mathbf{c}_p \mathbf{s} + d_p U\\
+\end{align}
+$$
+
+Substituting (4) into (1), we get a system of  3 equations:
+
+$$
 \begin{bmatrix}
-A d_v & 2\rho c
+  1 & -1 & d_p\\
+  0 & Z^{-1} & 1\\
+  Z^{-1} & 0 & 1\\
 \end{bmatrix}
 \begin{bmatrix}
-F_1\\B_2
-\end{bmatrix}\right)\right]\\
-&= \left[\mathbf{A}_v + \mathbf{b}_v \frac{1}{A d_v + 2 \rho c}\frac{A}{\rho c}\mathbf{c}_v\right]\mathbf{s}_v
-+ \mathbf{b}_v\frac{2A}{A d_v + 2 \rho c}
+  F_2\\B_1\\U
+\end{bmatrix}=
 \begin{bmatrix}
-1 & -1
+  \mathbf{c}_p\\\mathbf{0}\\\mathbf{0}
+\end{bmatrix}
+\mathbf{s}
++\begin{bmatrix}
+  1 & -1\\
+  Z^{-1} & 0\\
+  0 & Z^{-1}
 \end{bmatrix}
 \begin{bmatrix}
-F_1\\B_2
+  F_1\\B_2
+\end{bmatrix}
+$$
+
+Solving this yields
+
+$$
+\begin{equation}
+\begin{bmatrix}
+  F_2\\B_1\\U
+\end{bmatrix}=
+\begin{bmatrix}
+  \mathbf{C}\\
+  \mathbf{c}_u\\
+\end{bmatrix}
+\mathbf{s}
++\begin{bmatrix}
+  \mathbf{D}\\
+  \mathbf{d}_u\\
+\end{bmatrix}
+\begin{bmatrix}
+  F_1\\B_2
+\end{bmatrix}
+\end{equation}
+$$
+
+where
+
+$$
+\begin{align}
+\begin{bmatrix}
+  \mathbf{C}\\\mathbf{c}_u
+\end{bmatrix}&=
+\begin{bmatrix}
+  1 & -1 & d_p\\
+  0 & Z^{-1} & 1\\
+  Z^{-1} & 0 & 1\\
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+  \mathbf{c}_p\\\mathbf{0}\\\mathbf{0}
 \end{bmatrix}\\
-\end{aligned}$$
-
-Hence, we have the yielding-wall block:
-
-$$\begin{align}
-\mathbf{A} &= \mathbf{A}_v + \mathbf{b}_v \frac{1}{A d_v + 2 \rho c}\frac{A}{\rho c}\mathbf{c}_v\\
-\mathbf{B} &= \mathbf{b}_v\frac{2A}{A d_v + 2 \rho c}
 \begin{bmatrix}
-1 & -1
-\end{bmatrix}\\
-\mathbf{C} &= \frac{1}{A d_v + 2 \rho c}\begin{bmatrix}1\\-1\\\end{bmatrix}\mathbf{c}_v\\
-\mathbf{D} &= \frac{1}{A d_v + 2 \rho c}
+  \mathbf{D}\\\mathbf{d}_u
+\end{bmatrix}&=
 \begin{bmatrix}
-2\rho c & A d_v\\
-A d_v & 2\rho c
+  1 & -1 & d_p\\
+  0 & Z^{-1} & 1\\
+  Z^{-1} & 0 & 1\\
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+  1 & -1\\
+  Z^{-1} & 0\\
+  0 & Z^{-1}
 \end{bmatrix}
-\end{align}$$
+\end{align}
+$$
 
-## For the loss model in an improper first-order TF 
-Now if the series block is represented by an improper first-order transfer function, a la the RL viscous loss model, Story Eq (2.72)...
+The two-port state equation is found by substituting the $U=\mathbf{c}_u\mathbf{s}+\mathbf{d}_u[F_1\ B_2]^T$ into (5) with the matrices:
 
-$$\begin{equation}
-P_v = R_v U + L_v \dot{U}
-\end{equation}$$
+$$
+\begin{align}
+\mathbf{A} &= \mathbf{A}_p + \mathbf{b}_p\mathbf{c}_u\\
+\mathbf{B} &= \mathbf{b}_p\mathbf{d}_u
+\end{align}
+$$
 
-This system does not have a state-space representation, so the above derivation cannot be used. Here, we use $U$ as the state variable $s$, and solve the system of equations for $F_2$, $B_1$, and $\dot{s}$. The governing equations are
+## Case 2: Improper $Z_p(s)$
 
-$$\begin{align}
-F_1 + B_1 &= R_v s + L_v \dot{s} + F_2 + B_2\\
-s &= \frac{1}{Z}(F_1-B_1)\\
-s &= \frac{1}{Z}(F_2-B_2)\\
-\end{align}$$
+If $Z_p(s)$ is improper, a two-port state-space representation must be sought with the admittance $Y_p = 1/Z_p$. (This is the more common case as the series element is usually inductive). Let a state-space representation of $Y_p$ be
 
-Manipulate the questions so that $F_2$, $B_1$, and $\dot{s}$ appear on the left hand side and $F_1$, $B_2$, and $s$ appear on the right hand side:
+$$
+\begin{align}
+\dot{\mathbf{s}} &= \mathbf{A}_y \mathbf{s} + \mathbf{b}_y P_p\\
+U &= \mathbf{c}_y \mathbf{s} + d_y P_p\\
+\end{align}
+$$
 
-$$\begin{align}
-L_v\dot{s} + F_2 - B_1 &= -R_vs+F_1 - B_2\\
-\frac{1}{Z}B_1 &= -s + \frac{1}{Z}F_1 \\
-\frac{1}{Z} F_2  &= s + \frac{1}{Z}B_2\\
-\end{align}$$
+and the three governing equations are:
 
-Convert the equations to a matrix-vector equation and solve for $[\dot{s}\ F_2\ B_1]^T$:
+$$
+\begin{align}
+  F_1+B_1 &= F_2+B_2+P_p\\
+  Z^{-1}F_1 - Z^{-1}B_1 &= \mathbf{c}_y \mathbf{s} + d_y P_p\\
+  Z^{-1}F_2 - Z^{-1}B_2 &= \mathbf{c}_y \mathbf{s} + d_y P_p\\
+\end{align}
+$$
 
-$$\begin{align}
-\begin{bmatrix} 
-L_v & 1 & -1\\
-0 & 0 & 1/Z\\
-0 & 1/Z & 0\\
-\end{bmatrix} \begin{bmatrix}\dot{s}\\F_2\\B_1\end{bmatrix} &= \begin{bmatrix}-R_v & 1 & -1\\
--1 & 1/Z & 0\\
-1 & 0 & 1/Z\\
-\end{bmatrix} \begin{bmatrix}s\\F_1\\B_2\end{bmatrix}\\
-\begin{bmatrix}\dot{s}\\F_2\\B_1\end{bmatrix} &= 
+Formulating them as a vector-matrix format:
+
+$$
 \begin{bmatrix}
-    1/L_v & Z/L_v & Z/L_v\\
-    0 & 0 & Z\\
-    0 & Z & 0
+  1 & -1 & 1\\
+  0 & Z^{-1} & d_y\\
+  Z^{-1} & 0 & -d_y\\
 \end{bmatrix}
 \begin{bmatrix}
-    -R_v & 1 & -1\\
-    -1 & 1/Z & 0\\
-    1 & 0 & 1/Z
-\end{bmatrix} \\
-\begin{bmatrix}\dot{s}\\F_2\\B_1\end{bmatrix}
-&= 
+  F_2\\B_1\\P_p
+\end{bmatrix}=
 \begin{bmatrix}
-    -\frac{R_v+2Z}{L_v} & \frac{2}{L_v} & -\frac{2}{L_v}\\
-    Z & 0 & 1\\
-    -Z & 1 & 0
-\end{bmatrix} 
-\begin{bmatrix}s\\F_1\\B_2\end{bmatrix}
-\end{align}$$
+  \mathbf{0}\\-\mathbf{c}_y\\\mathbf{c}_y
+\end{bmatrix}
+\mathbf{s}
++\begin{bmatrix}
+  1 & -1\\
+  Z^{-1} & 0\\
+  0 & Z^{-1}
+\end{bmatrix}
+\begin{bmatrix}
+  F_1\\B_2
+\end{bmatrix}
+$$
 
-Accordingly, the resulting statespace coefficients are:
+Solving this equation yields the output equation matrices and $P_p=\mathbf{c}_v\mathbf{s}+\mathbf{d}_v[F_1\ B_2]^T$:
 
-$$\begin{align}
-A &= -\frac{R_v+2Z}{L_v} \\
-\mathbf{B} &= \frac{2}{L_v} \begin{bmatrix} 1 & -1\end{bmatrix}\\
-\mathbf{C} &= Z \begin{bmatrix}1\\-1\end{bmatrix}\\
-\mathbf{D} &= \begin{bmatrix}
-     0 & 1\\
-    1 & 0
+$$
+\begin{align}
+\begin{bmatrix}
+  \mathbf{C}\\\mathbf{c}_v
+\end{bmatrix}&=
+\begin{bmatrix}
+  1 & -1 & 1\\
+  0 & Z^{-1} & d_y\\
+  Z^{-1} & 0 & -d_y\\
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+  \mathbf{0}\\-\mathbf{c}_y\\\mathbf{c}_y
 \end{bmatrix}\\
-\end{align}$$
+\begin{bmatrix}
+  \mathbf{D}\\\mathbf{d}_v
+\end{bmatrix}&=
+\begin{bmatrix}
+  1 & -1 & 1\\
+  0 & Z^{-1} & d_y\\
+  Z^{-1} & 0 & -d_y\\
+\end{bmatrix}^{-1}
+\begin{bmatrix}
+  1 & -1\\
+  Z^{-1} & 0\\
+  0 & Z^{-1}
+\end{bmatrix}
+\end{align}
+$$
+
+and the two-port state equation matrices:
+
+$$
+\begin{align}
+\mathbf{A} &= \mathbf{A}_p + \mathbf{b}_y\mathbf{c}_v\\
+\mathbf{B} &= \mathbf{b}_p\mathbf{d}_v
+\end{align}
+$$
