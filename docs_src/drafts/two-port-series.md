@@ -37,24 +37,34 @@ P_p &= \mathbf{c}_p \mathbf{s} + d_p U\\
 \end{align}
 $$
 
-Substituting (4) into (1), we get a system of  3 equations:
+With these equation, we now have a system of three equations to solve:
+
+$$
+\begin{align}
+F_1 + B_1 &= F_2 + B_2 + \mathbf{c}_p \mathbf{s} + d_p U\\
+\frac{F_1-B_1}{Z} &= \frac{F_2-B_2}{Z} \\
+\frac{F_2-B_2}{Z} &= U\\
+\end{align}
+$$
+
+In matrix-vector formulation, we get
 
 $$
 \begin{bmatrix}
   1 & -1 & d_p\\
-  0 & Z^{-1} & 1\\
-  Z^{-1} & 0 & 1\\
+  Z^{-1} & Z^{-1} & 0\\
+  Z^{-1} & 0 & -1\\
 \end{bmatrix}
 \begin{bmatrix}
   F_2\\B_1\\U
 \end{bmatrix}=
 \begin{bmatrix}
-  \mathbf{c}_p\\\mathbf{0}\\\mathbf{0}
+  -\mathbf{c}_p\\\mathbf{0}\\\mathbf{0}
 \end{bmatrix}
 \mathbf{s}
 +\begin{bmatrix}
   1 & -1\\
-  Z^{-1} & 0\\
+  Z^{-1} & Z^{-1}\\
   0 & Z^{-1}
 \end{bmatrix}
 \begin{bmatrix}
@@ -93,11 +103,11 @@ $$
 \end{bmatrix}&=
 \begin{bmatrix}
   1 & -1 & d_p\\
-  0 & Z^{-1} & 1\\
-  Z^{-1} & 0 & 1\\
+  Z^{-1} & Z^{-1} & 0\\
+  Z^{-1} & 0 & -1\\
 \end{bmatrix}^{-1}
 \begin{bmatrix}
-  \mathbf{c}_p\\\mathbf{0}\\\mathbf{0}
+  -\mathbf{c}_p\\\mathbf{0}\\\mathbf{0}
 \end{bmatrix}\\
 \begin{bmatrix}
   \mathbf{D}\\\mathbf{d}_u
@@ -105,11 +115,11 @@ $$
 \begin{bmatrix}
   1 & -1 & d_p\\
   0 & Z^{-1} & 1\\
-  Z^{-1} & 0 & 1\\
+  Z^{-1} & 0 & -1\\
 \end{bmatrix}^{-1}
 \begin{bmatrix}
   1 & -1\\
-  Z^{-1} & 0\\
+  Z^{-1} & Z^{-1}\\
   0 & Z^{-1}
 \end{bmatrix}
 \end{align}
@@ -140,7 +150,7 @@ and the three governing equations are:
 $$
 \begin{align}
   F_1+B_1 &= F_2+B_2+P_p\\
-  Z^{-1}F_1 - Z^{-1}B_1 &= \mathbf{c}_y \mathbf{s} + d_y P_p\\
+  Z^{-1}F_1 - Z^{-1}B_1 &= Z^{-1}F_2 - Z^{-1}B_2\\
   Z^{-1}F_2 - Z^{-1}B_2 &= \mathbf{c}_y \mathbf{s} + d_y P_p\\
 \end{align}
 $$
@@ -150,19 +160,19 @@ Formulating them as a vector-matrix format:
 $$
 \begin{bmatrix}
   1 & -1 & 1\\
-  0 & Z^{-1} & d_y\\
+  Z^{-1} & Z^{-1} & 0\\
   Z^{-1} & 0 & -d_y\\
 \end{bmatrix}
 \begin{bmatrix}
   F_2\\B_1\\P_p
 \end{bmatrix}=
 \begin{bmatrix}
-  \mathbf{0}\\-\mathbf{c}_y\\\mathbf{c}_y
+  \mathbf{0}\\\mathbf{0}\\\mathbf{c}_y
 \end{bmatrix}
 \mathbf{s}
 +\begin{bmatrix}
   1 & -1\\
-  Z^{-1} & 0\\
+  Z^{-1} & Z^{-1}\\
   0 & Z^{-1}
 \end{bmatrix}
 \begin{bmatrix}
@@ -179,23 +189,23 @@ $$
 \end{bmatrix}&=
 \begin{bmatrix}
   1 & -1 & 1\\
-  0 & Z^{-1} & d_y\\
+  Z^{-1} & Z^{-1} & 0\\
   Z^{-1} & 0 & -d_y\\
 \end{bmatrix}^{-1}
 \begin{bmatrix}
-  \mathbf{0}\\-\mathbf{c}_y\\\mathbf{c}_y
+  \mathbf{0}\\\mathbf{0}\\\mathbf{c}_y
 \end{bmatrix}\\
 \begin{bmatrix}
   \mathbf{D}\\\mathbf{d}_v
 \end{bmatrix}&=
 \begin{bmatrix}
   1 & -1 & 1\\
-  0 & Z^{-1} & d_y\\
+  Z^{-1} & Z^{-1} & 0\\
   Z^{-1} & 0 & -d_y\\
 \end{bmatrix}^{-1}
 \begin{bmatrix}
   1 & -1\\
-  Z^{-1} & 0\\
+  Z^{-1} & Z^{-1}\\
   0 & Z^{-1}
 \end{bmatrix}
 \end{align}

@@ -10,13 +10,19 @@ areas = vocaltract_areas["aa"]
 fs = 44100
 sample_kws = {"method": "bilinear"}
 
-z1 = segments.DefaultLosslessPropagationTF()
-z2 = segments.DefaultViscousLossTF(drop_reactive=False)
-z3 = segments.DefaultLaminarResistance()
-s = segments.SeriesNetwork(z1, z2, z3)
-sys = s(
-    areas[0], length, _use_improper=False
-)  # , fs=fs, sample_kws=sample_kws, sample_last=True)
+
+series = segments.SeriesNetwork(
+    segments.DefaultLosslessPropagationTF(),
+    segments.DefaultViscousLossTF(drop_reactive=False),
+    segments.DefaultLaminarResistance(),
+)
+shunt = segments.ShuntNetwork(
+    segments.DefaultYieldingWall(), segments.DefaultHeatLossGain()
+)
+
+segm = segments.TSegment(series, shunt)
+
+sys = segm(areas[0], length)  # , fs=fs, sample_kws=sample_kws, sample_last=True)
 print(sys)
 
 ct.bode_plot(sys, omega_limits=(10, 20000))

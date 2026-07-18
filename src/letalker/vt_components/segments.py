@@ -7,14 +7,62 @@ from ..constants import c as c_default
 from ..constants import mu as mu_default
 from ..constants import rho_air as rho_air_default
 from ..constants import vt_atten as atten_default
-from .abc import LTISegmentFactory, LTISinkFactory, LTISourceFactory
+from .abc import LTIImpedanceFactory, LTISegmentFactory
 from .cascade import cascade
 
 rhoc_default = rho_air_default * c_default
 
 
-class DefaultYieldingWall(LTISegmentFactory):
-    """Yielding wall model by Milenkvic1988"""
+class DefaultLosslessPropagationTF(LTIImpedanceFactory):
+    """Flanagan's Acoustic L (without viscous loss)
+
+    .. math::
+
+      P/U = s L_a
+
+    where
+
+    .. math::
+
+      L_a = \rho/A
+
+    is the acoustic inertance per unit length.
+
+    """
+
+    rho: float = rho_air_default
+
+    def __init__(
+        self,
+        rho: float | None = None,
+    ):
+        super().__init__()
+
+        if rho is not None:
+            self.rho = rho
+
+    def __call__(
+        self,
+        area: float,
+        length: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.TransferFunction:
+
+        L = self.rho / area
+
+        tf = ct.tf([L * length, 0], [1])
+        assert isinstance(tf, ct.TransferFunction)
+
+        if fs is not None:
+            tf = 1 / (1 / tf).sample(1 / fs, **(sample_kws if sample_kws else {}))
+
+        return tf
+
+
+class DefaultYieldingWall(LTIImpedanceFactory):
+    """Yielding wall impedance by Milenkvic1988"""
 
     M: float = 1.5  # g/cm^2
     K: float = 33000  # dyne/cm^3
@@ -53,7 +101,6 @@ class DefaultYieldingWall(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
-        sample_last: bool = False,
     ) -> ct.LTI:
         """Create a tf model of one vocal tract segment
 
@@ -73,7 +120,7 @@ class DefaultYieldingWall(LTISegmentFactory):
         Cw = c / self.K
         Rw = self.B / c
 
-        tf = ct.tf([Cw, 0], [Lw * Cw, Rw * Cw, 1])
+        tf = ct.tf([Lw * Cw, Rw * Cw, 1], [Cw, 0])
         assert tf is not None
         return (
             tf
@@ -82,8 +129,8 @@ class DefaultYieldingWall(LTISegmentFactory):
         )
 
 
-class DefaultHeatLossGain(LTISegmentFactory):
-    """Fixed heat loss model"""
+class DefaultHeatLossGain(LTIImpedanceFactory):
+    """Fixed heat loss impedance model"""
 
     Gt: float = 8.07e-7 * 1.08 * 1000 * 0.5  # g/cm^2
 
@@ -107,25 +154,15 @@ class DefaultHeatLossGain(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
-        sample_last: bool = False,
     ) -> ct.LTI:
 
-        return ct.tf([self.Gt * length * area**-0.5], [1.0], dt=fs and 1 / fs)
+        return ct.tf([1.0], [self.Gt * length * area**-0.5], dt=fs and 1 / fs)
 
 
-class DefaultViscousLossTF(LTISegmentFactory):
-    """Viscous loss model by Story 1995
+class DefaultViscousLossTF(LTIImpedanceFactory):
+    """Flangan's Acoustic R, viscous loss model"""
 
-    Parameters
-    ----------
-    LTISegmentFactory
-        _description_
-
-    Returns
-    -------
-        _description_
-    """
-
+    drop_reactive: bool = False
     omega: float = np.pi * 2000  # default: 1000 Hz (Story, 1995)
     rho: float = rho_air_default
     mu: float = mu_default
@@ -135,11 +172,15 @@ class DefaultViscousLossTF(LTISegmentFactory):
 
     def __init__(
         self,
+        drop_reactive: bool = False,
         omega: float | None = None,
         rho: float | None = None,
         mu: float | None = None,
     ):
         super().__init__()
+
+        if drop_reactive:
+            self.drop_reactive = True
 
         if omega is not None or rho is not None or mu is not None:
             if rho is None:
@@ -168,7 +209,6 @@ class DefaultViscousLossTF(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
-        sample_last: bool = False,
     ) -> ct.LTI:
 
         # r = (area / np.pi) ** 0.5
@@ -176,9 +216,12 @@ class DefaultViscousLossTF(LTISegmentFactory):
         a = 2 * (np.pi / area) ** 0.5 / area
 
         Rvsc = a * self._r_const * length
-        Lvsc = (self.rho / area + a * self._l_const) * length
+        if self.drop_reactive:
+            tf = ct.tf([Rvsc], [1])
+        else:
+            Lvsc = a * self._l_const * length
+            tf = ct.tf([Lvsc, Rvsc], [1])
 
-        tf = ct.tf([Lvsc, Rvsc], [1])
         assert isinstance(tf, ct.LTI)
 
         return (
@@ -188,7 +231,7 @@ class DefaultViscousLossTF(LTISegmentFactory):
         )
 
 
-class DefaultLaminarResistance(LTISegmentFactory):
+class DefaultLaminarResistance(LTIImpedanceFactory):
     """Fixed laminar resistance model"""
 
     mu: float = mu_default
@@ -206,7 +249,6 @@ class DefaultLaminarResistance(LTISegmentFactory):
         *,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
-        sample_last: bool = False,
     ) -> ct.LTI:
 
         return ct.tf([8 * np.pi * self.mu * area**-2 * length], [1.0], dt=fs and 1 / fs)
@@ -218,12 +260,12 @@ class DefaultLaminarResistance(LTISegmentFactory):
 class ShuntNetwork(LTISegmentFactory):
     # Shunt networks representing flows into wall
 
-    _lti_factories: tuple[LTISegmentFactory]
+    _z_factories: tuple[LTISegmentFactory]
     rhoc: float = rhoc_default
 
     def __init__(
         self,
-        *p_to_u_lti_systems: tuple[LTISegmentFactory],
+        *impedance_factories: tuple[LTISegmentFactory],
         rhoc: float | None = None,
     ):
         """Factory of a 2-in/2-out wave-reflection two-port subsystem, which
@@ -231,9 +273,9 @@ class ShuntNetwork(LTISegmentFactory):
 
         Parameters
         ----------
-        p_to_u_lti_systems
-            factories to create continuous-time transfer functions from pressure
-            drop to to-wall flow rate that are present in parallel.
+        impedance_factories
+            factories to create continuous-time transfer functions from to-wall
+            flow rate to the pressure drop. All impedances are present in parallel.
 
             These yielding wall and heat loss functions (or gains). If
             non-assigned,
@@ -243,7 +285,7 @@ class ShuntNetwork(LTISegmentFactory):
             the system constant
         """
 
-        self._lti_factories = p_to_u_lti_systems
+        self._z_factories = impedance_factories
         if rhoc is not None:
             self.rhoc = rhoc
 
@@ -255,6 +297,7 @@ class ShuntNetwork(LTISegmentFactory):
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
         sample_last: bool = False,
+        _use_improper: bool = False,
     ) -> ct.LTI:
         """generate state-space models and iterate over n samples
 
@@ -266,35 +309,62 @@ class ShuntNetwork(LTISegmentFactory):
             length (in cm) of each tube section
         """
 
-        kws = {"fs": fs, "sample_kws": sample_kws}
+        kws = {} if sample_last else {"fs": fs, "sample_kws": sample_kws}
 
-        nsys = len(self._lti_factories)
-        Hw: ct.StateSpace = (
-            ct.parallel(*(f(area, length, **kws) for f in self._lti_factories))
-            if nsys
-            else ct.tf([0.0], [1.0], fs and 1 / fs)  # no flow loss
-        ).to_ss()
+        # calculate and combine all impedances into a single system
+        itY = (1 / f(area, length, **kws) for f in self._z_factories)
+        try:
+            Yz0 = next(itY)
+        except StopIteration:
+            Yz = ct.tf([0], [1], dt=fs and 1 / fs)
+        else:
+            Yz = sum(itY, start=Yz0)
+
+        assert Yz.issiso()
 
         Y = area / self.rhoc
-        dw = Hw.D[0, 0]
-        den = 2 * Y + dw
 
-        C = np.tile(-Hw.C / den, (2, 1))
-        D = np.array([[2 * Y, -dw], [-dw, 2 * Y]]) / den
-        A = Hw.A + Hw.B @ C[1:]
-        B = Hw.B @ (D[1:] + np.array([[1, 0]]))
+        # conditioned on the properness of Z
+        nznum, nzden = [len(n[0][0]) for n in (Yz.num, Yz.den)]
+        if nznum < nzden or (nznum == nzden and not _use_improper):
+            # use admittance
+            Hw: ct.StateSpace = Yz.to_ss()
 
-        return ct.StateSpace(A, B, C, D, dt=Hw.dt)
+            Q = np.array([[1, -1, 0], [1, 0, -1], [Y, Y, Hw.D[0, 0]]])
+            P = np.zeros((3, Hw.nstates))
+            P[2] = -Hw.C[0]
+            R = np.array([[1, -1], [0, -1], [Y, Y]])
+
+        else:
+            # use impedance
+            Hw: ct.StateSpace = (1 / Yz).to_ss()
+
+            Q = np.array([[1, -1, 0], [1, 0, -Hw.D[0, 0]], [Y, Y, 1]])
+            P = np.zeros((3, Hw.nstates))
+            P[1] = Hw.C[0]
+            R = np.array([[1, -1], [0, Y], [Y, Y]])
+
+        C, cu = np.vsplit(np.linalg.lstsq(Q, P)[0], [2])
+        D, du = np.vsplit(np.linalg.lstsq(Q, R)[0], [2])
+        A = Hw.A + Hw.B @ cu
+        B = Hw.B @ du
+
+        sys = ct.StateSpace(A, B, C, D, dt=Hw.dt)
+
+        if sample_last and fs is not None:
+            sys = sys.sample(1 / fs, **kws)
+
+        return sys
 
 
 class SeriesNetwork(LTISegmentFactory):
-    _lti_factories: tuple[LTISegmentFactory]
+    _z_factories: tuple[LTIImpedanceFactory]
     rhoc: float = rhoc_default
 
     def __init__(
         self,
         /,
-        *u_to_p_lti_systems: tuple[LTISegmentFactory],
+        *series_impedances: tuple[LTIImpedanceFactory],
         rhoc: float | None = None,
     ):
         """Factory of a 2-in/2-out wave-reflection two-port subsystem, which
@@ -302,7 +372,7 @@ class SeriesNetwork(LTISegmentFactory):
 
         Parameters
         ----------
-        u_to_p_lti_systems
+        series_impedances
             factories to create continuous-time transfer functions from flow to
             pressure drop that are present in series (or parallel in systems sense).
 
@@ -313,7 +383,7 @@ class SeriesNetwork(LTISegmentFactory):
             the system constant
         """
 
-        self._lti_factories = u_to_p_lti_systems
+        self._z_factories = series_impedances
 
         if rhoc is not None:
             self.rhoc = rhoc
@@ -326,50 +396,55 @@ class SeriesNetwork(LTISegmentFactory):
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
         sample_last: bool = False,
-    ) -> ct.LTI:
-        """generate a 2-in/2-out state-space model of from (F1,B2)->(F2,B1)
+        _use_improper: bool = False,
+    ) -> ct.StateSpace:
 
-        Args
-        ----
-        area
-            cross-sectional areas of tube sections
-        length
-            length (in cm) of each tube section
-        """
+        kws = {} if sample_last else {"fs": fs, "sample_kws": sample_kws}
 
-        rhoc = self.rhoc
-        kws = {"fs": fs, "sample_kws": sample_kws}
-
-        nsys = len(self._lti_factories)
-        Hv: ct.TransferFunction = (
-            ct.parallel(*(f(area, length, **kws) for f in self._lti_factories))
-            if nsys
-            else ct.tf([0], [1], dt=fs and 1 / fs)  # no pressure loss
-        ).to_tf()
-
-        if len(Hv.den[0][0]) == 1 and len(Hv.num[0][0]) == 2:
-            L, R = Hv.num[0][0] / Hv.den[0][0]
-            Z = rhoc / area
-            A = -(R + 2 * Z) / L
-            b = 2 / L
-            B = np.array([[b, -b]])
-            C = np.array([[Z], [-Z]])
-            D = np.array([[0, 1], [1, 0]])
+        # calculate and combine all impedances into a single system
+        itZ = (f(area, length, **kws) for f in self._z_factories)
+        try:
+            Z0 = next(itZ)
+        except StopIteration:
+            Z = ct.tf([0], [1], dt=fs and 1 / fs)
         else:
-            Hv: ct.StateSpace = Hv.to_ss()
-            two_rhoc = 2 * rhoc
-            ad = area * Hv.D[0, 0]
-            den = 1 / (ad + two_rhoc)
-            A = Hv.A - (Hv.B * den * area / rhoc) @ Hv.C
-            b = Hv.B * (2 * area * den)
-            B = np.concatenate([b, -b], 1)
-            c = den * Hv.C
-            C = np.concatenate([c, -c])
-            k1 = two_rhoc * den
-            k2 = ad * den
-            D = np.array([[k1, k2], [k2, k1]])
+            Z = sum(itZ, start=Z0)
 
-        return ct.StateSpace(A, B, C, D, dt=Hv.dt)
+        assert Z.issiso()
+
+        Y = area / self.rhoc
+
+        # conditioned on the properness of Z
+        nznum, nzden = [len(n[0][0]) for n in (Z.num, Z.den)]
+        if nznum < nzden or (nznum == nzden and not _use_improper):
+            # use impedance
+            Hv: ct.StateSpace = Z.to_ss()
+
+            Q = np.array([[1, -1, Hv.D[0, 0]], [Y, Y, 0], [Y, 0, -1]])
+            P = np.zeros((3, Hv.nstates))
+            P[0] = -Hv.C[0]
+            R = np.array([[1, -1], [Y, Y], [0, Y]])
+
+        else:
+            # use admittance
+            Hv: ct.StateSpace = (1 / Z).to_ss()
+
+            Q = np.array([[1, -1, 1], [Y, Y, 0], [Y, 0, -Hv.D[0, 0]]])
+            P = np.zeros((3, Hv.nstates))
+            P[-1] = Hv.C[0]
+            R = np.array([[1, -1], [Y, Y], [0, Y]])
+
+        C, cu = np.vsplit(np.linalg.lstsq(Q, P)[0], [2])
+        D, du = np.vsplit(np.linalg.lstsq(Q, R)[0], [2])
+        A = Hv.A + Hv.B @ cu
+        B = Hv.B @ du
+
+        sys = ct.StateSpace(A, B, C, D, dt=Hv.dt)
+
+        if sample_last and fs is not None:
+            sys = sys.sample(1 / fs, **kws)
+
+        return sys
 
 
 ######################
@@ -469,7 +544,7 @@ class DTForwardDelay(DTDelaySegmentBase):
             name="forward_delay",
             inputs=[f"F{input_id}", f"B{output_id}"],
             outputs=[f"F{output_id}", f"B{input_id}"],
-            states=[f"next_F{output_id}"]
+            states=[f"next_F{output_id}"],
         )
 
 
@@ -504,5 +579,5 @@ class DTBackwardDelay(DTDelaySegmentBase):
             name="forward_delay",
             inputs=[f"F{input_id}", f"B{output_id}"],
             outputs=[f"F{output_id}", f"B{input_id}"],
-            states=[f"next_B{input_id}"]
+            states=[f"next_B{input_id}"],
         )

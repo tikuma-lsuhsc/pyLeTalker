@@ -56,8 +56,8 @@ def cascade(
     -------
         cascaded system
     """
-    ss1 = cast(ct.StateSpace, ct.ss(sys1))
-    ss2 = cast(ct.StateSpace, ct.ss(sys2))
+    ss1 = cast(ct.StateSpace, sys1.to_ss())
+    ss2 = cast(ct.StateSpace, sys2.to_ss())
 
     nst1, nst2 = ss1.nstates, ss2.nstates
     nin1, nin2 = ss1.ninputs, ss2.ninputs
@@ -142,7 +142,7 @@ def cascade(
     sys.update_names(
         inputs=[*names1in, *names2in],
         outputs=[*names2out, *names1out],
-        states=[*ss1.state_labels, *ss2.state_labels],
+        # states=[*ss1.state_labels, *ss2.state_labels],
     )
 
     # fwd_out, optional

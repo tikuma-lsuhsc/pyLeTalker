@@ -11,6 +11,41 @@ from ..core import TimeSampleHandler
 __all__ = ["TwoPortSystem"]
 
 
+class LTIImpedanceFactory(Protocol):
+    def __call__(
+        self,
+        area: float,
+        length: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.TransferFunction:
+        """Generate an LTI transfer function moedlign an acoustic impedance of a 
+        unit-length segment of a tube.
+
+        Parameters
+        ----------
+        area
+            cross-sectional area in cm²
+        length
+            segment length in cm
+        fs, optional
+            sampling rate in samples/second to create a discrete-time model,
+            by default the created model will be a continuous-time model.
+        sample_kws, optional
+            Keyword arguments to run ``ct.sample()`` function to discretize
+            the model, by default the default parameters of ``ct.sample()`` will
+            be used.
+        sample_last, optional
+            True to generate the subsystems in the continuous-time then
+            convert to the discrete time at the end, by default False to sample
+            the original continous-time systems
+
+        Returns
+        -------
+            Generated transfer function to produce acoustic pressure from acoustic flow
+        """
+
 class LTISegmentFactory(Protocol):
     def __call__(
         self,
