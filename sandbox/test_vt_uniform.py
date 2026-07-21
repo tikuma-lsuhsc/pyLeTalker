@@ -2,7 +2,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.signal import freqz
 
-from letalker.constants import vocaltract_areas
 from letalker.constants import vocaltract_resolution as length
 from letalker.vt_components import cascade, endpoints, junctions, segments
 
@@ -22,9 +21,9 @@ jct = junctions.LosslessJunction()
 
 segms = [
     cascade.chain(
-        bsegm(area1, length, fs=fs, input_id=2 * i + 1, output_id=2 * i + 2),
+        bsegm(area1, length, fs=fs),
         jct(area1, area2, fs=fs),
-        fsegm(area2, length, fs=fs, input_id=2 * i + 2, output_id=2 * i + 3),
+        fsegm(area2, length, fs=fs),
     )
     for i, (area1, area2) in enumerate(zip(areas[::2], areas[1::2]))
 ]
@@ -38,9 +37,9 @@ vf_src = endpoints.VFFlowSource()
 sys = cascade.cascade(vf_src(areas[0], fs=fs), sys)
 
 lips1 = endpoints.TwoPortAcousticRadiator()
-lips2 = endpoints.TwoPortStoryRadiator()#TwoPortAcousticRadiator()
+lips2 = endpoints.TwoPortStoryRadiator()  # TwoPortAcousticRadiator()
 
-for lips in (lips1,lips2):
+for lips in (lips1, lips2):
     tf = cascade.cascade(sys, lips(areas[-1], fs=fs, sample_kws=sample_kws)).to_tf()
 
     f, H = freqz(tf.num[0][0], tf.den[0][0], fs=fs, worN=fs)
@@ -48,5 +47,5 @@ for lips in (lips1,lips2):
 
 plt.xlim(10, 5000)
 
-plt.legend(['1','2'])
+plt.legend(["1", "2"])
 plt.show()

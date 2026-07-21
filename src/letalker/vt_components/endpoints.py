@@ -86,6 +86,8 @@ class LeTalkerLungs(LTISourceFactory):
             np.zeros([0, 0]),
             np.zeros([0, 2]),
             np.zeros([1, 0], np.array([[-0.8, 0.9]])),
+            inputs=["PL", "B1"],
+            outputs=["F1"],
         )
 
 
@@ -344,6 +346,8 @@ class VFFlowSource(LTISourceFactory):
             np.zeros([1, 0]),
             np.array([[self.rhoc / area, 1.0]]),
             fs and 1 / fs,
+            inputs=["Ug", "B2"],
+            outputs=["F2"],
         )
 
 
@@ -385,6 +389,8 @@ class VFFlowSink(LTISinkFactory):
             np.zeros([1, 0]),
             np.array([[1.0, -self.rhoc / area]]),
             fs and 1 / fs,
+            inputs=["F1"],
+            outputs=["Ug", "B1"],
         )
 
 
@@ -409,4 +415,6 @@ class ResistiveLoadSink(LTISinkFactory):
             np.zeros([2, 0]),
             np.array([[1 + r], [r]]),
             fs and 1 / fs,
+            inputs=["F1"],
+            outputs=["B1"],
         )

@@ -1,3 +1,4 @@
+from math import prod
 from typing import Any
 
 import control as ct
@@ -318,7 +319,7 @@ class ShuntNetwork(LTISegmentFactory):
         except StopIteration:
             Yz = ct.tf([0], [1], dt=fs and 1 / fs)
         else:
-            Yz = sum(itY, start=Yz0)
+            Yz = prod(itY, start=Yz0)
 
         assert Yz.issiso()
 
@@ -337,7 +338,7 @@ class ShuntNetwork(LTISegmentFactory):
 
         else:
             # use impedance
-            Hw: ct.StateSpace = (1 / Yz).to_ss()
+            Hw = (1 / Yz).to_ss()
 
             Q = np.array([[1, -1, 0], [1, 0, -Hw.D[0, 0]], [Y, Y, 1]])
             P = np.zeros((3, Hw.nstates))
@@ -349,7 +350,9 @@ class ShuntNetwork(LTISegmentFactory):
         A = Hw.A + Hw.B @ cu
         B = Hw.B @ du
 
-        sys = ct.StateSpace(A, B, C, D, dt=Hw.dt)
+        sys = ct.StateSpace(
+            A, B, C, D, dt=Hw.dt, inputs=["F1", "B2"], outputs=["F2", "B1"]
+        )
 
         if sample_last and fs is not None:
             sys = sys.sample(1 / fs, **kws)
@@ -408,7 +411,7 @@ class SeriesNetwork(LTISegmentFactory):
         except StopIteration:
             Z = ct.tf([0], [1], dt=fs and 1 / fs)
         else:
-            Z = sum(itZ, start=Z0)
+            Z = prod(itZ, start=Z0)
 
         assert Z.issiso()
 
@@ -439,7 +442,9 @@ class SeriesNetwork(LTISegmentFactory):
         A = Hv.A + Hv.B @ cu
         B = Hv.B @ du
 
-        sys = ct.StateSpace(A, B, C, D, dt=Hv.dt)
+        sys = ct.StateSpace(
+            A, B, C, D, dt=Hv.dt, inputs=["F1", "B2"], outputs=["F2", "B1"]
+        )
 
         if sample_last and fs is not None:
             sys = sys.sample(1 / fs, **kws)
@@ -541,10 +546,8 @@ class DTForwardDelay(DTDelaySegmentBase):
             C,
             D,
             1 / fs,
-            name="forward_delay",
-            inputs=[f"F{input_id}", f"B{output_id}"],
-            outputs=[f"F{output_id}", f"B{input_id}"],
-            states=[f"next_F{output_id}"],
+            inputs=["F1", "B2"],
+            outputs=["F2", "B1"],
         )
 
 
@@ -557,8 +560,6 @@ class DTBackwardDelay(DTDelaySegmentBase):
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
         sample_last: bool = False,
-        input_id: int = 1,
-        output_id: int = 2,
     ) -> ct.LTI:
 
         assert fs is not None, "DTBackwardDelay is discrete-time only"
@@ -576,8 +577,6 @@ class DTBackwardDelay(DTDelaySegmentBase):
             C,
             D,
             1 / fs,
-            name="forward_delay",
-            inputs=[f"F{input_id}", f"B{output_id}"],
-            outputs=[f"F{output_id}", f"B{input_id}"],
-            states=[f"next_B{input_id}"],
+            inputs=["F1", "B2"],
+            outputs=["F2", "B1"],
         )

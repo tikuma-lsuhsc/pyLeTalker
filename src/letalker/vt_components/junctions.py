@@ -16,6 +16,7 @@ class LTIJunctionFactory(Protocol):
         nb_inputs: int = 1,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
+        **kwargs,
     ) -> ct.StateSpace:
         """create a feed-through only two-port junction system
 
@@ -76,7 +77,8 @@ class LosslessJunction(LTIJunctionFactory):
         nb_inlets: int = 1,
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
-        _force_mimo: bool=False
+        _force_mimo: bool = False,
+        **kwargs,
     ) -> ct.StateSpace:
 
         nsegs = len(areas)
@@ -105,6 +107,14 @@ class LosslessJunction(LTIJunctionFactory):
             np.empty((2 * nout, 0)),
             np.linalg.lstsq(A, B)[0],
             dt=fs and 1 / fs,
+            inputs=[
+                *(f"F{i}" for i in range(1, nin + 1)),
+                *(f"B{i}" for i in range(1, nout + 1)),
+            ],
+            outnputs=[
+                *(f"F{i}" for i in range(1, nout + 1)),
+                *(f"B{i}" for i in range(1, nin + 1)),
+            ],
         )
 
     def _siso(self, area1: float, area2: float, fs: float | None) -> ct.StateSpace:
@@ -117,5 +127,11 @@ class LosslessJunction(LTIJunctionFactory):
         D = np.array([[2 * area1 / den, -d], [d, 2 * area2 / den]])
 
         return ct.ss(
-            np.empty((0, 0)), np.empty((0, 2)), np.empty((2, 0)), D, dt=fs and 1 / fs
+            np.empty((0, 0)),
+            np.empty((0, 2)),
+            np.empty((2, 0)),
+            D,
+            dt=fs and 1 / fs,
+            inputs=["F1", "B2"],
+            outputs=["F2", "B1"],
         )
