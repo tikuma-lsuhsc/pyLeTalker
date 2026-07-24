@@ -13,7 +13,7 @@ sample_kws = {"method": "bilinear"}
 
 series = segments.SeriesNetwork(
     segments.DefaultLosslessPropagationTF(),
-    segments.DefaultViscousLossTF(drop_reactive=False),
+    segments.DefaultViscousLossTF(resistive_only=False),
     segments.DefaultLaminarResistance(),
 )
 shunt = segments.ShuntNetwork(

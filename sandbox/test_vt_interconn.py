@@ -1,3 +1,5 @@
+from itertools import zip_longest
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy.signal import freqz
@@ -37,8 +39,6 @@ kwargs = {"fs": fs, "sample_kws": sample_kws}
 
 lips = endpoints.TwoPortAcousticRadiator()
 vf_src = endpoints.VFFlowSource()
-
-from itertools import zip_longest
 
 
 def iter_letalker(areas):

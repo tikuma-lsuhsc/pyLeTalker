@@ -1,4 +1,3 @@
-from math import prod
 from typing import Any
 
 import control as ct
@@ -163,7 +162,7 @@ class DefaultHeatLossGain(LTIImpedanceFactory):
 class DefaultViscousLossTF(LTIImpedanceFactory):
     """Flangan's Acoustic R, viscous loss model"""
 
-    drop_reactive: bool = False
+    resistive_only: bool = False
     omega: float = np.pi * 2000  # default: 1000 Hz (Story, 1995)
     rho: float = rho_air_default
     mu: float = mu_default
@@ -173,15 +172,15 @@ class DefaultViscousLossTF(LTIImpedanceFactory):
 
     def __init__(
         self,
-        drop_reactive: bool = False,
+        resistive_only: bool = False,
         omega: float | None = None,
         rho: float | None = None,
         mu: float | None = None,
     ):
         super().__init__()
 
-        if drop_reactive:
-            self.drop_reactive = True
+        if resistive_only:
+            self.resistive_only = True
 
         if omega is not None or rho is not None or mu is not None:
             if rho is None:
@@ -217,7 +216,7 @@ class DefaultViscousLossTF(LTIImpedanceFactory):
         a = 2 * (np.pi / area) ** 0.5 / area
 
         Rvsc = a * self._r_const * length
-        if self.drop_reactive:
+        if self.resistive_only:
             tf = ct.tf([Rvsc], [1])
         else:
             Lvsc = a * self._l_const * length
@@ -319,7 +318,7 @@ class ShuntNetwork(LTISegmentFactory):
         except StopIteration:
             Yz = ct.tf([0], [1], dt=fs and 1 / fs)
         else:
-            Yz = prod(itY, start=Yz0)
+            Yz = sum(itY, start=Yz0)
 
         assert Yz.issiso()
 
@@ -411,7 +410,7 @@ class SeriesNetwork(LTISegmentFactory):
         except StopIteration:
             Z = ct.tf([0], [1], dt=fs and 1 / fs)
         else:
-            Z = prod(itZ, start=Z0)
+            Z = sum(itZ, start=Z0)
 
         assert Z.issiso()
 
@@ -430,7 +429,7 @@ class SeriesNetwork(LTISegmentFactory):
 
         else:
             # use admittance
-            Hv: ct.StateSpace = (1 / Z).to_ss()
+            Hv = (1 / Z).to_ss()
 
             Q = np.array([[1, -1, 1], [Y, Y, 0], [Y, 0, -Hv.D[0, 0]]])
             P = np.zeros((3, Hv.nstates))
@@ -441,6 +440,9 @@ class SeriesNetwork(LTISegmentFactory):
         D, du = np.vsplit(np.linalg.lstsq(Q, R)[0], [2])
         A = Hv.A + Hv.B @ cu
         B = Hv.B @ du
+
+        C[np.isclose(C, [[0]])] = 0
+        D[np.isclose(D, [[0]])] = 0
 
         sys = ct.StateSpace(
             A, B, C, D, dt=Hv.dt, inputs=["F1", "B2"], outputs=["F2", "B1"]

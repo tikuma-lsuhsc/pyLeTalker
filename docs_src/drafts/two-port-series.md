@@ -219,3 +219,26 @@ $$
 \mathbf{B} &= \mathbf{b}_p\mathbf{d}_v
 \end{align}
 $$
+
+## Lossless Propagation (Flanagan's $L$)
+
+$$
+Z_p(s)=sL
+$$
+
+where
+
+$$
+L=\frac{\rho l}{A}
+$$
+
+with air density $\rho$, cross-sectional area $A$ and length $l$ of a tube section. This is a differentiator which has an improper transfer function. The equivalent admittance has a state-space representation:
+
+$$
+\begin{align}
+\dot{s} &= \frac{1}{L} P\\
+U &= s\\
+\end{align}
+$$
+
+or $A = [0]$, $B=[1/L]$, $C=[1]$, $D=[0]$.

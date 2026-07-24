@@ -325,11 +325,14 @@ class VFFlowSource(LTISourceFactory):
     """
 
     rhoc: float = rhoc_default
+    r: float = 1.0
 
-    def __init__(self, rhoc: float | None = None):
+    def __init__(self, r: float | None = None, rhoc: float | None = None):
 
         if rhoc is not None:
             self.rhoc = rhoc
+        if r is not None:
+            self.r = r
 
     def __call__(
         self,
@@ -338,17 +341,30 @@ class VFFlowSource(LTISourceFactory):
         fs: float | None = None,
         sample_kws: dict[str, Any] | None = None,
         sample_last: bool = False,
+        ct_returnn_delay: float = 1e-9,
     ) -> ct.StateSpace:
+
+        if fs is None:
+            ...
 
         return ct.StateSpace(
             np.zeros([0, 0]),
             np.zeros([0, 2]),
             np.zeros([1, 0]),
-            np.array([[self.rhoc / area, 1.0]]),
+            np.array([[self.rhoc / area, self.r]]),
             fs and 1 / fs,
             inputs=["Ug", "B2"],
             outputs=["F2"],
         )
+
+    def terminate(self, sys: ct.LTI, area: float) -> ct.StateSpace:
+        ss = sys.to_ss()
+        Q = np.array([[self.rhoc / area, 1.0], [0, 1]])  # F1/B2 => Ug/B2
+        ss.B = ss.B @ Q
+        (d11, d12), (d21, d22) = ss.D
+        # g1 =
+        # g2 = 1.0
+        Q = np.array([[1, -d11 * g2], [0, 1 - d21 * g2]])
 
 
 class VFFlowSink(LTISinkFactory):
