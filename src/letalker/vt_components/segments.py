@@ -8,12 +8,12 @@ from ..constants import mu as mu_default
 from ..constants import rho_air as rho_air_default
 from ..constants import vt_atten as atten_default
 from .abc import LTIImpedanceFactory, LTISegmentFactory
-from .cascade import cascade
+from .cascade import combine
 
 rhoc_default = rho_air_default * c_default
 
 
-class DefaultLosslessPropagationTF(LTIImpedanceFactory):
+class DefaultInertance(LTIImpedanceFactory):
     """Flanagan's Acoustic L (without viscous loss)
 
     .. math::
@@ -53,6 +53,39 @@ class DefaultLosslessPropagationTF(LTIImpedanceFactory):
         L = self.rho / area
 
         tf = ct.tf([L * length, 0], [1])
+        assert isinstance(tf, ct.TransferFunction)
+
+        if fs is not None:
+            tf = 1 / (1 / tf).sample(1 / fs, **(sample_kws if sample_kws else {}))
+
+        return tf
+
+
+class DefaultCompliance(LTIImpedanceFactory):
+    rhoc2: float = rho_air_default * c_default**2
+
+    def __init__(self, rho: float | None = None, c: float | None = None):
+        super().__init__()
+
+        if rho is not None or c is not None:
+            if rho is None:
+                rho = rho_air_default
+            if c is None:
+                c = c_default
+            self.rhoc2 = rho * c**2
+
+    def __call__(
+        self,
+        area: float,
+        length: float,
+        *,
+        fs: float | None = None,
+        sample_kws: dict[str, Any] | None = None,
+    ) -> ct.TransferFunction:
+
+        C = area / self.rhoc2
+
+        tf = ct.tf([0, 1], [C * length, 0])
         assert isinstance(tf, ct.TransferFunction)
 
         if fs is not None:
@@ -484,7 +517,9 @@ class TSegment(SegmentBase):
         series = self.series(area, length / 2)
         shunt = self.shunt(area, length)
 
-        sys = cascade(cascade(series, shunt), series)
+        sys = combine(combine(series, shunt), series)
+
+        # sys = cascade(cascade(series, shunt), series)
 
         if fs is None:
             return sys
@@ -506,7 +541,7 @@ class PiSegment(SegmentBase):
         shunt = self.shunt(area, length / 2)
         series = self.series(area, length)
 
-        sys = cascade(cascade(shunt, series), shunt)
+        sys = combine(combine(shunt, series), shunt)
         if fs is None:
             return sys
         return sys.sample(Ts=1 / fs, **(sample_kws or {}))

@@ -1,8 +1,7 @@
-import control as ct
 import numpy as np
 from matplotlib import pyplot as plt
 
-from letalker.constants import c, vocaltract_areas
+from letalker.constants import vocaltract_areas
 from letalker.constants import vocaltract_resolution as length
 from letalker.vt_components import segments
 
@@ -12,7 +11,7 @@ sample_kws = {"method": "bilinear"}
 
 
 series = segments.SeriesNetwork(
-    segments.DefaultLosslessPropagationTF(),
+    segments.DefaultInertance(),
     segments.DefaultViscousLossTF(resistive_only=False),
     segments.DefaultLaminarResistance(),
 )
@@ -21,37 +20,27 @@ shunt = segments.ShuntNetwork(
     segments.DefaultHeatLossGain(),
 )
 
-segm = segments.PiSegment(series, shunt)
+segm = segments.TSegment(series, shunt)
 
-sys = segm(areas[0], length)  # , fs=fs, sample_kws=sample_kws, sample_last=True)
-print(sys)
+sys = segm(areas[0], length * 44)
+dsys = sys.sample(1 / fs, **sample_kws)
+print(dsys)
 
-ct.bode_plot(sys, omega_limits=(10, 20000))
-plt.show()
-exit()
+tf = sys.to_tf()
+dtf = dsys.to_tf()
 
 f = np.arange(10, 5000, 1)
 omega = 2 * np.pi * f
-omega = 2 * np.pi * f
-domega = omega[1] - omega[0]
-resp = ct.frequency_response(sys, omega=omega)
 
-tau = length / c
-print(tau)
-sys2 = ct.tf([1, 0], [tau, 1])
-r2 = ct.frequency_response(sys2, omega=omega)
-print(sys2)
+from scipy.signal import freqs, freqz
 
-fig, ax = plt.subplots(3, 1)
-ax[0].plot(f, 20 * np.log10(resp.magnitude.reshape(4, -1).T))
-ax[0].plot(f, 20 * np.log10(r2.magnitude.reshape(1, -1).T))
-ax[1].plot(f, resp.phase.reshape(4, -1).T)
-ax[2].plot(
-    f[:-1],
-    -np.diff(resp.phase.reshape(4, -1).T, axis=0) / domega,
-    f[:-1],
-    -np.diff(r2.phase.reshape(1, -1).T, axis=0) / domega,
-)
-ax[2].axhline(tau, ls=":", c="k")
-plt.legend(["1", "2", "3", "4"])
+omega, H = freqs(tf.num[0][0], tf.den[0][0], omega)
+omega, Hz = freqz(dtf.num[0][0], dtf.den[0][0], f, fs)
+domega = np.diff(omega)
+
+fig, ax = plt.subplots(2, 1)
+ax[0].plot(f, 20 * np.log10(np.abs(H)))
+ax[0].plot(f, 20 * np.log10(np.abs(Hz)))
+ax[1].plot(f[:-1], -np.diff(np.angle(H[1:] / H[:-1]), axis=0) / domega)
+ax[1].plot(f[:-1], -np.diff(np.angle(Hz[1:] / Hz[:-1]), axis=0) / domega)
 plt.show()
